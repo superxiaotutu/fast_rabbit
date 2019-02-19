@@ -1,0 +1,6 @@
+model_checkpoint_path: "ocr-model-1-20001"
+all_model_checkpoint_paths: "ocr-model-1-1"
+all_model_checkpoint_paths: "ocr-model-1-5001"
+all_model_checkpoint_paths: "ocr-model-1-10001"
+all_model_checkpoint_paths: "ocr-model-1-15001"
+all_model_checkpoint_paths: "ocr-model-1-20001"
