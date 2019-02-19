@@ -25,3 +25,4 @@
 2/20 5:36:39 Epoch 241/10000, accuracy = 0.000, avg_train_cost = 8.971, lastbatch_err = 17.942, time = 0.566, lr=0.00480200
 2/20 5:37:14 Epoch 251/10000, accuracy = 0.000, avg_train_cost = 8.703, lastbatch_err = 17.406, time = 0.535, lr=0.00480200
 2/20 5:37:49 Epoch 261/10000, accuracy = 0.000, avg_train_cost = 8.870, lastbatch_err = 17.741, time = 0.562, lr=0.00480200
+2/20 5:38:25 Epoch 271/10000, accuracy = 0.000, avg_train_cost = 8.769, lastbatch_err = 17.538, time = 0.568, lr=0.00480200
