@@ -35,7 +35,7 @@ def train(restore=False, checkpoint_dir="train/model"):
     Var_restore = tf.global_variables()
     Var_restore.pop(0)
 
-    saver = tf.train.Saver(Var_restore, max_to_keep=10, allow_empty=True)
+    saver = tf.train.Saver(Var_restore, max_to_keep=5, allow_empty=True)
     accuracy = 0
     train_writer = tf.summary.FileWriter("train/log", sess.graph)
     acc_sum = tf.Summary()
@@ -98,9 +98,8 @@ def train(restore=False, checkpoint_dir="train/model"):
                     lastbatch_err += err
 
                 LSTM.accuracy_calculation(val_rar_label, dense_decoded, ignore_value=-1, isPrint=True)
+
                 accuracy = (acc_batch_total * batch_size) / 2
-                acc_sum.value.add(tag='val_acc', simple_value=accuracy)
-                train_writer.add_summary(acc_sum)
 
                 avg_train_cost = err / 2
 
@@ -116,7 +115,8 @@ def train(restore=False, checkpoint_dir="train/model"):
                 print(log.format(now.month, now.day, now.hour, now.minute, now.second,
                                  cur_epoch + 1, num_epochs, accuracy, avg_train_cost,
                                  err, time.time() - start_time, lr))
-
+            acc_sum.value.add(tag='val_acc', simple_value=accuracy)
+            train_writer.add_summary(acc_sum, global_step=step)
 
 def infer(Checkpoint_PATH, img_PATH):
     os.environ["CUDA_VISIBLE_DEVICES"] = '1'
@@ -131,7 +131,7 @@ def infer(Checkpoint_PATH, img_PATH):
     Var_restore = tf.global_variables()
     Var_restore.pop(0)
 
-    saver = tf.train.Saver(Var_restore, max_to_keep=10, allow_empty=True)
+    saver = tf.train.Saver(Var_restore, max_to_keep=5, allow_empty=True)
     ckpt = tf.train.latest_checkpoint(Checkpoint_PATH)
     if ckpt:
         saver.restore(sess, ckpt)
@@ -174,7 +174,7 @@ def creat_adv(Checkpoint_PATH, img_PATH):
     sess = tf.Session(config=config)
     sess.run(tf.global_variables_initializer())
 
-    saver = tf.train.Saver(Var_restore, max_to_keep=10, allow_empty=True)
+    saver = tf.train.Saver(Var_restore, max_to_keep=5, allow_empty=True)
     ckpt = tf.train.latest_checkpoint(Checkpoint_PATH)
     if ckpt:
         saver.restore(sess, ckpt)
@@ -225,7 +225,7 @@ def creat_adv(Checkpoint_PATH, img_PATH):
 
 
 def main():
-    train()
+    train(True)
     # infer("train/model", "example/2.png")
     # creat_adv("train/model", "example/2.png")
 

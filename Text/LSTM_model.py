@@ -15,9 +15,9 @@ out_channels = 64
 cnn_count = 4
 leakiness = 0.01
 num_hidden = 128
-initial_learning_rate = 5e-3
+initial_learning_rate = 1e-3
 decay_steps = 10000
-decay_rate = 0.98
+decay_rate = 0.96
 output_keep_prob = 0.8
 
 batch_size = 32

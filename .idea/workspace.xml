@@ -4,7 +4,33 @@
     <bookmark url="file://$PROJECT_DIR$/Text/train.py" line="66" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="19ba44c5-a8a7-4218-8b0c-a5cda6db8036" name="Default Changelist" comment="" />
+    <list default="true" id="19ba44c5-a8a7-4218-8b0c-a5cda6db8036" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Text/LSTM_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/Text/LSTM_model.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Text/train.py" beforeDir="false" afterPath="$PROJECT_DIR$/Text/train.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Text/train/log/events.out.tfevents.1550611346.Kirin" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Text/train/log/test_acc.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Text/train/model/checkpoint" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Text/train/model/ocr-model-1-1.data-00000-of-00001" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Text/train/model/ocr-model-1-1.index" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Text/train/model/ocr-model-1-1.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Text/train/model/ocr-model-1-10001.data-00000-of-00001" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Text/train/model/ocr-model-1-10001.index" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Text/train/model/ocr-model-1-10001.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Text/train/model/ocr-model-1-15001.data-00000-of-00001" beforeDir="false" afterPath="$PROJECT_DIR$/Text/train/model/ocr-model-1-15001.data-00000-of-00001" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Text/train/model/ocr-model-1-15001.index" beforeDir="false" afterPath="$PROJECT_DIR$/Text/train/model/ocr-model-1-15001.index" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Text/train/model/ocr-model-1-15001.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Text/train/model/ocr-model-1-15001.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Text/train/model/ocr-model-1-20001.data-00000-of-00001" beforeDir="false" afterPath="$PROJECT_DIR$/Text/train/model/ocr-model-1-20001.data-00000-of-00001" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Text/train/model/ocr-model-1-20001.index" beforeDir="false" afterPath="$PROJECT_DIR$/Text/train/model/ocr-model-1-20001.index" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Text/train/model/ocr-model-1-20001.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Text/train/model/ocr-model-1-20001.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Text/train/model/ocr-model-1-25001.data-00000-of-00001" beforeDir="false" afterPath="$PROJECT_DIR$/Text/train/model/ocr-model-1-25001.data-00000-of-00001" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Text/train/model/ocr-model-1-25001.index" beforeDir="false" afterPath="$PROJECT_DIR$/Text/train/model/ocr-model-1-25001.index" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Text/train/model/ocr-model-1-25001.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Text/train/model/ocr-model-1-25001.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Text/train/model/ocr-model-1-5001.data-00000-of-00001" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Text/train/model/ocr-model-1-5001.index" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Text/train/model/ocr-model-1-5001.meta" beforeDir="false" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -13,7 +39,7 @@
   </component>
   <component name="CoverageDataManager">
     <SUITE FILE_PATH="coverage/Captcha$LSTM_model.coverage" NAME="LSTM_model Coverage Results" MODIFIED="1550600809686" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Text" />
-    <SUITE FILE_PATH="coverage/Captcha$train.coverage" NAME="train Coverage Results" MODIFIED="1550611343295" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Text" />
+    <SUITE FILE_PATH="coverage/Captcha$train.coverage" NAME="train Coverage Results" MODIFIED="1550617224633" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Text" />
     <SUITE FILE_PATH="coverage/Captcha$tutu.coverage" NAME="tutu Coverage Results" MODIFIED="1550427766230" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Text" />
   </component>
   <component name="FileEditorManager">
@@ -21,8 +47,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Text/train.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="253">
-              <caret line="53" column="22" lean-forward="true" selection-start-line="53" selection-start-column="22" selection-end-line="53" selection-end-column="22" />
+            <state relative-caret-position="1012">
+              <caret line="118" column="63" selection-start-line="118" selection-start-column="63" selection-end-line="118" selection-end-column="63" />
               <folding>
                 <element signature="e#0#23#0" expanded="true" />
               </folding>
@@ -33,8 +59,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Text/LSTM_model.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="3696">
-              <caret line="279" column="47" selection-start-line="279" selection-start-column="34" selection-end-line="279" selection-end-column="47" />
+            <state relative-caret-position="220">
+              <caret line="19" column="17" selection-start-line="19" selection-start-column="17" selection-end-line="19" selection-end-column="17" />
               <folding>
                 <element signature="e#0#23#0" expanded="true" />
               </folding>
@@ -62,6 +88,9 @@
       <find>train_cost</find>
     </findStrings>
   </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
@@ -78,6 +107,7 @@
     <option name="width" value="1400" />
     <option name="height" value="1000" />
   </component>
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
     <navigator proportions="" version="1">
       <foldersAlwaysOnTop value="true" />
@@ -101,6 +131,20 @@
               <item name="Captcha" type="462c0819:PsiDirectoryNode" />
               <item name="Text" type="462c0819:PsiDirectoryNode" />
               <item name="train" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="Captcha" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Captcha" type="462c0819:PsiDirectoryNode" />
+              <item name="Text" type="462c0819:PsiDirectoryNode" />
+              <item name="train" type="462c0819:PsiDirectoryNode" />
+              <item name="log" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="Captcha" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Captcha" type="462c0819:PsiDirectoryNode" />
+              <item name="Text" type="462c0819:PsiDirectoryNode" />
+              <item name="train" type="462c0819:PsiDirectoryNode" />
+              <item name="model" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -225,23 +269,22 @@
       <workItem from="1550512644032" duration="6166000" />
       <workItem from="1550531848589" duration="2347000" />
       <workItem from="1550550889630" duration="6607000" />
-      <workItem from="1550589256868" duration="17120000" />
+      <workItem from="1550589256868" duration="20918000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="56881000" />
+    <option name="totallyTimeSpent" value="60679000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1920" height="1080" extended-state="6" />
-    <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.17235859" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.17235859" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32875264" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.31712472" />
+      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.47295865" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.37843552" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -250,7 +293,7 @@
       <window_info anchor="bottom" id="Version Control" order="8" />
       <window_info anchor="bottom" id="Database Changes" order="9" />
       <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" />
-      <window_info anchor="bottom" id="Terminal" order="11" weight="0.28118393" />
+      <window_info anchor="bottom" id="Terminal" order="11" weight="0.28101802" />
       <window_info anchor="bottom" id="Python Console" order="12" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -321,13 +364,6 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Text/tutu.py" />
-    <entry file="file://$PROJECT_DIR$/Text/train/log/test_acc.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="469">
-          <caret line="669" lean-forward="true" selection-start-line="669" selection-end-line="669" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file:///usr/lib/python3.6/site-packages/tensorflow/python/training/optimizer.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="266">
@@ -346,13 +382,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="661">
           <caret line="1576" selection-start-line="1576" selection-end-line="1576" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Text/train/model/checkpoint">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="22">
-          <caret line="1" selection-start-line="1" selection-end-line="1" />
         </state>
       </provider>
     </entry>
@@ -400,20 +429,34 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/Text/train/model/checkpoint">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="22">
+          <caret line="1" selection-start-line="1" selection-end-line="1" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/Text/LSTM_model.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3696">
-          <caret line="279" column="47" selection-start-line="279" selection-start-column="34" selection-end-line="279" selection-end-column="47" />
+        <state relative-caret-position="220">
+          <caret line="19" column="17" selection-start-line="19" selection-start-column="17" selection-end-line="19" selection-end-column="17" />
           <folding>
             <element signature="e#0#23#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/Text/train/log/test_acc.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="242">
+          <caret line="11" lean-forward="true" selection-start-line="11" selection-end-line="11" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/Text/train.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="253">
-          <caret line="53" column="22" lean-forward="true" selection-start-line="53" selection-start-column="22" selection-end-line="53" selection-end-column="22" />
+        <state relative-caret-position="1012">
+          <caret line="118" column="63" selection-start-line="118" selection-start-column="63" selection-end-line="118" selection-end-column="63" />
           <folding>
             <element signature="e#0#23#0" expanded="true" />
           </folding>
