@@ -20,3 +20,8 @@
 2/20 5:33:42 Epoch 191/10000, accuracy = 0.000, avg_train_cost = 9.055, lastbatch_err = 18.109, time = 0.545, lr=0.00490000
 2/20 5:34:17 Epoch 201/10000, accuracy = 0.000, avg_train_cost = 9.233, lastbatch_err = 18.466, time = 0.566, lr=0.00480200
 2/20 5:34:53 Epoch 211/10000, accuracy = 0.000, avg_train_cost = 8.849, lastbatch_err = 17.698, time = 0.575, lr=0.00480200
+2/20 5:35:28 Epoch 221/10000, accuracy = 0.000, avg_train_cost = 9.154, lastbatch_err = 18.308, time = 0.575, lr=0.00480200
+2/20 5:36:4 Epoch 231/10000, accuracy = 0.000, avg_train_cost = 9.184, lastbatch_err = 18.368, time = 0.560, lr=0.00480200
+2/20 5:36:39 Epoch 241/10000, accuracy = 0.000, avg_train_cost = 8.971, lastbatch_err = 17.942, time = 0.566, lr=0.00480200
+2/20 5:37:14 Epoch 251/10000, accuracy = 0.000, avg_train_cost = 8.703, lastbatch_err = 17.406, time = 0.535, lr=0.00480200
+2/20 5:37:49 Epoch 261/10000, accuracy = 0.000, avg_train_cost = 8.870, lastbatch_err = 17.741, time = 0.562, lr=0.00480200
