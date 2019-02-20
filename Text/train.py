@@ -8,7 +8,7 @@ import cv2
 import matplotlib.pyplot as plt
 
 num_epochs = 100000
-batch_size = 32
+batch_size = 128
 num_batches_per_epoch = 100
 save_steps = 5000
 validation_steps = 1000
@@ -35,7 +35,7 @@ def train(restore=False, checkpoint_dir="train/model"):
     Var_restore = tf.global_variables()
 
     saver = tf.train.Saver(Var_restore, max_to_keep=5, allow_empty=True)
-    accuracy = 0
+
     train_writer = tf.summary.FileWriter("train/log", sess.graph)
     acc_sum = tf.Summary()
 

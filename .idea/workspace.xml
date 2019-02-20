@@ -7,13 +7,20 @@
     <list default="true" id="19ba44c5-a8a7-4218-8b0c-a5cda6db8036" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Text/LSTM_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/Text/LSTM_model.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Text/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/Text/test.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Text/train.py" beforeDir="false" afterPath="$PROJECT_DIR$/Text/train.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Text/train/log/events.out.tfevents.1550617228.Kirin" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Text/train/log/events.out.tfevents.1550672169.Kirin" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/Text/train/log/test_acc.txt" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/Text/train/model/checkpoint" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Text/train/model/ocr-model-1-1.data-00000-of-00001" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Text/train/model/ocr-model-1-1.index" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Text/train/model/ocr-model-1-1.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Text/train/model/ocr-model-1-0.data-00000-of-00001" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Text/train/model/ocr-model-1-0.index" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Text/train/model/ocr-model-1-0.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Text/train/model/ocr-model-1-10.data-00000-of-00001" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Text/train/model/ocr-model-1-10.index" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Text/train/model/ocr-model-1-10.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Text/train/model/ocr-model-1-5.data-00000-of-00001" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Text/train/model/ocr-model-1-5.index" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Text/train/model/ocr-model-1-5.meta" beforeDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -23,16 +30,16 @@
   </component>
   <component name="CoverageDataManager">
     <SUITE FILE_PATH="coverage/Captcha$LSTM_model.coverage" NAME="LSTM_model Coverage Results" MODIFIED="1550618963460" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Text" />
-    <SUITE FILE_PATH="coverage/Captcha$train.coverage" NAME="train Coverage Results" MODIFIED="1550672165648" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Text" />
-    <SUITE FILE_PATH="coverage/Captcha$tutu.coverage" NAME="tutu Coverage Results" MODIFIED="1550619201792" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Text" />
+    <SUITE FILE_PATH="coverage/Captcha$train.coverage" NAME="train Coverage Results" MODIFIED="1550673581078" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Text" />
+    <SUITE FILE_PATH="coverage/Captcha$tutu.coverage" NAME="tutu Coverage Results" MODIFIED="1550674672615" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Text" />
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Text/train.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="220">
-              <caret line="10" column="15" selection-start-line="10" selection-start-column="15" selection-end-line="10" selection-end-column="15" />
+            <state relative-caret-position="80">
+              <caret line="104" column="45" selection-start-line="104" selection-start-column="45" selection-end-line="104" selection-end-column="45" />
               <folding>
                 <element signature="e#0#23#0" expanded="true" />
               </folding>
@@ -40,11 +47,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Text/LSTM_model.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="168">
-              <caret line="8" column="20" selection-start-line="8" selection-start-column="20" selection-end-line="8" selection-end-column="20" />
+            <state relative-caret-position="286">
+              <caret line="16" column="16" selection-start-line="16" selection-start-column="16" selection-end-line="16" selection-end-column="16" />
               <folding>
                 <element signature="e#0#23#0" expanded="true" />
               </folding>
@@ -55,8 +62,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Text/test.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="66">
-              <caret line="3" column="16" selection-start-line="3" selection-start-column="16" selection-end-line="3" selection-end-column="16" />
+            <state relative-caret-position="198">
+              <caret line="9" selection-start-line="9" selection-end-line="9" />
             </state>
           </provider>
         </entry>
@@ -80,6 +87,7 @@
       <find>lastbatch_</find>
       <find>train_cost</find>
       <find>max_to_keep</find>
+      <find>accuracy</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -90,9 +98,9 @@
       <list>
         <option value="$PROJECT_DIR$/Text/train/model/checkpoint" />
         <option value="$PROJECT_DIR$/Text/tutu.py" />
+        <option value="$PROJECT_DIR$/Text/LSTM_model.py" />
         <option value="$PROJECT_DIR$/Text/test.py" />
         <option value="$PROJECT_DIR$/Text/train.py" />
-        <option value="$PROJECT_DIR$/Text/LSTM_model.py" />
       </list>
     </option>
   </component>
@@ -127,13 +135,6 @@
               <item name="Text" type="462c0819:PsiDirectoryNode" />
               <item name="train" type="462c0819:PsiDirectoryNode" />
             </path>
-            <path>
-              <item name="Captcha" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Captcha" type="462c0819:PsiDirectoryNode" />
-              <item name="Text" type="462c0819:PsiDirectoryNode" />
-              <item name="train" type="462c0819:PsiDirectoryNode" />
-              <item name="model" type="462c0819:PsiDirectoryNode" />
-            </path>
           </expand>
           <select />
         </subPane>
@@ -167,7 +168,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.train">
+  <component name="RunManager" selected="Python.tutu">
     <configuration name="LSTM_model" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="Captcha" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -236,8 +237,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.train" />
         <item itemvalue="Python.tutu" />
+        <item itemvalue="Python.train" />
         <item itemvalue="Python.LSTM_model" />
       </list>
     </recent_temporary>
@@ -257,12 +258,12 @@
       <workItem from="1550512644032" duration="6166000" />
       <workItem from="1550531848589" duration="2347000" />
       <workItem from="1550550889630" duration="6607000" />
-      <workItem from="1550589256868" duration="28863000" />
+      <workItem from="1550589256868" duration="31987000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="68624000" />
+    <option name="totallyTimeSpent" value="71748000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1920" height="1080" extended-state="6" />
@@ -272,7 +273,7 @@
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32875264" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.39130434" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.3043478" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.37751856" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -432,25 +433,25 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Text/test.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="66">
-          <caret line="3" column="16" selection-start-line="3" selection-start-column="16" selection-end-line="3" selection-end-column="16" />
+        <state relative-caret-position="198">
+          <caret line="9" selection-start-line="9" selection-end-line="9" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Text/train.py">
+    <entry file="file://$PROJECT_DIR$/Text/LSTM_model.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="220">
-          <caret line="10" column="15" selection-start-line="10" selection-start-column="15" selection-end-line="10" selection-end-column="15" />
+        <state relative-caret-position="286">
+          <caret line="16" column="16" selection-start-line="16" selection-start-column="16" selection-end-line="16" selection-end-column="16" />
           <folding>
             <element signature="e#0#23#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Text/LSTM_model.py">
+    <entry file="file://$PROJECT_DIR$/Text/train.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="168">
-          <caret line="8" column="20" selection-start-line="8" selection-start-column="20" selection-end-line="8" selection-end-column="20" />
+        <state relative-caret-position="80">
+          <caret line="104" column="45" selection-start-line="104" selection-start-column="45" selection-end-line="104" selection-end-column="45" />
           <folding>
             <element signature="e#0#23#0" expanded="true" />
           </folding>

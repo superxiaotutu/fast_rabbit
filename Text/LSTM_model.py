@@ -6,7 +6,7 @@ from captcha.image import ImageCaptcha
 from random import randint
 from PIL import Image, ImageFont, ImageDraw, ImageFilter
 
-num_classes = 62 + 2
+num_classes = 36 + 2
 
 image_height = 60
 image_width = 180
@@ -20,8 +20,8 @@ decay_steps = 8000
 decay_rate = 0.97
 output_keep_prob = 0.8
 
-batch_size = 32
-LABEL_CHOICES = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+batch_size = 128
+LABEL_CHOICES = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 LABEL_CHOICES_LIST = [str(i) for i in LABEL_CHOICES]
 encode_maps = {}
 decode_maps = {}
@@ -308,8 +308,7 @@ class LSTMOCR(object):
     def _batch_norm(self, name, x):
         """Batch normalization."""
         with tf.variable_scope(name):
-            x_bn = \
-                tf.contrib.layers.batch_norm(
+            x_bn = tf.contrib.layers.batch_norm(
                     inputs=x,
                     decay=0.9,
                     center=True,
@@ -322,7 +321,6 @@ class LSTMOCR(object):
                     zero_debias_moving_mean=True,
                     scope='BatchNorm'
                 )
-
         return x_bn
 
     def _leaky_relu(self, x, leakiness=0.0):
