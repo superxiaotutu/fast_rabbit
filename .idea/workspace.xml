@@ -5,22 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="19ba44c5-a8a7-4218-8b0c-a5cda6db8036" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Text/LSTM_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/Text/LSTM_model.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Text/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/Text/test.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Text/train.py" beforeDir="false" afterPath="$PROJECT_DIR$/Text/train.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Text/train/log/events.out.tfevents.1550672169.Kirin" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Text/train/log/test_acc.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Text/train/model/checkpoint" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Text/train/log/events.out.tfevents.1550673584.Kirin" beforeDir="false" afterPath="$PROJECT_DIR$/Text/train/log/events.out.tfevents.1550673584.Kirin" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Text/train/log/test_acc.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Text/train/log/test_acc.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Text/train/model/checkpoint" beforeDir="false" afterPath="$PROJECT_DIR$/Text/train/model/checkpoint" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Text/train/model/ocr-model-1-0.data-00000-of-00001" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/Text/train/model/ocr-model-1-0.index" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/Text/train/model/ocr-model-1-0.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Text/train/model/ocr-model-1-10.data-00000-of-00001" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Text/train/model/ocr-model-1-10.index" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Text/train/model/ocr-model-1-10.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Text/train/model/ocr-model-1-5.data-00000-of-00001" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Text/train/model/ocr-model-1-5.index" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Text/train/model/ocr-model-1-5.meta" beforeDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -38,8 +29,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Text/train.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="80">
-              <caret line="104" column="45" selection-start-line="104" selection-start-column="45" selection-end-line="104" selection-end-column="45" />
+            <state relative-caret-position="454">
+              <caret line="103" selection-start-line="103" selection-end-line="103" />
               <folding>
                 <element signature="e#0#23#0" expanded="true" />
               </folding>
@@ -50,8 +41,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Text/LSTM_model.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="286">
-              <caret line="16" column="16" selection-start-line="16" selection-start-column="16" selection-end-line="16" selection-end-column="16" />
+            <state relative-caret-position="426">
+              <caret line="348" column="41" selection-start-line="348" selection-start-column="29" selection-end-line="348" selection-end-column="41" />
               <folding>
                 <element signature="e#0#23#0" expanded="true" />
               </folding>
@@ -134,6 +125,13 @@
               <item name="Captcha" type="462c0819:PsiDirectoryNode" />
               <item name="Text" type="462c0819:PsiDirectoryNode" />
               <item name="train" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="Captcha" type="b2602c69:ProjectViewProjectNode" />
+              <item name="Captcha" type="462c0819:PsiDirectoryNode" />
+              <item name="Text" type="462c0819:PsiDirectoryNode" />
+              <item name="train" type="462c0819:PsiDirectoryNode" />
+              <item name="log" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -258,22 +256,22 @@
       <workItem from="1550512644032" duration="6166000" />
       <workItem from="1550531848589" duration="2347000" />
       <workItem from="1550550889630" duration="6607000" />
-      <workItem from="1550589256868" duration="31987000" />
+      <workItem from="1550589256868" duration="32364000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="71748000" />
+    <option name="totallyTimeSpent" value="72125000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1920" height="1080" extended-state="6" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.17235859" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.17235859" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32875264" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.3043478" />
+      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.3043478" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.37751856" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -440,8 +438,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Text/LSTM_model.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="286">
-          <caret line="16" column="16" selection-start-line="16" selection-start-column="16" selection-end-line="16" selection-end-column="16" />
+        <state relative-caret-position="426">
+          <caret line="348" column="41" selection-start-line="348" selection-start-column="29" selection-end-line="348" selection-end-column="41" />
           <folding>
             <element signature="e#0#23#0" expanded="true" />
           </folding>
@@ -450,8 +448,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Text/train.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="80">
-          <caret line="104" column="45" selection-start-line="104" selection-start-column="45" selection-end-line="104" selection-end-column="45" />
+        <state relative-caret-position="454">
+          <caret line="103" selection-start-line="103" selection-end-line="103" />
           <folding>
             <element signature="e#0#23#0" expanded="true" />
           </folding>

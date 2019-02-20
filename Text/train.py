@@ -96,7 +96,7 @@ def train(restore=False, checkpoint_dir="train/model"):
 
                 LSTM.accuracy_calculation(val_rar_label, dense_decoded, ignore_value=-1, isPrint=True)
 
-                accuracy = (acc_batch_total * batch_size) / 2
+                accuracy = acc_batch_total / 2
                 acc_sum.value.add(tag='acc', simple_value=accuracy)
                 train_writer.add_summary(acc_sum, global_step=step)
 
