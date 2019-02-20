@@ -1,2 +1,4 @@
-model_checkpoint_path: "ocr-model-1-1"
-all_model_checkpoint_paths: "ocr-model-1-1"
+model_checkpoint_path: "ocr-model-1-10"
+all_model_checkpoint_paths: "ocr-model-1-0"
+all_model_checkpoint_paths: "ocr-model-1-5"
+all_model_checkpoint_paths: "ocr-model-1-10"

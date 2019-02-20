@@ -16,8 +16,8 @@ cnn_count = 4
 leakiness = 0.01
 num_hidden = 128
 initial_learning_rate = 1e-3
-decay_steps = 10000
-decay_rate = 0.96
+decay_steps = 8000
+decay_rate = 0.97
 output_keep_prob = 0.8
 
 batch_size = 32
@@ -28,6 +28,7 @@ decode_maps = {}
 for i, char in enumerate(LABEL_CHOICES, 1):
     encode_maps[char] = i
     decode_maps[i] = char
+
 
 SPACE_INDEX = 0
 SPACE_TOKEN = ''
@@ -349,5 +350,3 @@ def accuracy_calculation(original_seq, decoded_seq, ignore_value=-1, isPrint=Fal
         print('seq{0:4d}: origin: {1} decoded:{2}'.format(i, origin_label, decoded_label))
     return count * 1.0 / len(original_seq)
 
-# a = DataIterator()
-# a.refresh_data()

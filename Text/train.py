@@ -7,7 +7,7 @@ import datetime
 import cv2
 import matplotlib.pyplot as plt
 
-num_epochs = 10000
+num_epochs = 100000
 batch_size = 32
 num_batches_per_epoch = 100
 save_steps = 5000
@@ -33,7 +33,6 @@ def train(restore=False, checkpoint_dir="train/model"):
     sess.run(tf.global_variables_initializer())
 
     Var_restore = tf.global_variables()
-    Var_restore.pop(0)
 
     saver = tf.train.Saver(Var_restore, max_to_keep=5, allow_empty=True)
     accuracy = 0
@@ -77,9 +76,8 @@ def train(restore=False, checkpoint_dir="train/model"):
 
             # save the checkpoint
             if step % save_steps == 1:
-                saver.save(sess, os.path.join("train/model", 'ocr-model-1'), global_step=step)
+                saver.save(sess, os.path.join("train/model", 'ocr-model-1'), global_step=step//1000)
 
-            # train_err += the_err * FLAGS.batch_size
             # do validation
             if step % validation_steps == 0:
                 acc_batch_total = 0
@@ -90,8 +88,7 @@ def train(restore=False, checkpoint_dir="train/model"):
                     val_inputs, _, val_labels, val_rar_label = val_feeder.input_index_generate_batch()
                     val_feed = {model.inputs: val_inputs, model.labels: val_labels}
 
-                    dense_decoded, err, lr = sess.run([model.dense_decoded, model.cost, model.lrn_rate],
-                                                      val_feed)
+                    dense_decoded, err, lr = sess.run([model.dense_decoded, model.cost, model.lrn_rate], val_feed)
                     # print the decode result
                     acc = LSTM.accuracy_calculation(val_rar_label, dense_decoded, ignore_value=-1, isPrint=False)
                     acc_batch_total += acc
@@ -100,10 +97,11 @@ def train(restore=False, checkpoint_dir="train/model"):
                 LSTM.accuracy_calculation(val_rar_label, dense_decoded, ignore_value=-1, isPrint=True)
 
                 accuracy = (acc_batch_total * batch_size) / 2
+                acc_sum.value.add(tag='acc', simple_value=accuracy)
+                train_writer.add_summary(acc_sum, global_step=step)
 
                 avg_train_cost = err / 2
 
-                # train_err /= num_train_samples
                 now = datetime.datetime.now()
                 log = "{}/{} {}:{}:{} Epoch {}/{}, " \
                       "accuracy = {:.3f}, avg_train_cost = {:.3f}, " \
@@ -112,11 +110,9 @@ def train(restore=False, checkpoint_dir="train/model"):
                     f.write(str(log.format(now.month, now.day, now.hour, now.minute, now.second,
                                            cur_epoch + 1, num_epochs, accuracy, avg_train_cost,
                                            err, time.time() - start_time, lr)) + "\n")
-                print(log.format(now.month, now.day, now.hour, now.minute, now.second,
-                                 cur_epoch + 1, num_epochs, accuracy, avg_train_cost,
-                                 err, time.time() - start_time, lr))
-            acc_sum.value.add(tag='val_acc', simple_value=accuracy)
-            train_writer.add_summary(acc_sum, global_step=step)
+                print(log.format(now.month, now.day, now.hour, now.minute, now.second, cur_epoch + 1, num_epochs,
+                                 accuracy, avg_train_cost, err, time.time() - start_time, lr))
+
 
 def infer(Checkpoint_PATH, img_PATH):
     os.environ["CUDA_VISIBLE_DEVICES"] = '1'
@@ -129,7 +125,6 @@ def infer(Checkpoint_PATH, img_PATH):
     sess.run(tf.global_variables_initializer())
 
     Var_restore = tf.global_variables()
-    Var_restore.pop(0)
 
     saver = tf.train.Saver(Var_restore, max_to_keep=5, allow_empty=True)
     ckpt = tf.train.latest_checkpoint(Checkpoint_PATH)
@@ -140,7 +135,6 @@ def infer(Checkpoint_PATH, img_PATH):
         print('cannot restore')
         return
     im = cv2.imread(img_PATH).astype(np.float32) / 255.
-    # im = np.reshape(im, [image_height, image_width, image_channel])
     imgs_input = []
     imgs_input.append(im)
 
