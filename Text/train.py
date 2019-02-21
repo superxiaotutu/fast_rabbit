@@ -153,10 +153,8 @@ def infer(Checkpoint_PATH, img_PATH):
 
 
 def creat_adv(Checkpoint_PATH, img_PATH):
-    os.environ["CUDA_VISIBLE_DEVICES"] = '1'
+    os.environ["CUDA_VISIBLE_DEVICES"] = '0'
     model = LSTM.LSTMOCR("infer")
-    Var_restore = tf.global_variables()
-
     model.build_graph()
     config = tf.ConfigProto()
     config.gpu_options.allow_growth = True
@@ -165,10 +163,12 @@ def creat_adv(Checkpoint_PATH, img_PATH):
     ADV_LOSS = tf.reduce_sum(model.logits)
     grad_y2x = tf.sign(tf.gradients(ADV_LOSS, model.inputs)[0])
 
+    Var_restore = tf.global_variables()
+    saver = tf.train.Saver(Var_restore, max_to_keep=5, allow_empty=True)
+
     sess = tf.Session(config=config)
     sess.run(tf.global_variables_initializer())
 
-    saver = tf.train.Saver(Var_restore, max_to_keep=5, allow_empty=True)
     ckpt = tf.train.latest_checkpoint(Checkpoint_PATH)
     if ckpt:
         saver.restore(sess, ckpt)
@@ -196,8 +196,8 @@ def creat_adv(Checkpoint_PATH, img_PATH):
             expression += LSTM.decode_maps[i]
     print("BEFORE:{}".format(expression))
 
-    adv_step = 0.1
-    for i in range(10):
+    adv_step = 0.01
+    for i in range(100):
         grad = sess.run(grad_y2x, feed)
         imgs_input = imgs_input - grad * adv_step
         feed = {model.inputs: imgs_input}
@@ -219,9 +219,9 @@ def creat_adv(Checkpoint_PATH, img_PATH):
 
 
 def main():
-    train(True)
-    # infer("train/model", "example/2.png")
-    # creat_adv("train/model", "example/2.png")
+    # train(True)
+    # infer("train_2/model", "example/2.png")
+    creat_adv("train_3/model", "example/2.png")
 
 
 if __name__ == '__main__':
