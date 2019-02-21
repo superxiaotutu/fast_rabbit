@@ -5,13 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="19ba44c5-a8a7-4218-8b0c-a5cda6db8036" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Text/LSTM_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/Text/LSTM_model.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Text/train.py" beforeDir="false" afterPath="$PROJECT_DIR$/Text/train.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Text/train/log/events.out.tfevents.1550673584.Kirin" beforeDir="false" afterPath="$PROJECT_DIR$/Text/train/log/events.out.tfevents.1550673584.Kirin" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Text/train/log/test_acc.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Text/train/log/test_acc.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Text/train/model/checkpoint" beforeDir="false" afterPath="$PROJECT_DIR$/Text/train/model/checkpoint" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Text/train/model/ocr-model-1-0.data-00000-of-00001" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Text/train/model/ocr-model-1-0.index" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Text/train/model/ocr-model-1-0.meta" beforeDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -21,15 +18,15 @@
   </component>
   <component name="CoverageDataManager">
     <SUITE FILE_PATH="coverage/Captcha$LSTM_model.coverage" NAME="LSTM_model Coverage Results" MODIFIED="1550618963460" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Text" />
-    <SUITE FILE_PATH="coverage/Captcha$train.coverage" NAME="train Coverage Results" MODIFIED="1550673581078" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Text" />
+    <SUITE FILE_PATH="coverage/Captcha$train.coverage" NAME="train Coverage Results" MODIFIED="1550706073870" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Text" />
     <SUITE FILE_PATH="coverage/Captcha$tutu.coverage" NAME="tutu Coverage Results" MODIFIED="1550674672615" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Text" />
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Text/train.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="454">
+            <state relative-caret-position="20">
               <caret line="103" selection-start-line="103" selection-end-line="103" />
               <folding>
                 <element signature="e#0#23#0" expanded="true" />
@@ -38,11 +35,23 @@
           </provider>
         </entry>
       </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/README.md">
+          <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+            <state split_layout="SPLIT">
+              <first_editor relative-caret-position="22">
+                <caret line="1" column="16" selection-start-line="1" selection-start-column="16" selection-end-line="1" selection-end-column="16" />
+              </first_editor>
+              <second_editor />
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Text/LSTM_model.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="426">
-              <caret line="348" column="41" selection-start-line="348" selection-start-column="29" selection-end-line="348" selection-end-column="41" />
+            <state relative-caret-position="405">
+              <caret line="136" column="25" selection-start-line="136" selection-start-column="25" selection-end-line="136" selection-end-column="25" />
               <folding>
                 <element signature="e#0#23#0" expanded="true" />
               </folding>
@@ -87,19 +96,21 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/Text/train/model/checkpoint" />
         <option value="$PROJECT_DIR$/Text/tutu.py" />
-        <option value="$PROJECT_DIR$/Text/LSTM_model.py" />
         <option value="$PROJECT_DIR$/Text/test.py" />
+        <option value="$PROJECT_DIR$/Text/LSTM_model.py" />
         <option value="$PROJECT_DIR$/Text/train.py" />
+        <option value="$PROJECT_DIR$/Text/train/log/test_acc.txt" />
+        <option value="$PROJECT_DIR$/Text/train/model/checkpoint" />
+        <option value="$PROJECT_DIR$/Text/train_3/model/checkpoint" />
+        <option value="$PROJECT_DIR$/README.md" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="260" />
-    <option name="y" value="40" />
-    <option name="width" value="1400" />
-    <option name="height" value="1000" />
+    <option name="x" value="225" />
+    <option name="width" value="1390" />
+    <option name="height" value="1007" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
@@ -120,19 +131,6 @@
               <item name="Captcha" type="462c0819:PsiDirectoryNode" />
               <item name="Text" type="462c0819:PsiDirectoryNode" />
             </path>
-            <path>
-              <item name="Captcha" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Captcha" type="462c0819:PsiDirectoryNode" />
-              <item name="Text" type="462c0819:PsiDirectoryNode" />
-              <item name="train" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="Captcha" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Captcha" type="462c0819:PsiDirectoryNode" />
-              <item name="Text" type="462c0819:PsiDirectoryNode" />
-              <item name="train" type="462c0819:PsiDirectoryNode" />
-              <item name="log" type="462c0819:PsiDirectoryNode" />
-            </path>
           </expand>
           <select />
         </subPane>
@@ -141,7 +139,7 @@
   </component>
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../red-green-blindness" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
   </component>
@@ -166,7 +164,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.tutu">
+  <component name="RunManager" selected="Python.train">
     <configuration name="LSTM_model" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="Captcha" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -235,8 +233,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.tutu" />
         <item itemvalue="Python.train" />
+        <item itemvalue="Python.tutu" />
         <item itemvalue="Python.LSTM_model" />
       </list>
     </recent_temporary>
@@ -256,22 +254,23 @@
       <workItem from="1550512644032" duration="6166000" />
       <workItem from="1550531848589" duration="2347000" />
       <workItem from="1550550889630" duration="6607000" />
-      <workItem from="1550589256868" duration="32364000" />
+      <workItem from="1550589256868" duration="40056000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="72125000" />
+    <option name="totallyTimeSpent" value="79817000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1920" height="1080" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.17235859" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Find" order="1" weight="0.32875264" />
-      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.3043478" />
+      <window_info anchor="bottom" id="Find" order="1" weight="0.32873806" />
+      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.4559915" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.37751856" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -280,7 +279,7 @@
       <window_info anchor="bottom" id="Version Control" order="8" />
       <window_info anchor="bottom" id="Database Changes" order="9" />
       <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" />
-      <window_info anchor="bottom" id="Terminal" order="11" weight="0.28101802" />
+      <window_info anchor="bottom" auto_hide="true" x="1920" y="64" width="1920" height="1016" id="Terminal" maximized="true" order="11" type="WINDOWED" weight="0.7995758" />
       <window_info anchor="bottom" id="Python Console" order="12" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -415,14 +414,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Text/train/model/checkpoint">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="22">
-          <caret line="1" selection-start-line="1" selection-end-line="1" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Text/train/log/test_acc.txt">
+    <entry file="file://$PROJECT_DIR$/Text/train_1/log/test_acc.txt">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="414">
           <caret line="30" lean-forward="true" selection-start-line="30" selection-end-line="30" />
@@ -436,23 +428,68 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/Text/train_1/model/checkpoint">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="44">
+          <caret line="2" lean-forward="true" selection-start-line="2" selection-end-line="2" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/Text/LSTM_model.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="426">
-          <caret line="348" column="41" selection-start-line="348" selection-start-column="29" selection-end-line="348" selection-end-column="41" />
+        <state relative-caret-position="405">
+          <caret line="136" column="25" selection-start-line="136" selection-start-column="25" selection-end-line="136" selection-end-column="25" />
           <folding>
             <element signature="e#0#23#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/Text/train_2/log/test_acc.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="237">
+          <caret line="18" lean-forward="true" selection-start-line="18" selection-end-line="18" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Text/train_2/model/checkpoint">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="44">
+          <caret line="2" lean-forward="true" selection-start-line="2" selection-end-line="2" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Text/train_3/log/test_acc.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="286">
+          <caret line="13" column="14" lean-forward="true" selection-start-line="13" selection-start-column="14" selection-end-line="13" selection-end-column="14" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Text/train_3/model/checkpoint">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="44">
+          <caret line="2" lean-forward="true" selection-start-line="2" selection-end-line="2" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/Text/train.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="454">
+        <state relative-caret-position="20">
           <caret line="103" selection-start-line="103" selection-end-line="103" />
           <folding>
             <element signature="e#0#23#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/README.md">
+      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+        <state split_layout="SPLIT">
+          <first_editor relative-caret-position="22">
+            <caret line="1" column="16" selection-start-line="1" selection-start-column="16" selection-end-line="1" selection-end-column="16" />
+          </first_editor>
+          <second_editor />
         </state>
       </provider>
     </entry>

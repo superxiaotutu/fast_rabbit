@@ -7,7 +7,7 @@ import datetime
 import cv2
 import matplotlib.pyplot as plt
 
-num_epochs = 100000
+num_epochs = 2500
 batch_size = 128
 num_batches_per_epoch = 100
 save_steps = 5000
@@ -20,8 +20,8 @@ image_channel = 3
 train_feeder = LSTM.DataIterator()
 val_feeder = LSTM.DataIterator()
 
-def train(restore=False, checkpoint_dir="train/model"):
-    os.environ["CUDA_VISIBLE_DEVICES"] = '0'
+def train(restore=False, checkpoint_dir="train_3/model"):
+    os.environ["CUDA_VISIBLE_DEVICES"] = '1'
     model = LSTM.LSTMOCR('train')
     model.build_graph()
 
@@ -36,7 +36,7 @@ def train(restore=False, checkpoint_dir="train/model"):
 
     saver = tf.train.Saver(Var_restore, max_to_keep=5, allow_empty=True)
 
-    train_writer = tf.summary.FileWriter("train/log", sess.graph)
+    train_writer = tf.summary.FileWriter("train_3/log", sess.graph)
     acc_sum = tf.Summary()
 
     if restore:
@@ -76,7 +76,7 @@ def train(restore=False, checkpoint_dir="train/model"):
 
             # save the checkpoint
             if step % save_steps == 1:
-                saver.save(sess, os.path.join("train/model", 'ocr-model-1'), global_step=step//1000)
+                saver.save(sess, os.path.join("train_3/model", 'ocr-model-3'), global_step=step//1000)
 
             # do validation
             if step % validation_steps == 0:
@@ -106,7 +106,7 @@ def train(restore=False, checkpoint_dir="train/model"):
                 log = "{}/{} {}:{}:{} Epoch {}/{}, " \
                       "accuracy = {:.3f}, avg_train_cost = {:.3f}, " \
                       "lastbatch_err = {:.3f}, time = {:.3f}, lr={:.8f}"
-                with open('train/log/test_acc.txt', 'a')as f:
+                with open('train_3/log/test_acc.txt', 'a')as f:
                     f.write(str(log.format(now.month, now.day, now.hour, now.minute, now.second,
                                            cur_epoch + 1, num_epochs, accuracy, avg_train_cost,
                                            err, time.time() - start_time, lr)) + "\n")
