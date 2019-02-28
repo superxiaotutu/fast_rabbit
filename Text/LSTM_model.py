@@ -37,6 +37,24 @@ decode_maps[SPACE_INDEX] = SPACE_TOKEN
 
 image = ImageCaptcha(width=image_width, height=image_height)
 
+def gene_code(chars, line, point):
+    def random_color(start, end, opacity=None):
+        red = random.randint(start, end)
+        green = random.randint(start, end)
+        blue = random.randint(start, end)
+        if opacity is None:
+            return (red, green, blue)
+        return (red, green, blue, opacity)
+
+    background = random_color(238, 255)
+    color = random_color(10, 200, random.randint(220, 255))
+    im = image.create_captcha_image(chars, color, background)
+    image.create_noise_dots(im, color, number=point)
+    for i in range(line):
+        image.create_noise_curve(im, color)
+    im = im.filter(ImageFilter.SMOOTH)
+    return im
+
 
 def gene_code_1(chars):
     def random_color(start, end, opacity=None):
@@ -124,7 +142,7 @@ class DataIterator:
         for num in range(batch_size):
             slice = random.sample(LABEL_CHOICES_LIST, 4)
             captcha = ''.join(slice)
-            img = gene_code_3(captcha)
+            img = gene_code_1(captcha)
             img = np.asarray(img).astype(np.float32) / 255.
             code = [SPACE_INDEX if captcha == SPACE_TOKEN else encode_maps[c] for c in list(captcha)]
             self.labels.append(code)
@@ -134,10 +152,20 @@ class DataIterator:
         target = random.randint(0, batch_size - 1)
         slice = random.sample(LABEL_CHOICES_LIST, 4)
         captcha = ''.join(slice)
-        img = gene_code_3(captcha)
+        img = gene_code_1(captcha)
         img = np.asarray(img).astype(np.float32) / 255.
         code = [SPACE_INDEX if captcha == SPACE_TOKEN else encode_maps[c] for c in list(captcha)]
         self.image[target], self.labels[target] = img, code
+
+
+    def get_test_img(self, num_line, num_point):
+        slice = random.sample(LABEL_CHOICES_LIST, 4)
+        captcha = ''.join(slice)
+        img = gene_code(captcha, num_line, num_point)
+        img = np.asarray(img).astype(np.float32) / 255.
+        code = [SPACE_INDEX if captcha == SPACE_TOKEN else encode_maps[c] for c in list(captcha)]
+        return img, captcha
+
 
     @property
     def size(self):

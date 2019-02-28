@@ -6,6 +6,7 @@ import os
 import datetime
 import cv2
 import matplotlib.pyplot as plt
+import random
 
 num_epochs = 2500
 batch_size = 128
@@ -19,6 +20,7 @@ image_channel = 3
 
 train_feeder = LSTM.DataIterator()
 val_feeder = LSTM.DataIterator()
+
 
 def train(restore=False, checkpoint_dir="train_3/model"):
     os.environ["CUDA_VISIBLE_DEVICES"] = '1'
@@ -68,7 +70,8 @@ def train(restore=False, checkpoint_dir="train_3/model"):
             feed = {model.inputs: batch_inputs, model.labels: batch_labels}
 
             # if summary is needed
-            summary_str, batch_cost, step, _ = sess.run([model.merged_summay, model.cost, model.global_step, model.train_op], feed)
+            summary_str, batch_cost, step, _ = sess.run(
+                [model.merged_summay, model.cost, model.global_step, model.train_op], feed)
             # calculate the cost
             train_cost += batch_cost * batch_size
 
@@ -76,7 +79,7 @@ def train(restore=False, checkpoint_dir="train_3/model"):
 
             # save the checkpoint
             if step % save_steps == 1:
-                saver.save(sess, os.path.join("train_3/model", 'ocr-model-3'), global_step=step//1000)
+                saver.save(sess, os.path.join("train_3/model", 'ocr-model-3'), global_step=step // 1000)
 
             # do validation
             if step % validation_steps == 0:
@@ -176,6 +179,7 @@ def creat_adv(Checkpoint_PATH, img_PATH):
     else:
         print('cannot restore')
         return
+
     im = cv2.imread(img_PATH).astype(np.float32) / 255.
     # im = np.reshape(im, [image_height, image_width, image_channel])
 
@@ -214,14 +218,82 @@ def creat_adv(Checkpoint_PATH, img_PATH):
             expression += LSTM.decode_maps[i]
     print("AFTER:{}".format(expression))
 
-    plt.imshow(imgs_input_after[0])
-    plt.show()
+    # plt.imshow(imgs_input_after[0])
+    # plt.show()
+    return expression
+
+
+def test():
+    num_test = 128
+    t = 0
+    train_feeder.refresh_data()
+    for e in range(num_test // batch_size):
+        for i in range(batch_size):
+            plt.imsave("temp.png", train_feeder.image[i])
+            expression = creat_adv("train_1/model", "temp.png")
+            if expression != train_feeder.labels[i]:
+                t += 1
+            print()
+    print(t / num_test)
+
+
+def darw_table(Checkpoint_PATH):
+    img_table = np.zeros([10, 10])
+
+    os.environ["CUDA_VISIBLE_DEVICES"] = '0'
+    model = LSTM.LSTMOCR("infer")
+    model.build_graph()
+    config = tf.ConfigProto()
+    config.gpu_options.allow_growth = True
+
+    Var_restore = tf.global_variables()
+    saver = tf.train.Saver(Var_restore, max_to_keep=5, allow_empty=True)
+
+    sess = tf.Session(config=config)
+    sess.run(tf.global_variables_initializer())
+
+    ckpt = tf.train.latest_checkpoint(Checkpoint_PATH)
+    if ckpt:
+        saver.restore(sess, ckpt)
+        print('restore from ckpt{}'.format(ckpt))
+    else:
+        print('cannot restore')
+        return
+
+    for i in range(10):
+        for j in range(10):
+            count = 0
+            for k in range(100):
+                im, la = train_feeder.get_test_img(i*2, j*10)
+
+                imgs_input = []
+                imgs_input.append(im)
+                imgs_input = np.asarray(imgs_input)
+                imgs_input = np.repeat(imgs_input, batch_size, axis=0)
+
+                feed = {model.inputs: imgs_input}
+
+                dense_decoded_code = sess.run(model.dense_decoded, feed)
+                expression = ''
+                for c in dense_decoded_code[0]:
+                    if c == -1:
+                        expression += ''
+                    else:
+                        expression += LSTM.decode_maps[c]
+                if expression == la:
+                    count += 1
+                # print(expression, la)
+            img_table[i, j] = count/100
+            print("i:{}, j:{}, p={}".format(i, j, img_table[i, j]))
+    np.save("table2.npy", img_table)
 
 
 def main():
     # train(True)
     # infer("train_2/model", "example/2.png")
-    creat_adv("train_3/model", "example/2.png")
+    # creat_adv("train_3/model", "example/2.png")
+    # test()
+    darw_table("train_2/model")
 
 
 if __name__ == '__main__':
