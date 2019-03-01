@@ -156,6 +156,19 @@ def infer(Checkpoint_PATH, img_PATH):
 
 
 def creat_adv(Checkpoint_PATH, img_PATH):
+    shuff_dir = {}
+    lst = [i for i in range(36)]
+    random.shuffle(lst)
+
+    def creat_onehot(num):
+        re = np.zeros([38])
+        re[num - 1] = 1
+        return re
+
+    for i in range(36):
+        shuff_dir.update({i + 1: creat_onehot(lst[i])})
+    shuff_dir.update({37: creat_onehot(37)})
+
     os.environ["CUDA_VISIBLE_DEVICES"] = '0'
     model = LSTM.LSTMOCR("infer")
     model.build_graph()
@@ -163,7 +176,9 @@ def creat_adv(Checkpoint_PATH, img_PATH):
     config.gpu_options.allow_growth = True
 
     # adv_node
-    ADV_LOSS = tf.reduce_sum(model.logits)
+    target = tf.placeholder(tf.float32, [12, 128, 38])
+    predict = tf.nn.softmax(model.logits)
+    ADV_LOSS = tf.reduce_sum(tf.square(predict - target))
     grad_y2x = tf.sign(tf.gradients(ADV_LOSS, model.inputs)[0])
 
     Var_restore = tf.global_variables()
@@ -181,7 +196,6 @@ def creat_adv(Checkpoint_PATH, img_PATH):
         return
 
     im = cv2.imread(img_PATH).astype(np.float32) / 255.
-    # im = np.reshape(im, [image_height, image_width, image_channel])
 
     imgs_input = []
     imgs_input.append(im)
@@ -191,24 +205,40 @@ def creat_adv(Checkpoint_PATH, img_PATH):
     imgs_input_before = imgs_input
     feed = {model.inputs: imgs_input}
 
+    log = sess.run(model.logits, feed)
+    fir = log[:, 0, :]
+    ex = np.argmax(fir, axis=1)
+    print(ex)
+
+    target_creat = []
+    for i in range(12):
+        target_creat.append(shuff_dir[ex[i]])
+
+    target_creat = np.asarray(target_creat)
+    target_creat = target_creat[:, np.newaxis, :]
+    target_creat = np.repeat(target_creat, batch_size, axis=1)
+
     dense_decoded_code = sess.run(model.dense_decoded, feed)
     expression = ''
     for i in dense_decoded_code[0]:
         if i == -1:
-            expression += ''
+            expression += '-'
         else:
             expression += LSTM.decode_maps[i]
     print("BEFORE:{}".format(expression))
 
     adv_step = 0.01
-    for i in range(100):
-        grad = sess.run(grad_y2x, feed)
+    feed = {model.inputs: imgs_input, target: target_creat}
+    for i in range(30):
+        loss_now, grad = sess.run([ADV_LOSS, grad_y2x], feed)
+        if (i + 1) % 10 == 0:
+            print("LOSS:{}".format(loss_now))
         imgs_input = imgs_input - grad * adv_step
-        feed = {model.inputs: imgs_input}
+        feed = {model.inputs: imgs_input, target: target_creat}
 
     imgs_input_after = imgs_input
 
-    feed = {model.inputs: imgs_input}
+    feed = {model.inputs: imgs_input, target: target_creat}
     dense_decoded_code = sess.run(model.dense_decoded, feed)
     expression = ''
     for i in dense_decoded_code[0]:
@@ -218,9 +248,9 @@ def creat_adv(Checkpoint_PATH, img_PATH):
             expression += LSTM.decode_maps[i]
     print("AFTER:{}".format(expression))
 
-    # plt.imshow(imgs_input_after[0])
-    # plt.show()
-    return expression
+    plt.imshow(imgs_input_after[0])
+    plt.show()
+    return
 
 
 def test():
@@ -264,7 +294,7 @@ def darw_table(Checkpoint_PATH):
         for j in range(10):
             count = 0
             for k in range(100):
-                im, la = train_feeder.get_test_img(i*2, j*10)
+                im, la = train_feeder.get_test_img(i * 2, j * 10)
 
                 imgs_input = []
                 imgs_input.append(im)
@@ -283,7 +313,7 @@ def darw_table(Checkpoint_PATH):
                 if expression == la:
                     count += 1
                 # print(expression, la)
-            img_table[i, j] = count/100
+            img_table[i, j] = count / 100
             print("i:{}, j:{}, p={}".format(i, j, img_table[i, j]))
     np.save("table2.npy", img_table)
 
@@ -291,9 +321,9 @@ def darw_table(Checkpoint_PATH):
 def main():
     # train(True)
     # infer("train_2/model", "example/2.png")
-    # creat_adv("train_3/model", "example/2.png")
+    creat_adv("train_3/model", "example/2.png")
     # test()
-    darw_table("train_2/model")
+    # darw_table("train_2/model")
 
 
 if __name__ == '__main__':
