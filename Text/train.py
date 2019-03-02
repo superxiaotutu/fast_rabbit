@@ -177,8 +177,9 @@ def creat_adv(Checkpoint_PATH, img_PATH):
 
     # adv_node
     target = tf.placeholder(tf.float32, [12, 128, 38])
+    origin_inputs = tf.placeholder(tf.float32, [None, image_height, image_width, image_channel])
     predict = tf.nn.softmax(model.logits)
-    ADV_LOSS = tf.reduce_sum(tf.square(predict - target))
+    ADV_LOSS = tf.reduce_sum(tf.square(predict - target)) + tf.reduce_mean(tf.square(origin_inputs - model.inputs))
     grad_y2x = tf.sign(tf.gradients(ADV_LOSS, model.inputs)[0])
 
     Var_restore = tf.global_variables()
@@ -228,17 +229,17 @@ def creat_adv(Checkpoint_PATH, img_PATH):
     print("BEFORE:{}".format(expression))
 
     adv_step = 0.01
-    feed = {model.inputs: imgs_input, target: target_creat}
+    feed = {model.inputs: imgs_input, target: target_creat, origin_inputs:imgs_input_before}
     for i in range(30):
         loss_now, grad = sess.run([ADV_LOSS, grad_y2x], feed)
         if (i + 1) % 10 == 0:
             print("LOSS:{}".format(loss_now))
         imgs_input = imgs_input - grad * adv_step
-        feed = {model.inputs: imgs_input, target: target_creat}
+        feed = {model.inputs: imgs_input, target: target_creat, origin_inputs:imgs_input_before}
 
     imgs_input_after = imgs_input
 
-    feed = {model.inputs: imgs_input, target: target_creat}
+    feed = {model.inputs: imgs_input, target: target_creat, origin_inputs:imgs_input_before}
     dense_decoded_code = sess.run(model.dense_decoded, feed)
     expression = ''
     for i in dense_decoded_code[0]:
