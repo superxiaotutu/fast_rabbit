@@ -27,7 +27,6 @@ for i, char in enumerate(LABEL_CHOICES, 1):
     encode_maps[char] = i
     decode_maps[i] = char
 
-
 SPACE_INDEX = 0
 SPACE_TOKEN = ''
 encode_maps[SPACE_TOKEN] = SPACE_INDEX
@@ -53,7 +52,6 @@ def sparse_tuple_from_label(sequences, dtype=np.int32):
     shape = np.asarray([len(sequences), np.asarray(indices).max(0)[1] + 1], dtype=np.int64)
 
     return indices, values, shape
-
 
 
 class DataIterator:
@@ -83,7 +81,6 @@ class DataIterator:
         code = [SPACE_INDEX if captcha == SPACE_TOKEN else encode_maps[c] for c in list(captcha)]
         self.image[target], self.labels[target] = img, code
 
-
     def get_test_img(self, num_line, num_point):
         slice = random.sample(LABEL_CHOICES_LIST, 4)
         captcha = ''.join(slice)
@@ -91,7 +88,6 @@ class DataIterator:
         img = np.asarray(img).astype(np.float32) / 255.
         code = [SPACE_INDEX if captcha == SPACE_TOKEN else encode_maps[c] for c in list(captcha)]
         return img, captcha
-
 
     @property
     def size(self):
@@ -204,11 +200,17 @@ class LSTMOCR(object):
                                 initializer=tf.constant_initializer())
 
             self.logits = tf.matmul(outputs, W) + b
+            print(self.logits)
+
             # Reshaping back to the original shape
             shape = tf.shape(x)
             self.logits = tf.reshape(self.logits, [shape[0], -1, num_classes])
+            print(self.logits)
+
             # Time major
             self.logits = tf.transpose(self.logits, (1, 0, 2))
+            print(self.logits)
+
 
     def _build_train_op(self):
         # self.global_step = tf.Variable(0, trainable=False)
@@ -265,18 +267,18 @@ class LSTMOCR(object):
         """Batch normalization."""
         with tf.variable_scope(name):
             x_bn = tf.contrib.layers.batch_norm(
-                    inputs=x,
-                    decay=0.9,
-                    center=True,
-                    scale=True,
-                    epsilon=1e-5,
-                    updates_collections=None,
-                    is_training=self.mode == 'train',
-                    fused=True,
-                    data_format='NHWC',
-                    zero_debias_moving_mean=True,
-                    scope='BatchNorm'
-                )
+                inputs=x,
+                decay=0.9,
+                center=True,
+                scale=True,
+                epsilon=1e-5,
+                updates_collections=None,
+                is_training=self.mode == 'train',
+                fused=True,
+                data_format='NHWC',
+                zero_debias_moving_mean=True,
+                scope='BatchNorm'
+            )
         return x_bn
 
     def _leaky_relu(self, x, leakiness=0.0):
@@ -303,4 +305,3 @@ def accuracy_calculation(original_seq, decoded_seq, ignore_value=-1, isPrint=Fal
     if isPrint:
         print('seq{0:4d}: origin: {1} decoded:{2}'.format(i, origin_label, decoded_label))
     return count * 1.0 / len(original_seq)
-
