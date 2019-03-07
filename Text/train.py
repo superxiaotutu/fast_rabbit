@@ -23,7 +23,7 @@ val_feeder = LSTM.DataIterator()
 
 
 def train(restore=False, checkpoint_dir="train_3/model"):
-    os.environ["CUDA_VISIBLE_DEVICES"] = '1'
+    os.environ["CUDA_VISIBLE_DEVICES"] = '2,3'
     model = LSTM.LSTMOCR('train')
     model.build_graph()
 
