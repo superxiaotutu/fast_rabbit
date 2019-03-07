@@ -1,15 +1,32 @@
 import matplotlib.pyplot as plt
+import skimage.util
 from captcha.image import ImageCaptcha
 from random import randint
 from PIL import Image, ImageFont, ImageDraw, ImageFilter
 from captcha.image import DEFAULT_FONTS
 import random
 import numpy as np
-
+import  cv2
 image_height = 60
 image_width = 180
 image = ImageCaptcha(width=image_width, height=image_height)
 
+
+def blur_demo(image):      #均值模糊  去随机噪声有很好的去燥效果
+    image = cv2.imread(image)
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    dst = cv2.blur(image, (13, 13))
+    return dst
+def font_demo(chars):
+    image = ImageCaptcha(width=image_width, height=image_height,font_sizes=[80])
+    background = random_color(238, 255)
+    color = random_color(10, 200, random.randint(220, 255))
+    im = image.create_captcha_image(chars, color, background)
+    im = im.filter(ImageFilter.SMOOTH)
+    return im
+
+def add_noise(image):
+    skimage.util.random_noise(image, mode='gaussian', seed=0, clip=True)
 
 def gene_code(chars):
     flag = random.randint(0, 99)
@@ -83,7 +100,13 @@ def random_color(start, end, opacity=None):
     if opacity is None:
         return (red, green, blue)
     return (red, green, blue, opacity)
-
+if __name__ == '__main__':
+    num=10
+    for i in range(66,76):
+        # a = gene_code_normal('BCD'+str(chr(i)))
+        # a.save('adv_example/%s.png'%i)
+        font_demo('BCD'+str(chr(i))).save('adv_example/%s.png'%num,)
+        num+=1
 
 # a = (gene_code("asd"))
 # print(np.asanyarray(a))

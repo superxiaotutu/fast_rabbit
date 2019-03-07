@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import random
 
 num_epochs = 2500
-batch_size = 128
+batch_size = 1
 num_batches_per_epoch = 100
 save_steps = 5000
 validation_steps = 1000
@@ -109,7 +109,7 @@ def train(restore=False, checkpoint_dir="train_3/model"):
                 log = "{}/{} {}:{}:{} Epoch {}/{}, " \
                       "accuracy = {:.3f}, avg_train_cost = {:.3f}, " \
                       "lastbatch_err = {:.3f}, time = {:.3f}, lr={:.8f}"
-                with open(checkpoint_dir.replace('model','log')+'/test_acc.txt', 'a')as f:
+                with open(checkpoint_dir.replace('model', 'log') + '/test_acc.txt', 'a')as f:
                     f.write(str(log.format(now.month, now.day, now.hour, now.minute, now.second,
                                            cur_epoch + 1, num_epochs, accuracy, avg_train_cost,
                                            err, time.time() - start_time, lr)) + "\n")
@@ -319,9 +319,53 @@ def darw_table(Checkpoint_PATH):
     np.save("table2.npy", img_table)
 
 
+def infer_many(Checkpoint_PATH, img_PATH):
+    os.environ["CUDA_VISIBLE_DEVICES"] = '1'
+    model = LSTM.LSTMOCR("infer")
+    model.build_graph()
+    config = tf.ConfigProto()
+    config.gpu_options.allow_growth = True
+
+    sess = tf.Session(config=config)
+    sess.run(tf.global_variables_initializer())
+
+    Var_restore = tf.global_variables()
+
+    saver = tf.train.Saver(Var_restore, max_to_keep=5, allow_empty=True)
+    ckpt = tf.train.latest_checkpoint(Checkpoint_PATH)
+    if ckpt:
+        saver.restore(sess, ckpt)
+        print('restore from ckpt{}'.format(ckpt))
+    else:
+        print('cannot restore')
+        return
+    p = [('adv_example/%s.png' % i) for i in range(66,76)]
+    imgs_input = []
+    for img_PATH in p:
+        im = cv2.imread(img_PATH).astype(np.float32) / 255.
+        imgs_input.append(im)
+
+    imgs_input = np.asarray(imgs_input)
+    # imgs_input = np.repeat(imgs_input, batch_size, axis=0)
+
+    feed = {model.inputs: imgs_input}
+    dense_decoded_code = sess.run(model.dense_decoded, feed)
+    expression = ''
+    print(dense_decoded_code)
+    for j in dense_decoded_code:
+        for i in j:
+            if i == -1:
+                expression += ''
+            else:
+                expression += LSTM.decode_maps[i]
+        expression+=','
+    print(expression)
+
+
 def main():
-    train(restore=False, checkpoint_dir="train_all/model")
-    # infer("train_2/model", "example/2.png")
+    #
+    # train(restore=False, checkpoint_dir="train_all/model")
+    infer("train_all/model", "example/1.png")
     # creat_adv("train_3/model", "example/2.png")
     # test()
     # darw_table("train_2/model")

@@ -18,7 +18,7 @@ decay_steps = 8000
 decay_rate = 0.97
 output_keep_prob = 0.8
 
-batch_size = 128
+batch_size = 1
 LABEL_CHOICES = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 LABEL_CHOICES_LIST = [str(i) for i in LABEL_CHOICES]
 encode_maps = {}
@@ -190,6 +190,8 @@ class LSTMOCR(object):
             )  # [batch_size, max_stepsize, FLAGS.num_hidden]
 
             # Reshaping to apply the same weights over the timesteps
+            print(outputs.shape)
+
             outputs = tf.reshape(outputs, [-1, num_hidden])  # [batch_size * max_stepsize, FLAGS.num_hidden]
 
             W = tf.get_variable(name='W_out',
