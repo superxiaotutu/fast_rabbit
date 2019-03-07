@@ -109,7 +109,7 @@ def train(restore=False, checkpoint_dir="train_3/model"):
                 log = "{}/{} {}:{}:{} Epoch {}/{}, " \
                       "accuracy = {:.3f}, avg_train_cost = {:.3f}, " \
                       "lastbatch_err = {:.3f}, time = {:.3f}, lr={:.8f}"
-                with open('train_3/log/test_acc.txt', 'a')as f:
+                with open(checkpoint_dir.replace('model','log')+'/test_acc.txt', 'a')as f:
                     f.write(str(log.format(now.month, now.day, now.hour, now.minute, now.second,
                                            cur_epoch + 1, num_epochs, accuracy, avg_train_cost,
                                            err, time.time() - start_time, lr)) + "\n")

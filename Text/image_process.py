@@ -12,7 +12,7 @@ image = ImageCaptcha(width=image_width, height=image_height)
 
 
 def gene_code(chars):
-    flag = random.randint(0, 10)
+    flag = random.randint(0, 99)
     im = gene_code_normal(chars) if flag else gene_code_clean(chars)
     im = preprocess(im)
     return im
