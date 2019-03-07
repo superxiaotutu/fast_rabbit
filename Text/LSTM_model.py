@@ -200,16 +200,13 @@ class LSTMOCR(object):
                                 initializer=tf.constant_initializer())
 
             self.logits = tf.matmul(outputs, W) + b
-            print(self.logits)
 
             # Reshaping back to the original shape
             shape = tf.shape(x)
             self.logits = tf.reshape(self.logits, [shape[0], -1, num_classes])
-            print(self.logits)
 
             # Time major
             self.logits = tf.transpose(self.logits, (1, 0, 2))
-            print(self.logits)
 
 
     def _build_train_op(self):
