@@ -38,7 +38,7 @@ def train(restore=False, checkpoint_dir="train_3/model"):
 
     saver = tf.train.Saver(Var_restore, max_to_keep=5, allow_empty=True)
 
-    train_writer = tf.summary.FileWriter("train_3/log", sess.graph)
+    train_writer = tf.summary.FileWriter(checkpoint_dir.replace('model', 'log'), sess.graph)
     acc_sum = tf.Summary()
 
     if restore:
@@ -79,7 +79,7 @@ def train(restore=False, checkpoint_dir="train_3/model"):
 
             # save the checkpoint
             if step % save_steps == 1:
-                saver.save(sess, os.path.join("train_3/model", 'ocr-model-3'), global_step=step // 1000)
+                saver.save(sess, checkpoint_dir + '/ocr-model', global_step=step // 1000)
 
             # do validation
             if step % validation_steps == 0:
@@ -229,17 +229,17 @@ def creat_adv(Checkpoint_PATH, img_PATH):
     print("BEFORE:{}".format(expression))
 
     adv_step = 0.01
-    feed = {model.inputs: imgs_input, target: target_creat, origin_inputs:imgs_input_before}
+    feed = {model.inputs: imgs_input, target: target_creat, origin_inputs: imgs_input_before}
     for i in range(30):
         loss_now, grad = sess.run([ADV_LOSS, grad_y2x], feed)
         if (i + 1) % 10 == 0:
             print("LOSS:{}".format(loss_now))
         imgs_input = imgs_input - grad * adv_step
-        feed = {model.inputs: imgs_input, target: target_creat, origin_inputs:imgs_input_before}
+        feed = {model.inputs: imgs_input, target: target_creat, origin_inputs: imgs_input_before}
 
     imgs_input_after = imgs_input
 
-    feed = {model.inputs: imgs_input, target: target_creat, origin_inputs:imgs_input_before}
+    feed = {model.inputs: imgs_input, target: target_creat, origin_inputs: imgs_input_before}
     dense_decoded_code = sess.run(model.dense_decoded, feed)
     expression = ''
     for i in dense_decoded_code[0]:
@@ -313,16 +313,16 @@ def darw_table(Checkpoint_PATH):
                         expression += LSTM.decode_maps[c]
                 if expression == la:
                     count += 1
-                # print(expression, la)
+                    # print(expression, la)
             img_table[i, j] = count / 100
             print("i:{}, j:{}, p={}".format(i, j, img_table[i, j]))
     np.save("table2.npy", img_table)
 
 
 def main():
-    # train(True)
+    train(restore=False, checkpoint_dir="train_all/model")
     # infer("train_2/model", "example/2.png")
-    creat_adv("train_3/model", "example/2.png")
+    # creat_adv("train_3/model", "example/2.png")
     # test()
     # darw_table("train_2/model")
 

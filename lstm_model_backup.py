@@ -1,8 +1,12 @@
 import tensorflow as tf
 import numpy as np
 import random
+import matplotlib.pyplot as plt
+from captcha.image import ImageCaptcha
+from random import randint
+from PIL import Image, ImageFont, ImageDraw, ImageFilter
 
-from Text.image_process import gene_code
+num_classes = 36 + 2
 
 image_height = 60
 image_width = 180
@@ -12,13 +16,11 @@ cnn_count = 4
 leakiness = 0.01
 num_hidden = 128
 initial_learning_rate = 1e-3
-num_classes = 36 + 2
-
 decay_steps = 8000
 decay_rate = 0.97
 output_keep_prob = 0.8
 
-batch_size = 1
+batch_size = 128
 LABEL_CHOICES = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 LABEL_CHOICES_LIST = [str(i) for i in LABEL_CHOICES]
 encode_maps = {}
@@ -32,6 +34,79 @@ SPACE_INDEX = 0
 SPACE_TOKEN = ''
 encode_maps[SPACE_TOKEN] = SPACE_INDEX
 decode_maps[SPACE_INDEX] = SPACE_TOKEN
+
+image = ImageCaptcha(width=image_width, height=image_height)
+
+def gene_code(chars, line, point):
+    def random_color(start, end, opacity=None):
+        red = random.randint(start, end)
+        green = random.randint(start, end)
+        blue = random.randint(start, end)
+        if opacity is None:
+            return (red, green, blue)
+        return (red, green, blue, opacity)
+
+    background = random_color(238, 255)
+    color = random_color(10, 200, random.randint(220, 255))
+    im = image.create_captcha_image(chars, color, background)
+    image.create_noise_dots(im, color, number=point)
+    for i in range(line):
+        image.create_noise_curve(im, color)
+    im = im.filter(ImageFilter.SMOOTH)
+    return im
+
+
+def gene_code_1(chars):
+    def random_color(start, end, opacity=None):
+        red = random.randint(start, end)
+        green = random.randint(start, end)
+        blue = random.randint(start, end)
+        if opacity is None:
+            return (red, green, blue)
+        return (red, green, blue, opacity)
+
+    background = random_color(238, 255)
+    color = random_color(10, 200, random.randint(220, 255))
+    im = image.create_captcha_image(chars, color, background)
+    im = im.filter(ImageFilter.SMOOTH)
+    return im
+
+
+def gene_code_2(chars):
+    def random_color(start, end, opacity=None):
+        red = random.randint(start, end)
+        green = random.randint(start, end)
+        blue = random.randint(start, end)
+        if opacity is None:
+            return (red, green, blue)
+        return (red, green, blue, opacity)
+
+    background = random_color(238, 255)
+    color = random_color(10, 200, random.randint(220, 255))
+    im = image.create_captcha_image(chars, color, background)
+    image.create_noise_dots(im, color, number=30)
+    image.create_noise_curve(im, color)
+    im = im.filter(ImageFilter.SMOOTH)
+    return im
+
+
+def gene_code_3(chars):
+    def random_color(start, end, opacity=None):
+        red = random.randint(start, end)
+        green = random.randint(start, end)
+        blue = random.randint(start, end)
+        if opacity is None:
+            return (red, green, blue)
+        return (red, green, blue, opacity)
+
+    background = random_color(238, 255)
+    color = random_color(10, 200, random.randint(220, 255))
+    im = image.create_captcha_image(chars, color, background)
+    image.create_noise_dots(im, color, number=80)
+    for i in range(10):
+        image.create_noise_curve(im, color)
+    im = im.filter(ImageFilter.SMOOTH)
+    return im
 
 
 def sparse_tuple_from_label(sequences, dtype=np.int32):
@@ -55,7 +130,6 @@ def sparse_tuple_from_label(sequences, dtype=np.int32):
     return indices, values, shape
 
 
-
 class DataIterator:
     def __init__(self):
         self.image = []
@@ -68,7 +142,7 @@ class DataIterator:
         for num in range(batch_size):
             slice = random.sample(LABEL_CHOICES_LIST, 4)
             captcha = ''.join(slice)
-            img = gene_code(captcha)
+            img = gene_code_1(captcha)
             img = np.asarray(img).astype(np.float32) / 255.
             code = [SPACE_INDEX if captcha == SPACE_TOKEN else encode_maps[c] for c in list(captcha)]
             self.labels.append(code)
@@ -78,7 +152,7 @@ class DataIterator:
         target = random.randint(0, batch_size - 1)
         slice = random.sample(LABEL_CHOICES_LIST, 4)
         captcha = ''.join(slice)
-        img = gene_code(captcha)
+        img = gene_code_1(captcha)
         img = np.asarray(img).astype(np.float32) / 255.
         code = [SPACE_INDEX if captcha == SPACE_TOKEN else encode_maps[c] for c in list(captcha)]
         self.image[target], self.labels[target] = img, code
@@ -87,7 +161,7 @@ class DataIterator:
     def get_test_img(self, num_line, num_point):
         slice = random.sample(LABEL_CHOICES_LIST, 4)
         captcha = ''.join(slice)
-        img = gene_code(captcha)
+        img = gene_code(captcha, num_line, num_point)
         img = np.asarray(img).astype(np.float32) / 255.
         code = [SPACE_INDEX if captcha == SPACE_TOKEN else encode_maps[c] for c in list(captcha)]
         return img, captcha
@@ -301,4 +375,3 @@ def accuracy_calculation(original_seq, decoded_seq, ignore_value=-1, isPrint=Fal
     if isPrint:
         print('seq{0:4d}: origin: {1} decoded:{2}'.format(i, origin_label, decoded_label))
     return count * 1.0 / len(original_seq)
-
