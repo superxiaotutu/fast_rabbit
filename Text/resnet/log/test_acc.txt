@@ -1,0 +1,4 @@
+3/10 3:33:28 Epoch 1/2500, accuracy = 0.000, avg_train_cost = 16.720, lastbatch_err = 33.440, time = 1.109, lr=0.00100000
+3/10 3:33:43 Epoch 11/2500, accuracy = 0.000, avg_train_cost = 7.282, lastbatch_err = 14.565, time = 0.039, lr=0.00100000
+3/10 3:33:58 Epoch 21/2500, accuracy = 0.000, avg_train_cost = 7.332, lastbatch_err = 14.664, time = 0.044, lr=0.00100000
+3/10 3:34:12 Epoch 31/2500, accuracy = 0.000, avg_train_cost = 7.132, lastbatch_err = 14.263, time = 0.031, lr=0.00100000
