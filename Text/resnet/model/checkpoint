@@ -1,2 +1,6 @@
-model_checkpoint_path: "ocr-model-0"
-all_model_checkpoint_paths: "ocr-model-0"
+model_checkpoint_path: "ocr-model-35"
+all_model_checkpoint_paths: "ocr-model-15"
+all_model_checkpoint_paths: "ocr-model-20"
+all_model_checkpoint_paths: "ocr-model-25"
+all_model_checkpoint_paths: "ocr-model-30"
+all_model_checkpoint_paths: "ocr-model-35"
