@@ -4,7 +4,26 @@
     <bookmark url="file://$PROJECT_DIR$/Text/train.py" line="67" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="19ba44c5-a8a7-4218-8b0c-a5cda6db8036" name="Default Changelist" comment="" />
+    <list default="true" id="19ba44c5-a8a7-4218-8b0c-a5cda6db8036" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/Text/resnet/log/events.out.tfevents.1552160006.Kirin" beforeDir="false" afterPath="$PROJECT_DIR$/Text/resnet/log/events.out.tfevents.1552160006.Kirin" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Text/resnet/log/test_acc.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Text/resnet/log/test_acc.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Text/resnet/model/checkpoint" beforeDir="false" afterPath="$PROJECT_DIR$/Text/resnet/model/checkpoint" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Text/resnet/model/ocr-model-15.data-00000-of-00001" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Text/resnet/model/ocr-model-15.index" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Text/resnet/model/ocr-model-15.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Text/resnet/model/ocr-model-20.data-00000-of-00001" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Text/resnet/model/ocr-model-20.index" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Text/resnet/model/ocr-model-20.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Text/resnet/model/ocr-model-25.data-00000-of-00001" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Text/resnet/model/ocr-model-25.index" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Text/resnet/model/ocr-model-25.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Text/resnet/model/ocr-model-30.data-00000-of-00001" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Text/resnet/model/ocr-model-30.index" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Text/resnet/model/ocr-model-30.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Text/resnet/model/ocr-model-35.data-00000-of-00001" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Text/resnet/model/ocr-model-35.index" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Text/resnet/model/ocr-model-35.meta" beforeDir="false" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -23,7 +42,7 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Text/train.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="545">
+            <state relative-caret-position="133">
               <caret line="365" column="47" selection-start-line="365" selection-start-column="47" selection-end-line="365" selection-end-column="47" />
               <folding>
                 <element signature="e#0#23#0" expanded="true" />
@@ -274,12 +293,12 @@
       <workItem from="1550849130141" duration="4091000" />
       <workItem from="1551308797865" duration="3523000" />
       <workItem from="1552102914660" duration="217000" />
-      <workItem from="1552104250533" duration="9452000" />
+      <workItem from="1552104250533" duration="10041000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="98361000" />
+    <option name="totallyTimeSpent" value="98950000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1920" height="1080" extended-state="6" />
@@ -289,7 +308,7 @@
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32873806" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.4369035" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.4369035" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.3573701" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -298,7 +317,7 @@
       <window_info anchor="bottom" id="Version Control" order="8" />
       <window_info anchor="bottom" id="Database Changes" order="9" />
       <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" />
-      <window_info active="true" anchor="bottom" auto_hide="true" x="1920" y="64" width="1920" height="1016" id="Terminal" maximized="true" order="11" visible="true" weight="0.3244963" />
+      <window_info anchor="bottom" auto_hide="true" x="1920" y="64" width="1920" height="1016" id="Terminal" maximized="true" order="11" weight="0.3244963" />
       <window_info anchor="bottom" id="Python Console" order="12" weight="0.32979852" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -536,7 +555,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Text/train.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="545">
+        <state relative-caret-position="133">
           <caret line="365" column="47" selection-start-line="365" selection-start-column="47" selection-end-line="365" selection-end-column="47" />
           <folding>
             <element signature="e#0#23#0" expanded="true" />
