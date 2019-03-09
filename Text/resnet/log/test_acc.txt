@@ -77,3 +77,11 @@
 3/10 3:52:25 Epoch 761/2500, accuracy = 0.000, avg_train_cost = 7.166, lastbatch_err = 14.333, time = 0.045, lr=0.00076023
 3/10 3:52:40 Epoch 771/2500, accuracy = 0.000, avg_train_cost = 7.221, lastbatch_err = 14.441, time = 0.038, lr=0.00076023
 3/10 3:52:55 Epoch 781/2500, accuracy = 0.000, avg_train_cost = 7.197, lastbatch_err = 14.393, time = 0.045, lr=0.00076023
+3/10 3:53:10 Epoch 791/2500, accuracy = 0.000, avg_train_cost = 7.198, lastbatch_err = 14.397, time = 0.032, lr=0.00076023
+3/10 3:53:25 Epoch 801/2500, accuracy = 0.000, avg_train_cost = 7.115, lastbatch_err = 14.229, time = 0.043, lr=0.00073742
+3/10 3:53:40 Epoch 811/2500, accuracy = 0.000, avg_train_cost = 7.189, lastbatch_err = 14.378, time = 0.045, lr=0.00073742
+3/10 3:53:55 Epoch 821/2500, accuracy = 0.000, avg_train_cost = 7.013, lastbatch_err = 14.027, time = 0.033, lr=0.00073742
+3/10 3:54:9 Epoch 831/2500, accuracy = 0.000, avg_train_cost = 7.277, lastbatch_err = 14.554, time = 0.037, lr=0.00073742
+3/10 3:54:24 Epoch 841/2500, accuracy = 0.000, avg_train_cost = 7.212, lastbatch_err = 14.424, time = 0.033, lr=0.00073742
+3/10 3:54:39 Epoch 851/2500, accuracy = 0.000, avg_train_cost = 7.190, lastbatch_err = 14.380, time = 0.037, lr=0.00073742
+3/10 3:54:54 Epoch 861/2500, accuracy = 0.000, avg_train_cost = 7.105, lastbatch_err = 14.210, time = 0.032, lr=0.00073742
