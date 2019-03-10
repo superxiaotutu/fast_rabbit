@@ -19,7 +19,7 @@ decay_steps = 4000
 decay_rate = 0.96
 output_keep_prob = 0.8
 
-batch_size = 32
+batch_size = 128
 LABEL_CHOICES = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 LABEL_CHOICES_LIST = [str(i) for i in LABEL_CHOICES]
 encode_maps = {}
