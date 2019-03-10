@@ -329,7 +329,7 @@ class LSTMOCR(object):
         assert (cnn_count <= count_, "FLAGS.cnn_count should be <= {}!".format(count_))
 
         # CNN part
-        with tf.variable_scope('mini-resnet'):
+        with tf.variable_scope('mini-inception'):
             x = self.inputs
             x = self._conv2d(x, 'cnn1', 3, 3, 4, 1)
             x = self._leaky_relu(x, leakiness)
@@ -345,6 +345,7 @@ class LSTMOCR(object):
             block_2 = self._max_pool(block_2, 2, 2)
 
             x = self._conv2d(block_2, 'cnn3', 1, 480, 64, 1)
+            x = self._leaky_relu(x, leakiness)
             _, feature_h, feature_w, _ = x.get_shape().as_list()
             print('\nfeature_h: {}, feature_w: {}'.format(feature_h, feature_w))
 
@@ -533,13 +534,21 @@ class LSTMOCR(object):
 
     def _inception_block(self, input, input_channel, name=None):
         branch_0 = self._conv2d(input, name + 'Conv2d_0a_1x1', 1, input_channel, 128, 1)
+        branch_0 = self._leaky_relu(branch_0, leakiness)
+
         branch_1 = self._conv2d(input, name + 'Conv2d_1a_1x1', 1, input_channel, 128, 1)
+        branch_1 = self._leaky_relu(branch_1, leakiness)
         branch_1 = self._conv2d(branch_1, name + 'Conv2d_1b_3x3', 3, 128, 192, 1)
+        branch_1 = self._leaky_relu(branch_1, leakiness)
+
         branch_2 = self._conv2d(input, name + 'Conv2d_2a_1x1', 1, input_channel, 32, 1)
+        branch_2 = self._leaky_relu(branch_2, leakiness)
         branch_2 = self._conv2d(branch_2, name + 'Conv2d_2b_3x3', 3, 32, 96, 1)
+        branch_2 = self._leaky_relu(branch_2, leakiness)
 
         branch_3 = self._max_pool(input, 3, 1)
         branch_3 = self._conv2d(branch_3, name + 'Conv2d_3b_1x1', 1, input_channel, 64, 1)
+        branch_3 = self._leaky_relu(branch_3, leakiness)
 
         net = tf.concat(axis=3, values=[branch_0, branch_1, branch_2, branch_3])
         return net
