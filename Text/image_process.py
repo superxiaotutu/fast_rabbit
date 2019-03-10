@@ -6,7 +6,7 @@ from PIL import Image, ImageFont, ImageDraw, ImageFilter
 from captcha.image import DEFAULT_FONTS
 import random
 import numpy as np
-import  cv2
+import cv2
 image_height = 64
 image_width = 192
 image = ImageCaptcha(width=image_width, height=image_height)
