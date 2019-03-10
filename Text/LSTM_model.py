@@ -11,14 +11,14 @@ out_channels = 64
 cnn_count = 4
 leakiness = 0.01
 num_hidden = 128
-initial_learning_rate = 0.00001
+initial_learning_rate = 0.001
 num_classes = 36 + 2
 
 decay_steps = 4000
 decay_rate = 0.96
 output_keep_prob = 0.8
 
-batch_size = 128
+batch_size = 32
 LABEL_CHOICES = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 LABEL_CHOICES_LIST = [str(i) for i in LABEL_CHOICES]
 encode_maps = {}
@@ -332,20 +332,26 @@ class LSTMOCR(object):
         with tf.variable_scope('mini-inception'):
             x = self.inputs
             x = self._conv2d(x, 'cnn1', 3, 3, 4, 1)
+            x = self._batch_norm('bn1', x)
             x = self._leaky_relu(x, leakiness)
             x = self._max_pool(x, 2, 2)
+
             x = self._conv2d(x, 'cnn2', 3, 4, 8, 1)
+            x = self._batch_norm('bn2', x)
             x = self._leaky_relu(x, leakiness)
             x = self._max_pool(x, 2, 2)
 
             block_1 = self._inception_block(x, 8, 'block1')
             block_1 = self._max_pool(block_1, 2, 2)
 
-            block_2 = self._inception_block(block_1, 120, 'block2')
+            block_2 = self._inception_block(block_1, 120, 'block2a')
             block_2 = self._max_pool(block_2, 2, 2)
 
             x = self._conv2d(block_2, 'cnn3', 3, 120, 64, 1)
+            x = self._batch_norm('bn3', x)
             x = self._leaky_relu(x, leakiness)
+            x = self._max_pool(x, 2, 2)
+
             _, feature_h, feature_w, _ = x.get_shape().as_list()
             print('\nfeature_h: {}, feature_w: {}'.format(feature_h, feature_w))
 
@@ -534,23 +540,23 @@ class LSTMOCR(object):
 
     def _inception_block(self, input, input_channel, name=None):
         branch_0 = self._conv2d(input, name + 'Conv2d_0a_1x1', 1, input_channel, 32, 1)
-        branch_0 = self._leaky_relu(branch_0, leakiness)
 
         branch_1 = self._conv2d(input, name + 'Conv2d_1a_1x1', 1, input_channel, 32, 1)
+        branch_1 = self._batch_norm(name + "branch_1_bn", branch_1)
         branch_1 = self._leaky_relu(branch_1, leakiness)
         branch_1 = self._conv2d(branch_1, name + 'Conv2d_1b_3x3', 3, 32, 48, 1)
-        branch_1 = self._leaky_relu(branch_1, leakiness)
 
         branch_2 = self._conv2d(input, name + 'Conv2d_2a_1x1', 1, input_channel, 8, 1)
+        branch_2 = self._batch_norm(name + "branch_2_bn", branch_2)
         branch_2 = self._leaky_relu(branch_2, leakiness)
         branch_2 = self._conv2d(branch_2, name + 'Conv2d_2b_3x3', 3, 8, 24, 1)
-        branch_2 = self._leaky_relu(branch_2, leakiness)
 
         branch_3 = self._max_pool(input, 3, 1)
         branch_3 = self._conv2d(branch_3, name + 'Conv2d_3b_1x1', 1, input_channel, 16, 1)
-        branch_3 = self._leaky_relu(branch_3, leakiness)
 
         net = tf.concat(axis=3, values=[branch_0, branch_1, branch_2, branch_3])
+        net = self._batch_norm(name + "net_bn", net)
+        net = self._leaky_relu(net, leakiness)
         return net
 
 
