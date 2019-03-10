@@ -3,6 +3,7 @@ import numpy as np
 import random
 
 # from image_process import gene_code
+from Text.image_process import gene_code
 
 image_height = 64
 image_width = 192
@@ -35,23 +36,6 @@ decode_maps[SPACE_INDEX] = SPACE_TOKEN
 from PIL import Image, ImageFont, ImageDraw, ImageFilter
 from captcha.image import ImageCaptcha
 image = ImageCaptcha(width=image_width, height=image_height)
-
-def gene_code(chars):
-    def random_color(start, end, opacity=None):
-        red = random.randint(start, end)
-        green = random.randint(start, end)
-        blue = random.randint(start, end)
-        if opacity is None:
-            return (red, green, blue)
-        return (red, green, blue, opacity)
-
-    background = random_color(238, 255)
-    color = random_color(10, 200, random.randint(220, 255))
-    im = image.create_captcha_image(chars, color, background)
-    image.create_noise_dots(im, color, number=30)
-    image.create_noise_curve(im, color)
-    im = im.filter(ImageFilter.SMOOTH)
-    return im
 
 
 def sparse_tuple_from_label(sequences, dtype=np.int32):
