@@ -3,8 +3,8 @@ import matplotlib.pyplot as plt
 from PIL import Image
 from skimage.util import random_noise
 
-from Text.analyse.LSTM_model import LABEL_CHOICES_LIST
-from Text.analyse.anaylse import gen_gauss_code, gene_code_clean
+from LSTM_model import LABEL_CHOICES_LIST
+from anaylse import gen_gauss_code, gene_code_clean
 import numpy as np
 def gen_oppose():
     for num in range(1000):

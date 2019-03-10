@@ -10,7 +10,7 @@ import random
 
 from PIL import Image
 
-from Text.analyse.oppose_1000 import add_gauss
+from oppose_1000 import add_gauss
 
 num_epochs = 2500
 num_batches_per_epoch = 100
