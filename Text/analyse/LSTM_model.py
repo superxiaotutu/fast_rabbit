@@ -2,7 +2,7 @@ import tensorflow as tf
 import numpy as np
 import random
 import matplotlib as mpl
-# mpl.use('Agg')
+mpl.use('Agg')
 import matplotlib.pyplot as plt
 
 from anaylse import gen_gauss_code
@@ -21,7 +21,7 @@ decay_steps = 8000
 decay_rate = 0.97
 output_keep_prob = 0.8
 
-batch_size = 128
+batch_size = 1000
 LABEL_CHOICES = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 LABEL_CHOICES_LIST = [str(i) for i in LABEL_CHOICES]
 encode_maps = {}
