@@ -1,8 +1,11 @@
 import tensorflow as tf
 import numpy as np
 import random
+import matplotlib as mpl
+mpl.use('Agg')
+import matplotlib.pyplot as plt
 
-from anaylse import gen_salt_code
+from anaylse import gen_gauss_code
 
 image_height = 60
 image_width = 180
@@ -66,26 +69,29 @@ class DataIterator:
         for num in range(batch_size):
             slice = random.sample(LABEL_CHOICES_LIST, 4)
             captcha = ''.join(slice)
-            img = gen_salt_code(captcha)
-            img = np.asarray(img).astype(np.float32) / 255.
+            img = gen_gauss_code(captcha)
+            # img = np.asarray(img).astype(np.float32) / 255.
             code = [SPACE_INDEX if captcha == SPACE_TOKEN else encode_maps[c] for c in list(captcha)]
             self.labels.append(code)
             self.image.append(img)
-
+        for i in range(20):
+            plt.imshow(img)
+            plt.imsave('example/temp_%s.png'%i, img)
+            plt.close()
     def modify_data(self):
         target = random.randint(0, batch_size - 1)
         slice = random.sample(LABEL_CHOICES_LIST, 4)
         captcha = ''.join(slice)
-        img = gen_salt_code(captcha)
-        img = np.asarray(img).astype(np.float32) / 255.
+        img = gen_gauss_code(captcha)
+        # img = np.asarray(img).astype(np.float32) / 255.
         code = [SPACE_INDEX if captcha == SPACE_TOKEN else encode_maps[c] for c in list(captcha)]
         self.image[target], self.labels[target] = img, code
 
     def get_test_img(self, num_line, num_point):
         slice = random.sample(LABEL_CHOICES_LIST, 4)
         captcha = ''.join(slice)
-        img = gen_salt_code(captcha)
-        img = np.asarray(img).astype(np.float32) / 255.
+        img = gen_gauss_code(captcha)
+        # img = np.asarray(img).astype(np.float32) / 255.
         code = [SPACE_INDEX if captcha == SPACE_TOKEN else encode_maps[c] for c in list(captcha)]
         return img, captcha
 
@@ -207,7 +213,6 @@ class LSTMOCR(object):
 
             # Time major
             self.logits = tf.transpose(self.logits, (1, 0, 2))
-
 
     def _build_train_op(self):
         # self.global_step = tf.Variable(0, trainable=False)

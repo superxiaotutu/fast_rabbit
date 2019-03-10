@@ -5,8 +5,11 @@ from PIL import ImageDraw
 from PIL import ImageFont
 from PIL import ImageFilter
 from captcha.image import DEFAULT_FONTS
+from skimage.util import random_noise
+import matplotlib.pyplot as plt
 
-SALT_LEVEL = [0.3, 0.4, 0.5, 0.6, 0.7]
+SALT_LEVEL = []
+NOISE_NUM=[i for i in range(0,36,7)]
 image_height = 60
 image_width = 180
 
@@ -36,9 +39,21 @@ def addsalt_pepper(img, alpha=0.7):
     img = Image.fromarray(img.astype('uint8')).convert('RGB')
     return img
 
+def gen_gauss_code(captcha):
+    img = gene_code_clean(captcha)
+    img = np.asarray(img).astype(np.float32) / 255.
+    img.flags.writeable = True
+    level=random.choice(NOISE_NUM)
+    for j in range(level):
+        img=random_noise(img)
+    np.clip(img,0,1)
+    # img = Image.fromarray(img.astype('uint8')).convert('RGB')
+    return img
+
 
 def gen_salt_code(captcha):
     img = gene_code_clean(captcha)
-    salt_level = random.choice(SALT_LEVEL)
-    img = addsalt_pepper(img, alpha=salt_level)
+    # salt_level = random.choice(SALT_LEVEL)
+    img = gen_gauss_code(img)
     return img
+
