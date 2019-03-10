@@ -114,5 +114,5 @@ def train(restore=False, checkpoint_dir="train_3/model"):
 
 
 if __name__ == '__main__':
-    checkpoint_dir = "train_salt/model"
+    checkpoint_dir = "train_gauss/model"
     train(False, checkpoint_dir)

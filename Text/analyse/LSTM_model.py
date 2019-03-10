@@ -2,6 +2,7 @@ import tensorflow as tf
 import numpy as np
 import random
 import matplotlib as mpl
+
 mpl.use('Agg')
 import matplotlib.pyplot as plt
 
@@ -74,10 +75,11 @@ class DataIterator:
             code = [SPACE_INDEX if captcha == SPACE_TOKEN else encode_maps[c] for c in list(captcha)]
             self.labels.append(code)
             self.image.append(img)
-        for i in range(20):
+        for i, img in enumerate(self.image):
             plt.imshow(img)
-            plt.imsave('example/temp_%s.png'%i, img)
+            plt.imsave('example/temp_%s.png' % i, img)
             plt.close()
+
     def modify_data(self):
         target = random.randint(0, batch_size - 1)
         slice = random.sample(LABEL_CHOICES_LIST, 4)

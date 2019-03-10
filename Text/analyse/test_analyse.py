@@ -41,12 +41,20 @@ def addsalt_pepper(img, alpha=0.7):
 
 
 def gen_gauss_code(captcha):
-    img = gene_code_clean(captcha)
-    img = np.asarray(img).astype(np.float32) / 255.
-    img.flags.writeable = True
-    level = random.choice(NOISE_NUM)
-    for j in range(level):
-        img = random_noise(img)
-    np.clip(img, 0, 1)
+    for j in NOISE_NUM:
+        img = gene_code_clean(captcha)
+        img = np.asarray(img).astype(np.float32) / 255.
+        img.flags.writeable = True
+        for l in range(j):
+            img = random_noise(img)
+        np.clip(img, 0, 1)
+
+        plt.imshow(img)
+        plt.show()
+        plt.imsave('test.png', img)
+
     # img = Image.fromarray(img.astype('uint8')).convert('RGB')
     return img
+
+
+img = gen_gauss_code("SVJ2")
