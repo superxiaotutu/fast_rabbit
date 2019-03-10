@@ -67,9 +67,9 @@ def normal_choice():
         else:
             return int(line), int(dot)
 
-
+# random.choice([42, 50, 56])
 def gene_code_clean(chars):
-    font = ImageFont.truetype(DEFAULT_FONTS[0], size=random.choice([42, 50, 56]))
+    font = ImageFont.truetype(DEFAULT_FONTS[0], size=50)
     font_width, font_height = font.getsize(chars)
     im = Image.new('RGB', (image_width, image_height), color=(255, 255, 255))
     draw = ImageDraw.Draw(im)
@@ -102,11 +102,9 @@ def random_color(start, end, opacity=None):
     return (red, green, blue, opacity)
 if __name__ == '__main__':
     num=10
-    for i in range(66,76):
-        # a = gene_code_normal('BCD'+str(chr(i)))
-        # a.save('adv_example/%s.png'%i)
-        font_demo('BCD'+str(chr(i))).save('adv_example/%s.png'%num,)
-        num+=1
+    for i in range(1):
+        a = gene_code_clean('BCD2')
+        a.save('example/12%s.png'%i)
 
 # a = (gene_code("asd"))
 # print(np.asanyarray(a))
