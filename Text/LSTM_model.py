@@ -35,6 +35,7 @@ decode_maps[SPACE_INDEX] = SPACE_TOKEN
 
 from PIL import Image, ImageFont, ImageDraw, ImageFilter
 from captcha.image import ImageCaptcha
+
 image = ImageCaptcha(width=image_width, height=image_height)
 
 
@@ -113,7 +114,8 @@ class DataIterator:
 
 
 class LSTMOCR(object):
-    def __init__(self, mode):
+    def __init__(self, mode, cnn_mode):
+        self.cnn_mode = cnn_mode
         self.mode = mode
         # image
         self.inputs = tf.placeholder(tf.float32, [None, image_height, image_width, image_channel])
@@ -126,9 +128,12 @@ class LSTMOCR(object):
         self._extra_train_ops = []
 
     def build_graph(self):
-        # self._build_model()
-        # self._build_model_with_resnet()
-        self._build_model_with_inception()
+        if self.cnn_mode == "lenet":
+            self._build_model()
+        elif self.cnn_mode == "resenet":
+            self._build_model_with_resnet()
+        elif self.cnn_mode == "inception":
+            self._build_model_with_inception()
         self._build_train_op()
         self.merged_summay = tf.summary.merge_all()
 
