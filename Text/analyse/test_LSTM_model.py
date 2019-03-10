@@ -7,6 +7,8 @@ import matplotlib.pyplot as plt
 
 from anaylse import gen_gauss_code
 
+batch_size = 1
+
 image_height = 60
 image_width = 180
 image_channel = 3
@@ -21,7 +23,6 @@ decay_steps = 8000
 decay_rate = 0.97
 output_keep_prob = 0.8
 
-batch_size = 128
 LABEL_CHOICES = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 LABEL_CHOICES_LIST = [str(i) for i in LABEL_CHOICES]
 encode_maps = {}
