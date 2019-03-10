@@ -3,7 +3,7 @@ import numpy as np
 import random
 
 # from image_process import gene_code
-from Text.image_process import gene_code
+from image_process import gene_code
 
 image_height = 64
 image_width = 192
@@ -77,7 +77,9 @@ class DataIterator:
             code = [SPACE_INDEX if captcha == SPACE_TOKEN else encode_maps[c] for c in list(captcha)]
             self.labels.append(code)
             self.image.append(img)
-
+        import matplotlib.pyplot as plt
+        for i,img in enumerate(self.image):
+            plt.imsave("%s_temp"%i,img)
     def modify_data(self):
         target = random.randint(0, batch_size - 1)
         slice = random.sample(LABEL_CHOICES_LIST, 4)
