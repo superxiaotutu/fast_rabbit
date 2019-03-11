@@ -2,8 +2,7 @@ import tensorflow as tf
 import numpy as np
 import random
 
-# from image_process import gene_code
-from image_process import gene_code
+from image_process import gene_code,gene_code_clean
 
 image_height = 64
 image_width = 192

@@ -25,7 +25,7 @@ os.environ["CUDA_VISIBLE_DEVICES"] = '1'
 
 def train(restore=False, cnn_name="lenet"):
     checkpoint_dir = "train_%s/model"%cnn_name
-    model = LSTM.LSTMOCR('train','inception')
+    model = LSTM.LSTMOCR('train',cnn_name)
     model.build_graph()
 
     config = tf.ConfigProto()
