@@ -363,7 +363,7 @@ def infer_many(Checkpoint_PATH, img_PATH):
 
 
 def main():
-    train(restore=False, checkpoint_dir="inception/model")
+    train(restore=False, checkpoint_dir="test")
     # infer("train_all/model", "example/1.png")
     # creat_adv("train_3/model", "example/2.png")
     # test()

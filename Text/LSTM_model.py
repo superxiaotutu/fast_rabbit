@@ -486,10 +486,13 @@ class LSTMOCR(object):
         with tf.variable_scope('4fc'):
             x = tf.reshape(x, [batch_size, feature_w * feature_h * out_channels])
 
-            y1, sy1 = self._bulid_fc(x, num_classes)
-            y2, sy2 = self._bulid_fc(x, num_classes)
-            y3, sy3 = self._bulid_fc(x, num_classes)
-            y4, sy4 = self._bulid_fc(x, num_classes)
+            _, feature_l = x.get_shape().as_list()
+            print('\nfeature_l: {}'.format(feature_l))
+
+            y1, sy1 = self._bulid_fc(x, num_classes, '1')
+            y2, sy2 = self._bulid_fc(x, num_classes, '2')
+            y3, sy3 = self._bulid_fc(x, num_classes, '3')
+            y4, sy4 = self._bulid_fc(x, num_classes, '4')
 
             self.logits = tf.concat(axis=1, values=[y1, y2, y3, y4])
             self.log_prob = tf.concat(axis=1, values=[sy1, sy2, sy3, sy4])
@@ -638,11 +641,12 @@ class LSTMOCR(object):
         net = self._leaky_relu(net, leakiness)
         return net
 
-    def _bulid_fc(self, x, out_num):
-        x = slim.layers.fully_connected(x, 128)
-        x = slim.layers.fully_connected(x, 256)
-        x = slim.layers.fully_connected(x, out_num,  None)
-        after_softmax_x = slim.softmax(x)
+    def _bulid_fc(self, x, out_num, name):
+        with tf.variable_scope('fc' + name):
+            x = slim.layers.fully_connected(x, 512)
+            x = slim.layers.fully_connected(x, 256)
+            x = slim.layers.fully_connected(x, out_num,  None)
+            after_softmax_x = slim.softmax(x)
         return x, after_softmax_x
 
 def accuracy_calculation(original_seq, decoded_seq, ignore_value=-1, isPrint=False):
