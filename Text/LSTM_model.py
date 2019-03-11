@@ -497,6 +497,8 @@ class LSTMOCR(object):
             self.logits = tf.reshape(self.logits, [batch_size, 4, num_classes])
             self.log_prob = tf.reshape(self.log_prob, [batch_size, 4, num_classes])
 
+            self.dense_decoded = tf.arg_max(self.logits, dimension=2)
+
         self.global_step = tf.train.get_or_create_global_step()
 
         true_label = tf.sparse_tensor_to_dense(self.labels, default_value=0)
