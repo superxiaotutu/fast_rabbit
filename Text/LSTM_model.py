@@ -2,6 +2,8 @@ import tensorflow as tf
 import numpy as np
 import random
 
+import tensorflow.contrib.slim as slim
+
 # from image_process import gene_code
 
 image_height = 64
@@ -142,10 +144,14 @@ class LSTMOCR(object):
         self._extra_train_ops = []
 
     def build_graph(self):
-        # self._build_model()
-        # self._build_model_with_resnet()
-        self._build_model_with_inception()
-        self._build_train_op()
+        # if LSTM:
+        #     # self._build_model()
+        #     # self._build_model_with_resnet()
+        #     self._build_model_with_inception()
+        #     self._build_train_op()
+        # else:
+        self._bulid_CNN_with_4_FC()
+
         self.merged_summay = tf.summary.merge_all()
 
     def _build_model(self):
@@ -448,6 +454,71 @@ class LSTMOCR(object):
         # self.decoded, self.log_prob = tf.nn.ctc_greedy_decoder(logits, seq_len, merge_repeated=False)
         self.dense_decoded = tf.sparse_tensor_to_dense(self.decoded[0], default_value=-1)
 
+
+    def _bulid_CNN_with_4_FC(self):
+        filters = [3, 64, 128, 128, out_channels]
+        strides = [1, 2]
+
+        feature_h = image_height
+        feature_w = image_width
+
+        count_ = 0
+        min_size = min(image_height, image_width)
+        while min_size > 1:
+            min_size = (min_size + 1) // 2
+            count_ += 1
+        assert (cnn_count <= count_, "FLAGS.cnn_count should be <= {}!".format(count_))
+
+        # CNN part
+        with tf.variable_scope('cnn'):
+            x = self.inputs
+            for i in range(cnn_count):
+                with tf.variable_scope('unit-%d' % (i + 1)):
+                    x = self._conv2d(x, 'cnn-%d' % (i + 1), 3, filters[i], filters[i + 1], strides[0])
+                    x = self._batch_norm('bn%d' % (i + 1), x)
+                    x = self._leaky_relu(x, leakiness)
+                    x = self._max_pool(x, 2, strides[1])
+
+                    # print('----x.get_shape().as_list(): {}'.format(x.get_shape().as_list()))
+                    _, feature_h, feature_w, _ = x.get_shape().as_list()
+                    print('\nfeature_h: {}, feature_w: {}'.format(feature_h, feature_w))
+
+        with tf.variable_scope('4fc'):
+            x = tf.reshape(x, [batch_size, feature_w * feature_h * out_channels])
+
+            y1, sy1 = self._bulid_fc(x, num_classes)
+            y2, sy2 = self._bulid_fc(x, num_classes)
+            y3, sy3 = self._bulid_fc(x, num_classes)
+            y4, sy4 = self._bulid_fc(x, num_classes)
+
+            self.logits = tf.concat(axis=1, values=[y1, y2, y3, y4])
+            self.log_prob = tf.concat(axis=1, values=[sy1, sy2, sy3, sy4])
+
+            self.logits = tf.reshape(self.logits, [batch_size, 4, num_classes])
+            self.log_prob = tf.reshape(self.log_prob, [batch_size, 4, num_classes])
+
+        self.global_step = tf.train.get_or_create_global_step()
+
+        true_label = tf.sparse_tensor_to_dense(self.labels, default_value=0)
+        one_hot_true_label = tf.one_hot(true_label, depth=num_classes, axis=1)
+        one_hot_true_label = tf.transpose(one_hot_true_label, [0, 2, 1])
+        self.loss = tf.square(self.log_prob - one_hot_true_label)
+        self.cost = tf.reduce_mean(self.loss)
+        tf.summary.scalar('cost', self.cost)
+
+        self.lrn_rate = tf.train.exponential_decay(initial_learning_rate,
+                                                   self.global_step,
+                                                   decay_steps,
+                                                   decay_rate,
+                                                   staircase=True)
+        tf.summary.scalar('learning_rate', self.lrn_rate)
+
+        self.optimizer = tf.train.AdamOptimizer(learning_rate=self.lrn_rate).minimize(self.loss,
+                                                                                      global_step=self.global_step)
+        train_ops = [self.optimizer] + self._extra_train_ops
+        self.train_op = tf.group(*train_ops)
+
+
     def _conv2d(self, x, name, filter_size, in_channels, out_channels, strides):
         with tf.variable_scope(name):
             kernel = tf.get_variable(name='W',
@@ -559,6 +630,12 @@ class LSTMOCR(object):
         net = self._leaky_relu(net, leakiness)
         return net
 
+    def _bulid_fc(self, x, out_num):
+        x = slim.layers.fully_connected(x, 128)
+        x = slim.layers.fully_connected(x, 256)
+        x = slim.layers.fully_connected(x, out_num,  None)
+        after_softmax_x = slim.softmax(x)
+        return x, after_softmax_x
 
 def accuracy_calculation(original_seq, decoded_seq, ignore_value=-1, isPrint=False):
     if len(original_seq) != len(decoded_seq):
