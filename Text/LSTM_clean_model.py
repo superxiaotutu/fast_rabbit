@@ -1,7 +1,7 @@
 import tensorflow as tf
 import numpy as np
 import random
-
+import tensorflow.contrib.slim as slim
 from image_process import gene_code_clean
 
 image_height = 64
