@@ -20,10 +20,11 @@ image_channel = 3
 
 train_feeder = LSTM.DataIterator()
 val_feeder = LSTM.DataIterator()
-os.environ["CUDA_VISIBLE_DEVICES"] = '1'
 
 
 def train(restore=False, cnn_name="lenet"):
+
+
     checkpoint_dir = "train_%s/model"%cnn_name
     model = LSTM.LSTMOCR('train',cnn_name)
     model.build_graph()
@@ -364,12 +365,11 @@ def infer_many(Checkpoint_PATH, img_PATH):
 
 
 def main():
+    os.environ["CUDA_VISIBLE_DEVICES"] = '2'
     train(restore=False,cnn_name="resnet")
-    # infer("train_all/model", "example/1.png")
-    # creat_adv("train_3/model", "example/2.png")
-    # test()
-    # darw_table("train_2/model")
-
+    train(restore=False,cnn_name="lenet")
+    train(restore=False,cnn_name="cnn")
+    train(restore=False, cnn_name="inception")
 
 if __name__ == '__main__':
     main()

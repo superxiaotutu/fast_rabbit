@@ -101,10 +101,3 @@ def random_color(start, end, opacity=None):
         return (red, green, blue)
     return (red, green, blue, opacity)
 
-# if __name__ == '__main__':
-#     num=10
-#     for i in range(1):
-#         a = gene_code_clean('BCD2')
-#         a.save('example/12%s.png'%i)
-# a = (gene_code("asd"))
-# print(np.asanyarray(a))

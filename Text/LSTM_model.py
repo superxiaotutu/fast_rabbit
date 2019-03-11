@@ -2,7 +2,7 @@ import tensorflow as tf
 import numpy as np
 import random
 
-from image_process import gene_code,gene_code_clean
+from image_process import gene_code
 
 image_height = 64
 image_width = 192
@@ -77,8 +77,9 @@ class DataIterator:
             self.labels.append(code)
             self.image.append(img)
         import matplotlib.pyplot as plt
-        for i,img in enumerate(self.image):
-            plt.imsave("%s_temp"%i,img)
+        for i, img in enumerate(self.image[:10]):
+            plt.imsave("%s_temp" % i, img)
+
     def modify_data(self):
         target = random.randint(0, batch_size - 1)
         slice = random.sample(LABEL_CHOICES_LIST, 4)
@@ -129,13 +130,16 @@ class LSTMOCR(object):
         self._extra_train_ops = []
 
     def build_graph(self):
-        if self.cnn_mode == "lenet":
-            self._build_model()
-        elif self.cnn_mode == "resenet":
-            self._build_model_with_resnet()
-        elif self.cnn_mode == "inception":
-            self._build_model_with_inception()
-        self._build_train_op()
+        if self.cnn_mode == 'cnn':
+            self._bulid_CNN_with_4_FC()
+        else:
+            if self.cnn_mode == "lenet":
+                self._build_model()
+            elif self.cnn_mode == "resnet":
+                self._build_model_with_resnet()
+            elif self.cnn_mode == "inception":
+                self._build_model_with_inception()
+            self._build_train_op()
         self.merged_summay = tf.summary.merge_all()
 
     def _build_model(self):
@@ -437,6 +441,79 @@ class LSTMOCR(object):
         self.decoded, self.log_prob = tf.nn.ctc_beam_search_decoder(self.logits, self.seq_len, merge_repeated=False)
         # self.decoded, self.log_prob = tf.nn.ctc_greedy_decoder(logits, seq_len, merge_repeated=False)
         self.dense_decoded = tf.sparse_tensor_to_dense(self.decoded[0], default_value=-1)
+
+    def _bulid_CNN_with_4_FC(self):
+        filters = [3, 64, 128, 128, out_channels]
+        strides = [1, 2]
+
+        feature_h = image_height
+        feature_w = image_width
+
+        count_ = 0
+        min_size = min(image_height, image_width)
+        while min_size > 1:
+            min_size = (min_size + 1) // 2
+            count_ += 1
+        assert (cnn_count <= count_, "FLAGS.cnn_count should be <= {}!".format(count_))
+
+        # CNN part
+        with tf.variable_scope('cnn'):
+            x = self.inputs
+            for i in range(cnn_count):
+                with tf.variable_scope('unit-%d' % (i + 1)):
+                    x = self._conv2d(x, 'cnn-%d' % (i + 1), 3, filters[i], filters[i + 1], strides[0])
+                    x = self._batch_norm('bn%d' % (i + 1), x)
+                    x = self._leaky_relu(x, leakiness)
+                    x = self._max_pool(x, 2, strides[1])
+
+                    # print('----x.get_shape().as_list(): {}'.format(x.get_shape().as_list()))
+                    _, feature_h, feature_w, _ = x.get_shape().as_list()
+                    print('\nfeature_h: {}, feature_w: {}'.format(feature_h, feature_w))
+
+        with tf.variable_scope('4fc'):
+            x = tf.reshape(x, [batch_size, feature_w * feature_h * out_channels])
+
+            _, feature_l = x.get_shape().as_list()
+            print('\nfeature_l: {}'.format(feature_l))
+
+            y1, sy1 = self._bulid_fc(x, num_classes, '1')
+            y2, sy2 = self._bulid_fc(x, num_classes, '2')
+            y3, sy3 = self._bulid_fc(x, num_classes, '3')
+            y4, sy4 = self._bulid_fc(x, num_classes, '4')
+
+            self.logits = tf.concat(axis=1, values=[y1, y2, y3, y4])
+            self.log_prob = tf.concat(axis=1, values=[sy1, sy2, sy3, sy4])
+
+            self.logits = tf.reshape(self.logits, [batch_size, 4, num_classes])
+            self.log_prob = tf.reshape(self.log_prob, [batch_size, 4, num_classes])
+
+            self.dense_decoded = tf.arg_max(self.logits, dimension=2)
+
+        self.global_step = tf.train.get_or_create_global_step()
+
+        true_label = tf.sparse_tensor_to_dense(self.labels, default_value=0)
+        one_hot_true_label = tf.one_hot(true_label, depth=num_classes, axis=1)
+        one_hot_true_label = tf.transpose(one_hot_true_label, [0, 2, 1])
+
+        self.loss = slim.losses.softmax_cross_entropy(y1, one_hot_true_label[:, 0, :]) + \
+                    slim.losses.softmax_cross_entropy(y2, one_hot_true_label[:, 1, :]) + \
+                    slim.losses.softmax_cross_entropy(y3, one_hot_true_label[:, 2, :]) + \
+                    slim.losses.softmax_cross_entropy(y4, one_hot_true_label[:, 3, :])
+
+        self.cost = tf.reduce_mean(self.loss)
+        tf.summary.scalar('cost', self.cost)
+
+        self.lrn_rate = tf.train.exponential_decay(initial_learning_rate,
+                                                   self.global_step,
+                                                   decay_steps,
+                                                   decay_rate,
+                                                   staircase=True)
+        tf.summary.scalar('learning_rate', self.lrn_rate)
+
+        self.optimizer = tf.train.AdamOptimizer(learning_rate=self.lrn_rate).minimize(self.loss,
+                                                                                      global_step=self.global_step)
+        train_ops = [self.optimizer] + self._extra_train_ops
+        self.train_op = tf.group(*train_ops)
 
     def _conv2d(self, x, name, filter_size, in_channels, out_channels, strides):
         with tf.variable_scope(name):
