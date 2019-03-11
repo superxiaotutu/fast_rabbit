@@ -504,7 +504,13 @@ class LSTMOCR(object):
         true_label = tf.sparse_tensor_to_dense(self.labels, default_value=0)
         one_hot_true_label = tf.one_hot(true_label, depth=num_classes, axis=1)
         one_hot_true_label = tf.transpose(one_hot_true_label, [0, 2, 1])
-        self.loss = tf.square(self.log_prob - one_hot_true_label)
+
+
+        self.loss = slim.losses.softmax_cross_entropy(y1, one_hot_true_label[:, 0, :]) + \
+                    slim.losses.softmax_cross_entropy(y2, one_hot_true_label[:, 1, :]) + \
+                    slim.losses.softmax_cross_entropy(y3, one_hot_true_label[:, 2, :]) + \
+                    slim.losses.softmax_cross_entropy(y4, one_hot_true_label[:, 3, :])
+
         self.cost = tf.reduce_mean(self.loss)
         tf.summary.scalar('cost', self.cost)
 
