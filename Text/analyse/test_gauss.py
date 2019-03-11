@@ -5,7 +5,10 @@ import numpy as np
 import os
 import datetime
 import cv2
+import matplotlib as mpl
+mpl.use('Agg')
 import matplotlib.pyplot as plt
+
 import random
 
 from PIL import Image
@@ -26,7 +29,7 @@ val_feeder = LSTM.DataIterator()
 
 
 def infer(Checkpoint_PATH, img_PATH):
-    os.environ["CUDA_VISIBLE_DEVICES"] = '3'
+    os.environ["CUDA_VISIBLE_DEVICES"] = '0'
     model = LSTM.LSTMOCR("infer")
     model.build_graph()
     config = tf.ConfigProto()

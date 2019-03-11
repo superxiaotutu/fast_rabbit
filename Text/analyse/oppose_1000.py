@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from PIL import Image
 from skimage.util import random_noise
 
-from LSTM_model import LABEL_CHOICES_LIST
+from test_LSTM_model import LABEL_CHOICES_LIST
 from anaylse import gen_gauss_code, gene_code_clean
 import numpy as np
 def gen_oppose():

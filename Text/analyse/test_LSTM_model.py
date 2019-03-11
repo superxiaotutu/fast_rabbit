@@ -2,12 +2,12 @@ import tensorflow as tf
 import numpy as np
 import random
 import matplotlib as mpl
-# mpl.use('Agg')
+mpl.use('Agg')
 import matplotlib.pyplot as plt
 
 from anaylse import gen_gauss_code
 
-batch_size = 1
+batch_size = 1000
 
 image_height = 60
 image_width = 180
