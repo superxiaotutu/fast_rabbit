@@ -1,5 +1,5 @@
 import tensorflow as tf
-import LSTM_model as LSTM
+import gauss_modeel as LSTM
 import time
 import os
 import datetime
@@ -10,8 +10,8 @@ num_batches_per_epoch = 100
 save_steps = 5000
 validation_steps = 1000
 
-image_height = 60
-image_width = 180
+image_height = 64
+image_width = 192
 image_channel = 3
 
 train_feeder = LSTM.DataIterator()
