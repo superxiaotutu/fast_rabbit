@@ -7,8 +7,8 @@ import matplotlib.pyplot as plt
 
 from anaylse import gen_gauss_code
 
-image_height = 60
-image_width = 180
+image_height = 64
+image_width = 192
 image_channel = 3
 out_channels = 64
 cnn_count = 4
