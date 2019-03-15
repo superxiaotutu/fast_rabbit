@@ -136,7 +136,8 @@ def infer(Checkpoint_PATH, img_PATH):
         print('restore from ckpt{}'.format(ckpt))
     else:
         print('cannot restore')
-        return
+        # return
+
     im = cv2.imread(img_PATH).astype(np.float32) / 255.
     imgs_input = []
     imgs_input.append(im)
@@ -176,10 +177,17 @@ def creat_adv(Checkpoint_PATH, img_PATH):
     config.gpu_options.allow_growth = True
 
     # adv_node
-    target = tf.placeholder(tf.float32, [12, 128, 38])
+    target = tf.placeholder(tf.float32, [12, batch_size, 38])
     origin_inputs = tf.placeholder(tf.float32, [None, image_height, image_width, image_channel])
     predict = tf.nn.softmax(model.logits)
-    ADV_LOSS = tf.reduce_sum(tf.square(predict - target)) + tf.reduce_mean(tf.square(origin_inputs - model.inputs))
+    # ADV_LOSS = tf.reduce_sum(tf.square(predict - target)) + tf.reduce_mean(tf.square(origin_inputs - model.inputs))
+    current_status = tf.argmax(predict, axis=-1)
+    current_mengban = tf.one_hot(current_status, 38, axis=0)
+    current_mengban = tf.transpose(current_mengban, [1, 2, 0])
+
+    ADV_LOSS = tf.reduce_mean(tf.square(origin_inputs - model.inputs)) + tf.reduce_mean(
+        tf.square(tf.reduce_sum(predict * current_mengban) - tf.reduce_sum(predict * target)))
+
     grad_y2x = tf.sign(tf.gradients(ADV_LOSS, model.inputs)[0])
 
     Var_restore = tf.global_variables()
@@ -189,14 +197,16 @@ def creat_adv(Checkpoint_PATH, img_PATH):
     sess.run(tf.global_variables_initializer())
 
     ckpt = tf.train.latest_checkpoint(Checkpoint_PATH)
-    if ckpt:
-        saver.restore(sess, ckpt)
-        print('restore from ckpt{}'.format(ckpt))
-    else:
-        print('cannot restore')
-        return
+
+    # if ckpt:
+    #     saver.restore(sess, ckpt)
+    #     print('restore from ckpt{}'.format(ckpt))
+    # else:
+    #     print('cannot restore')
+    #     return
 
     im = cv2.imread(img_PATH).astype(np.float32) / 255.
+    im = cv2.resize(im, (192, 64))
 
     imgs_input = []
     imgs_input.append(im)
@@ -230,7 +240,7 @@ def creat_adv(Checkpoint_PATH, img_PATH):
 
     adv_step = 0.01
     feed = {model.inputs: imgs_input, target: target_creat, origin_inputs: imgs_input_before}
-    for i in range(30):
+    for i in range(50):
         loss_now, grad = sess.run([ADV_LOSS, grad_y2x], feed)
         if (i + 1) % 10 == 0:
             print("LOSS:{}".format(loss_now))
@@ -248,6 +258,8 @@ def creat_adv(Checkpoint_PATH, img_PATH):
         else:
             expression += LSTM.decode_maps[i]
     print("AFTER:{}".format(expression))
+
+    test = (sess.run([predict, current_status, current_mengban], feed_dict=feed))
 
     plt.imshow(imgs_input_after[0])
     plt.show()
@@ -339,7 +351,7 @@ def infer_many(Checkpoint_PATH, img_PATH):
     else:
         print('cannot restore')
         return
-    p = [('adv_example/%s.png' % i) for i in range(66,76)]
+    p = [('adv_example/%s.png' % i) for i in range(66, 76)]
     imgs_input = []
     for img_PATH in p:
         im = cv2.imread(img_PATH).astype(np.float32) / 255.
@@ -358,14 +370,14 @@ def infer_many(Checkpoint_PATH, img_PATH):
                 expression += ''
             else:
                 expression += LSTM.decode_maps[i]
-        expression+=','
+        expression += ','
     print(expression)
 
 
 def main():
-    train(restore=False, checkpoint_dir="test")
+    # train(restore=False, checkpoint_dir="test")
     # infer("train_all/model", "example/1.png")
-    # creat_adv("train_3/model", "example/2.png")
+    creat_adv("test/model", "example/2.png")
     # test()
     # darw_table("train_2/model")
 

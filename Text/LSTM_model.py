@@ -1,6 +1,7 @@
 import tensorflow as tf
 import numpy as np
 import random
+import tensorflow.contrib.image
 
 import tensorflow.contrib.slim as slim
 
@@ -36,7 +37,9 @@ decode_maps[SPACE_INDEX] = SPACE_TOKEN
 
 from PIL import Image, ImageFont, ImageDraw, ImageFilter
 from captcha.image import ImageCaptcha
+
 image = ImageCaptcha(width=image_width, height=image_height)
+
 
 def gene_code(chars):
     def random_color(start, end, opacity=None):
@@ -145,12 +148,12 @@ class LSTMOCR(object):
 
     def build_graph(self):
         # if LSTM:
-        #     # self._build_model()
-        #     # self._build_model_with_resnet()
-        #     self._build_model_with_inception()
-        #     self._build_train_op()
+        # self._build_model()
+        # self._build_model_with_resnet()
+        self._build_model_with_inception()
+        self._build_train_op()
         # else:
-        self._bulid_CNN_with_4_FC()
+        # self._bulid_CNN_with_4_FC()
 
         self.merged_summay = tf.summary.merge_all()
 
@@ -356,7 +359,6 @@ class LSTMOCR(object):
             x = self._conv2d(block_2, 'cnn3', 3, 120, 64, 1)
             x = self._batch_norm('bn3', x)
             x = self._leaky_relu(x, leakiness)
-            x = self._max_pool(x, 2, 2)
 
             _, feature_h, feature_w, _ = x.get_shape().as_list()
             print('\nfeature_h: {}, feature_w: {}'.format(feature_h, feature_w))
@@ -454,7 +456,6 @@ class LSTMOCR(object):
         # self.decoded, self.log_prob = tf.nn.ctc_greedy_decoder(logits, seq_len, merge_repeated=False)
         self.dense_decoded = tf.sparse_tensor_to_dense(self.decoded[0], default_value=-1)
 
-
     def _bulid_CNN_with_4_FC(self):
         filters = [3, 64, 128, 128, out_channels]
         strides = [1, 2]
@@ -508,7 +509,6 @@ class LSTMOCR(object):
         one_hot_true_label = tf.one_hot(true_label, depth=num_classes, axis=1)
         one_hot_true_label = tf.transpose(one_hot_true_label, [0, 2, 1])
 
-
         self.loss = slim.losses.softmax_cross_entropy(y1, one_hot_true_label[:, 0, :]) + \
                     slim.losses.softmax_cross_entropy(y2, one_hot_true_label[:, 1, :]) + \
                     slim.losses.softmax_cross_entropy(y3, one_hot_true_label[:, 2, :]) + \
@@ -528,7 +528,6 @@ class LSTMOCR(object):
                                                                                       global_step=self.global_step)
         train_ops = [self.optimizer] + self._extra_train_ops
         self.train_op = tf.group(*train_ops)
-
 
     def _conv2d(self, x, name, filter_size, in_channels, out_channels, strides):
         with tf.variable_scope(name):
@@ -645,9 +644,47 @@ class LSTMOCR(object):
         with tf.variable_scope('fc' + name):
             x = slim.layers.fully_connected(x, 512)
             x = slim.layers.fully_connected(x, 256)
-            x = slim.layers.fully_connected(x, out_num,  None)
+            x = slim.layers.fully_connected(x, out_num, None)
             after_softmax_x = slim.softmax(x)
         return x, after_softmax_x
+
+    def head_B(self, input):
+        phi = 0.5
+        S = 1 / (1 + tf.exp(-(input - phi)))
+        return S
+
+    def head_Guss(self, input):
+        def getGuessValue(kerStd, posX, posY):
+            return 1. / (2. * np.pi * (np.power(kerStd, 2))) * np.exp(
+                -(np.power(posX, 2) + np.power(posY, 2)) / (2. * (np.power(kerStd, 2))))
+
+        def getGuessKernel(kerStd):
+            K11 = np.column_stack(
+                (np.row_stack((np.eye(3) * getGuessValue(kerStd, -1, 1), [0., 0., 0.])), np.array([0., 0., 0., 1.])))
+            K12 = np.column_stack(
+                (np.row_stack((np.eye(3) * getGuessValue(kerStd, 0, 1), [0., 0., 0.])), np.array([0., 0., 0., 1.])))
+            K13 = np.column_stack(
+                (np.row_stack((np.eye(3) * getGuessValue(kerStd, 1, 1), [0., 0., 0.])), np.array([0., 0., 0., 1.])))
+            K21 = np.column_stack(
+                (np.row_stack((np.eye(3) * getGuessValue(kerStd, -1, 0), [0., 0., 0.])), np.array([0., 0., 0., 1.])))
+            K22 = np.column_stack(
+                (np.row_stack((np.eye(3) * getGuessValue(kerStd, 0, 0), [0., 0., 0.])), np.array([0., 0., 0., 1.])))
+            K23 = np.column_stack(
+                (np.row_stack((np.eye(3) * getGuessValue(kerStd, 1, 0), [0., 0., 0.])), np.array([0., 0., 0., 1.])))
+            K31 = np.column_stack(
+                (np.row_stack((np.eye(3) * getGuessValue(kerStd, -1, -1), [0., 0., 0.])), np.array([0., 0., 0., 1.])))
+            K32 = np.column_stack(
+                (np.row_stack((np.eye(3) * getGuessValue(kerStd, 0, -1), [0., 0., 0.])), np.array([0., 0., 0., 1.])))
+            K33 = np.column_stack(
+                (np.row_stack((np.eye(3) * getGuessValue(kerStd, 1, -1), [0., 0., 0.])), np.array([0., 0., 0., 1.])))
+            kernel = tf.constant(np.array([[K11, K12, K13], [K21, K22, K23], [K31, K32, K33]]),
+                                 dtype=tf.float32)  # 3*3*4*4
+            return kernel
+
+        kernel = getGuessKernel(0.8)
+        Guss = tf.nn.conv2d(input, kernel, strides=[1, 1, 1, 1], padding="SAME")
+        return Guss
+
 
 def accuracy_calculation(original_seq, decoded_seq, ignore_value=-1, isPrint=False):
     if len(original_seq) != len(decoded_seq):
