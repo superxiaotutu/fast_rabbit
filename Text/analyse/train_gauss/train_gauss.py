@@ -1,5 +1,5 @@
 import tensorflow as tf
-import gauss_modeel as LSTM
+import gauss_model as LSTM
 import time
 import os
 import datetime
