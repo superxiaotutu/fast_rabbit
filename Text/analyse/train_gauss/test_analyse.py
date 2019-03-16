@@ -12,8 +12,7 @@ from Text.analyse.anaylse import gene_code_clean
 
 SALT_LEVEL = []
 NOISE_NUM = [i for i in range(0, 41, 7)]
-image_height = 60
-image_width = 180
+
 
 
 def gen_gauss_code(captcha):

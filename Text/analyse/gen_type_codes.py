@@ -6,12 +6,10 @@ from PIL import ImageFont
 from PIL import ImageFilter
 from captcha.image import DEFAULT_FONTS
 from skimage.util import random_noise
-import matplotlib.pyplot as plt
-
+from ..config import *
 SALT_LEVEL = []
 NOISE_NUM = [i for i in range(0, 41, 7)]
-image_height = 64
-image_width = 192
+
 
 
 def gene_code_clean(chars):

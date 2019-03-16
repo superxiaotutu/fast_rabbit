@@ -7,10 +7,7 @@ import matplotlib.pyplot as plt
 
 from anaylse import gen_gauss_code
 
-batch_size = 1000
 
-image_height = 60
-image_width = 180
 image_channel = 3
 out_channels = 64
 cnn_count = 4

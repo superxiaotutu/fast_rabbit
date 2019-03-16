@@ -5,7 +5,6 @@ import os
 import datetime
 
 num_epochs = 2500
-batch_size = 128
 num_batches_per_epoch = 100
 save_steps = 5000
 validation_steps = 1000
