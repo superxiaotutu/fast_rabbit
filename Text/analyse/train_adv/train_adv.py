@@ -1,8 +1,16 @@
+import sys
+import os
+
+from PIL import Image
+
+from config import *
+
+from gen_type_codes import gene_code_clean
 import tensorflow as tf
 import tensorflow.contrib.image
 import tensorflow.contrib.slim as slim
 import time
-from ...config import *
+
 # from image_process import gene_code
 image_channel = 3
 out_channels = 64
@@ -42,7 +50,7 @@ class DataIterator:
         for num in range(batch_size):
             slice = random.sample(LABEL_CHOICES_LIST, 4)
             captcha = ''.join(slice)
-            img = gen(captcha)
+            img = gene_code_clean(captcha)
             img = np.asarray(img).astype(np.float32) / 255.
             code = [SPACE_INDEX if captcha == SPACE_TOKEN else encode_maps[c] for c in list(captcha)]
             self.labels.append(code)
@@ -52,7 +60,7 @@ class DataIterator:
         target = random.randint(0, batch_size - 1)
         slice = random.sample(LABEL_CHOICES_LIST, 4)
         captcha = ''.join(slice)
-        img = gene_code(captcha)
+        img = gene_code_clean(captcha)
         img = np.asarray(img).astype(np.float32) / 255.
         code = [SPACE_INDEX if captcha == SPACE_TOKEN else encode_maps[c] for c in list(captcha)]
         self.image[target], self.labels[target] = img, code
@@ -60,7 +68,7 @@ class DataIterator:
     def get_test_img(self, num_line, num_point):
         slice = random.sample(LABEL_CHOICES_LIST, 4)
         captcha = ''.join(slice)
-        img = gene_code(captcha)
+        img = gene_code_clean(captcha)
         img = np.asarray(img).astype(np.float32) / 255.
         code = [SPACE_INDEX if captcha == SPACE_TOKEN else encode_maps[c] for c in list(captcha)]
         return img, captcha
@@ -84,7 +92,8 @@ class DataIterator:
 
 
 class LSTMOCR(object):
-    def __init__(self, mode):
+    def __init__(self, mode, cnn_mode):
+        self.cnn_mode = cnn_mode
         self.mode = mode
         # image
         self.inputs = tf.placeholder(tf.float32, [None, image_height, image_width, image_channel])
@@ -97,14 +106,16 @@ class LSTMOCR(object):
         self._extra_train_ops = []
 
     def build_graph(self):
-        # if LSTM:
-        # self._build_model()
-        # self._build_model_with_resnet()
-        self._build_model_with_inception()
-        self._build_train_op()
-        # else:
-        # self._bulid_CNN_with_4_FC()
-
+        if self.cnn_mode == 'cnn':
+            self._bulid_CNN_with_4_FC()
+        else:
+            if self.cnn_mode == "lenet":
+                self._build_model()
+            elif self.cnn_mode == "resnet":
+                self._build_model_with_resnet()
+            elif self.cnn_mode == "inception":
+                self._build_model_with_inception()
+            self._build_train_op()
         self.merged_summay = tf.summary.merge_all()
 
     def _build_model(self):
@@ -309,6 +320,7 @@ class LSTMOCR(object):
             x = self._conv2d(block_2, 'cnn3', 3, 120, 64, 1)
             x = self._batch_norm('bn3', x)
             x = self._leaky_relu(x, leakiness)
+            x = self._max_pool(x, 2, 2)
 
             _, feature_h, feature_w, _ = x.get_shape().as_list()
             print('\nfeature_h: {}, feature_w: {}'.format(feature_h, feature_w))
@@ -479,6 +491,14 @@ class LSTMOCR(object):
         train_ops = [self.optimizer] + self._extra_train_ops
         self.train_op = tf.group(*train_ops)
 
+    def _bulid_fc(self, x, out_num, name):
+        with tf.variable_scope('fc' + name):
+            x = slim.layers.fully_connected(x, 512)
+            x = slim.layers.fully_connected(x, 256)
+            x = slim.layers.fully_connected(x, out_num, None)
+            after_softmax_x = slim.softmax(x)
+        return x, after_softmax_x
+
     def _conv2d(self, x, name, filter_size, in_channels, out_channels, strides):
         with tf.variable_scope(name):
             kernel = tf.get_variable(name='W',
@@ -590,51 +610,6 @@ class LSTMOCR(object):
         net = self._leaky_relu(net, leakiness)
         return net
 
-    def _bulid_fc(self, x, out_num, name):
-        with tf.variable_scope('fc' + name):
-            x = slim.layers.fully_connected(x, 512)
-            x = slim.layers.fully_connected(x, 256)
-            x = slim.layers.fully_connected(x, out_num, None)
-            after_softmax_x = slim.softmax(x)
-        return x, after_softmax_x
-
-    def head_B(self, input):
-        phi = 0.5
-        S = 1 / (1 + tf.exp(-(input - phi)))
-        return S
-
-    def head_Guss(self, input):
-        def getGuessValue(kerStd, posX, posY):
-            return 1. / (2. * np.pi * (np.power(kerStd, 2))) * np.exp(
-                -(np.power(posX, 2) + np.power(posY, 2)) / (2. * (np.power(kerStd, 2))))
-
-        def getGuessKernel(kerStd):
-            K11 = np.column_stack(
-                (np.row_stack((np.eye(3) * getGuessValue(kerStd, -1, 1), [0., 0., 0.])), np.array([0., 0., 0., 1.])))
-            K12 = np.column_stack(
-                (np.row_stack((np.eye(3) * getGuessValue(kerStd, 0, 1), [0., 0., 0.])), np.array([0., 0., 0., 1.])))
-            K13 = np.column_stack(
-                (np.row_stack((np.eye(3) * getGuessValue(kerStd, 1, 1), [0., 0., 0.])), np.array([0., 0., 0., 1.])))
-            K21 = np.column_stack(
-                (np.row_stack((np.eye(3) * getGuessValue(kerStd, -1, 0), [0., 0., 0.])), np.array([0., 0., 0., 1.])))
-            K22 = np.column_stack(
-                (np.row_stack((np.eye(3) * getGuessValue(kerStd, 0, 0), [0., 0., 0.])), np.array([0., 0., 0., 1.])))
-            K23 = np.column_stack(
-                (np.row_stack((np.eye(3) * getGuessValue(kerStd, 1, 0), [0., 0., 0.])), np.array([0., 0., 0., 1.])))
-            K31 = np.column_stack(
-                (np.row_stack((np.eye(3) * getGuessValue(kerStd, -1, -1), [0., 0., 0.])), np.array([0., 0., 0., 1.])))
-            K32 = np.column_stack(
-                (np.row_stack((np.eye(3) * getGuessValue(kerStd, 0, -1), [0., 0., 0.])), np.array([0., 0., 0., 1.])))
-            K33 = np.column_stack(
-                (np.row_stack((np.eye(3) * getGuessValue(kerStd, 1, -1), [0., 0., 0.])), np.array([0., 0., 0., 1.])))
-            kernel = tf.constant(np.array([[K11, K12, K13], [K21, K22, K23], [K31, K32, K33]]),
-                                 dtype=tf.float32)  # 3*3*4*4
-            return kernel
-
-        kernel = getGuessKernel(0.8)
-        Guss = tf.nn.conv2d(input, kernel, strides=[1, 1, 1, 1], padding="SAME")
-        return Guss
-
 
 train_feeder = DataIterator()
 val_feeder = DataIterator()
@@ -655,7 +630,7 @@ def creat_adv(Checkpoint_PATH, img_PATH):
     shuff_dir.update({37: creat_onehot(37)})
 
     os.environ["CUDA_VISIBLE_DEVICES"] = '0'
-    model = LSTMOCR("infer")
+    model = LSTMOCR("test", "lenet")
     model.build_graph()
     config = tf.ConfigProto()
     config.gpu_options.allow_growth = True
@@ -680,10 +655,12 @@ def creat_adv(Checkpoint_PATH, img_PATH):
     sess.run(tf.global_variables_initializer())
 
     ckpt = tf.train.latest_checkpoint(Checkpoint_PATH)
-
-    im = cv2.imread(img_PATH).astype(np.float32) / 255.
-    im = cv2.resize(im, (192, 64))
-
+    saver.restore(sess, ckpt)
+    # im = cv2.imread(img_PATH)
+    # im = cv2.cvtColor(im, cv2.COLOR_BGR2RGB)
+    im = np.asarray(img_PATH)
+    im = im.astype(np.float32) / 255.
+    # im = cv2.resize(im, (192, 64))
     imgs_input = []
     imgs_input.append(im)
     imgs_input = np.asarray(imgs_input)
@@ -714,28 +691,32 @@ def creat_adv(Checkpoint_PATH, img_PATH):
             expression += decode_maps[i]
     print("BEFORE:{}".format(expression))
 
-    adv_step = 0.01
-    feed = {model.inputs: imgs_input, target: target_creat, origin_inputs: imgs_input_before}
-    for i in range(50):
-        loss_now, grad = sess.run([ADV_LOSS, grad_y2x], feed)
-        if (i + 1) % 10 == 0:
-            print("LOSS:{}".format(loss_now))
-        imgs_input = imgs_input - grad * adv_step
+    # 0.01
+    adv_step = 0.03
+    # 50
+    for level in [1, 5, 10, 15, 20, 25, 30, 40, 50]:
         feed = {model.inputs: imgs_input, target: target_creat, origin_inputs: imgs_input_before}
 
-    imgs_input_after = imgs_input
+        for i in range(level):
+            loss_now, grad = sess.run([ADV_LOSS, grad_y2x], feed)
+            if (i + 1) % 10 == 0:
+                print("LOSS:{}".format(loss_now))
+            imgs_input = imgs_input - grad * adv_step
+            feed = {model.inputs: imgs_input, target: target_creat, origin_inputs: imgs_input_before}
 
-    feed = {model.inputs: imgs_input, target: target_creat, origin_inputs: imgs_input_before}
-    dense_decoded_code = sess.run(model.dense_decoded, feed)
-    expression = ''
-    for i in dense_decoded_code[0]:
-        if i == -1:
-            expression += ''
-        else:
-            expression += decode_maps[i]
-    print("AFTER:{}".format(expression))
+        imgs_input_after = imgs_input
 
-    test = (sess.run([predict, current_status, current_mengban], feed_dict=feed))
+        feed = {model.inputs: imgs_input, target: target_creat, origin_inputs: imgs_input_before}
+        dense_decoded_code = sess.run(model.dense_decoded, feed)
+        expression = ''
+        for i in dense_decoded_code[0]:
+            if i == -1:
+                expression += ''
+            else:
+                expression += decode_maps[i]
+        print("AFTER:{}".format(expression))
+
+    # test = (sess.run([predict, current_status, current_mengban], feed_dict=feed))
 
     plt.imshow(imgs_input_after[0])
     plt.show()
@@ -835,3 +816,11 @@ def train(restore=False, checkpoint_dir="train_/model"):
                                            err, time.time() - start_time, lr)) + "\n")
                 print(log.format(now.month, now.day, now.hour, now.minute, now.second, cur_epoch + 1, num_epochs,
                                  accuracy, avg_train_cost, err, time.time() - start_time, lr))
+
+
+if __name__ == '__main__':
+    for i in range(50):
+        slice = random.sample(LABEL_CHOICES_LIST, 4)
+        captcha = ''.join(slice)
+        img = gene_code_clean(captcha)
+        creat_adv('../../train/train_lenet_clean/model', img)
