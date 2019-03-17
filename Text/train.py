@@ -186,7 +186,7 @@ def creat_adv(Checkpoint_PATH, img_PATH):
     current_mengban = tf.transpose(current_mengban, [1, 2, 0])
 
     ADV_LOSS = tf.reduce_mean(tf.square(origin_inputs - model.inputs)) + tf.reduce_mean(
-        tf.square(tf.reduce_sum(predict * current_mengban) - tf.reduce_sum(predict * target)))
+        tf.reduce_sum(predict * current_mengban) - tf.reduce_sum(predict * target))
 
     grad_y2x = tf.sign(tf.gradients(ADV_LOSS, model.inputs)[0])
 
