@@ -660,6 +660,7 @@ def creat_adv(Checkpoint_PATH, img_PATH):
     # im = cv2.cvtColor(im, cv2.COLOR_BGR2RGB)
     im = np.asarray(img_PATH)
     im = im.astype(np.float32) / 255.
+    print(im,im.shape)
     # im = cv2.resize(im, (192, 64))
     imgs_input = []
     imgs_input.append(im)

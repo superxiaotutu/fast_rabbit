@@ -8,6 +8,8 @@ import tensorflow.contrib.slim as slim
 import time
 
 # from image_process import gene_code
+from gen_type_codes import gene_code_clean
+
 image_channel = 3
 out_channels = 64
 cnn_count = 4
@@ -224,55 +226,57 @@ class LSTMOCR(object):
                               padding='SAME',
                               name='avg_pool')
 
+arr=[]
+shuff_dir = {}
+lst = [i for i in range(36)]
+random.shuffle(lst)
 
-def creat_adv(Checkpoint_PATH, img_PATH):
-    shuff_dir = {}
-    lst = [i for i in range(36)]
-    random.shuffle(lst)
 
-    def creat_onehot(num):
-        re = np.zeros([38])
-        re[num - 1] = 1
-        return re
+def creat_onehot(num):
+    re = np.zeros([38])
+    re[num - 1] = 1
+    return re
 
-    for i in range(36):
-        shuff_dir.update({i + 1: creat_onehot(lst[i])})
-    shuff_dir.update({37: creat_onehot(37)})
 
-    os.environ["CUDA_VISIBLE_DEVICES"] = '0'
-    model = LSTMOCR("test", "lenet")
-    model.build_graph()
-    config = tf.ConfigProto()
-    config.gpu_options.allow_growth = True
+for i in range(36):
+    shuff_dir.update({i + 1: creat_onehot(lst[i])})
+shuff_dir.update({37: creat_onehot(37)})
 
-    target = tf.placeholder(tf.float32, [12, batch_size, 38])
-    origin_inputs = tf.placeholder(tf.float32, [None, image_height, image_width, image_channel])
-    predict = tf.nn.softmax(model.logits)
-    # ADV_LOSS = tf.reduce_sum(tf.square(predict - target)) + tf.reduce_mean(tf.square(origin_inputs - model.inputs))
-    current_status = tf.argmax(predict, axis=-1)
-    current_mengban = tf.one_hot(current_status, 38, axis=0)
-    current_mengban = tf.transpose(current_mengban, [1, 2, 0])
+os.environ["CUDA_VISIBLE_DEVICES"] = '0'
+model = LSTMOCR("test", "lenet")
+model.build_graph()
+config = tf.ConfigProto()
+config.gpu_options.allow_growth = True
 
-    ADV_LOSS = tf.reduce_mean(tf.square(origin_inputs - model.inputs)) + tf.reduce_mean(
-        tf.square(tf.reduce_sum(predict * current_mengban) - tf.reduce_sum(predict * target)))
+target = tf.placeholder(tf.float32, [12, batch_size, 38])
+origin_inputs = tf.placeholder(tf.float32, [None, image_height, image_width, image_channel])
+predict = tf.nn.softmax(model.logits)
+# ADV_LOSS = tf.reduce_sum(tf.square(predict - target)) + tf.reduce_mean(tf.square(origin_inputs - model.inputs))
+current_status = tf.argmax(predict, axis=-1)
+current_mengban = tf.one_hot(current_status, 38, axis=0)
+current_mengban = tf.transpose(current_mengban, [1, 2, 0])
 
-    grad_y2x = tf.sign(tf.gradients(ADV_LOSS, model.inputs)[0])
+ADV_LOSS = tf.reduce_mean(tf.square(origin_inputs - model.inputs)) + tf.reduce_mean(
+    tf.square(tf.reduce_sum(predict * current_mengban) - tf.reduce_sum(predict * target)))
 
-    Var_restore = tf.global_variables()
-    saver = tf.train.Saver(Var_restore, max_to_keep=5, allow_empty=True)
+grad_y2x = tf.sign(tf.gradients(ADV_LOSS, model.inputs)[0])
 
-    sess = tf.Session(config=config)
-    sess.run(tf.global_variables_initializer())
+Var_restore = tf.global_variables()
+saver = tf.train.Saver(Var_restore, max_to_keep=5, allow_empty=True)
+sess = tf.Session(config=config)
+sess.run(tf.global_variables_initializer())
 
-    ckpt = tf.train.latest_checkpoint(Checkpoint_PATH)
+ckpt = tf.train.latest_checkpoint('train_lenet_clean/model')
+if ckpt:
     saver.restore(sess, ckpt)
-    im = cv2.imread(img_PATH)
-    im = cv2.cvtColor(im, cv2.COLOR_BGR2RGB)
-    im = im.astype(np.float32) / 255.
-    # im = cv2.resize(im, (192, 64))
+    print('restore from ckpt{}'.format(ckpt))
+else:
+    print('cannot restore')
+
+def creat_adv(img_PATH):
+    im = np.asarray(img_PATH).astype(np.float32) / 255.
     imgs_input = []
     imgs_input.append(im)
-    imgs_input = np.asarray(imgs_input)
     imgs_input = np.repeat(imgs_input, batch_size, axis=0)
 
     imgs_input_before = imgs_input
@@ -283,8 +287,8 @@ def creat_adv(Checkpoint_PATH, img_PATH):
     ex = np.argmax(fir, axis=1)
 
     target_creat = []
-    for i in range(12):
-        target_creat.append(shuff_dir[ex[i]])
+    for e in range(12):
+        target_creat.append(shuff_dir[ex[e]])
 
     target_creat = np.asarray(target_creat)
     target_creat = target_creat[:, np.newaxis, :]
@@ -292,24 +296,27 @@ def creat_adv(Checkpoint_PATH, img_PATH):
 
     dense_decoded_code = sess.run(model.dense_decoded, feed)
     expression = ''
-    for i in dense_decoded_code[0]:
-        if i == -1:
+    for c in dense_decoded_code[0]:
+        if c == -1:
             expression += '-'
         else:
-            expression += decode_maps[i]
+            expression += decode_maps[c]
+    expression_before = expression
     print("BEFORE:{}".format(expression))
 
     # 0.09
-    adv_step = 0.0318
+    #0.004
+    adv_step = 0
     # 50
+    acc = [0 for i in range(50)]
     for item in range(50):
         feed = {model.inputs: imgs_input, target: target_creat, origin_inputs: imgs_input_before}
         loss_now, grad = sess.run([ADV_LOSS, grad_y2x], feed)
         if (item + 1) % 10 == 0:
             print("LOSS:{}".format(loss_now))
         imgs_input = imgs_input - grad * adv_step
-        plt.imshow(imgs_input[0])
-        plt.imsave(str(item) + 'level.png', imgs_input[0])
+        # plt.imshow(imgs_input[0])
+        # plt.imsave(str(item) + 'level.png', imgs_input[0])
         feed = {model.inputs: imgs_input, target: target_creat, origin_inputs: imgs_input_before}
         dense_decoded_code = sess.run(model.dense_decoded, feed)
         expression = ''
@@ -318,11 +325,17 @@ def creat_adv(Checkpoint_PATH, img_PATH):
                 expression += ''
             else:
                 expression += decode_maps[i]
+        if expression == expression_before:
+            acc[item] += 1
         print("AFTER:{}".format(expression))
-
+    arr.append(acc)
     return
 
 
 if __name__ == '__main__':
-    gen
-    creat_adv('H:/pycharmproject/fast_rabbit_xky/Text/train/train_lenet_clean/model', '../example/ori2.png')
+    for i in range(1000):
+        slice = random.sample(LABEL_CHOICES_LIST, 4)
+        captcha = ''.join(slice)
+        img = gene_code_clean(captcha)
+        creat_adv( img)
+        print(arr)
