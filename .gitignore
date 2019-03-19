@@ -1,2 +1,39 @@
 .idea/
 .vscode/
+ #Java
+*.class
+
+# Eclipse
+.classpath
+.project
+.settings/
+
+# Intellij
+.idea/
+*.iml
+*.iws
+out/
+
+# Mac
+.DS_Store
+
+# Maven
+log/
+target/
+
+# svn
+.svn/
+
+scandir/
+rebel.xml
+
+#lilei environment
+dep2.sh
+
+#log
+*.log
+---------------------
+作者：pmdream
+来源：CSDN
+原文：https://blog.csdn.net/pmdream/article/details/82415421
+版权声明：本文为博主原创文章，转载请附上博文链接！
