@@ -86,7 +86,6 @@ class DataIterator:
         img = np.asarray(img).astype(np.float32) / 255.
         code = [SPACE_INDEX if captcha == SPACE_TOKEN else encode_maps[c] for c in list(captcha)]
         self.image[target], self.labels[target] = img, code
-
     def get_test_img(self, num_line, num_point):
         slice = random.sample(LABEL_CHOICES_LIST, 1)
         captcha = ''.join(slice)
