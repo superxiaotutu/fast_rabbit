@@ -24,6 +24,14 @@ def add_gauss(img_name,level,show=False):
         plt.imshow(img)
         plt.show()
     return img
+
+def add_gauss(img_name,level,show=False):
+    img = np.asarray(img_name).astype(np.float32) / 255.
+    img.flags.writeable = True
+    for j in range(level):
+        img = random_noise(img)
+        
+    return img
 #
 # for i in range(30):
 #
