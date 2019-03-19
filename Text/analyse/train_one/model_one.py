@@ -70,7 +70,7 @@ class DataIterator:
         self.image = []
         self.labels = []
         for num in range(batch_size):
-            slice = random.sample(LABEL_CHOICES_LIST, 4)
+            slice = random.sample(LABEL_CHOICES_LIST, 1)
             captcha = ''.join(slice)
             img = gene_code_normal(captcha)
             img = np.asarray(img).astype(np.float32) / 255.
@@ -80,7 +80,7 @@ class DataIterator:
 
     def modify_data(self):
         target = random.randint(0, batch_size - 1)
-        slice = random.sample(LABEL_CHOICES_LIST, 4)
+        slice = random.sample(LABEL_CHOICES_LIST, 1)
         captcha = ''.join(slice)
         img = gene_code_normal(captcha)
         img = np.asarray(img).astype(np.float32) / 255.
@@ -88,7 +88,7 @@ class DataIterator:
         self.image[target], self.labels[target] = img, code
 
     def get_test_img(self, num_line, num_point):
-        slice = random.sample(LABEL_CHOICES_LIST, 4)
+        slice = random.sample(LABEL_CHOICES_LIST, 1)
         captcha = ''.join(slice)
         img = gene_code_normal(captcha)
         img = np.asarray(img).astype(np.float32) / 255.
