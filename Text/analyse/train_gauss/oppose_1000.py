@@ -1,37 +1,41 @@
-import random
-import matplotlib.pyplot as plt
-from PIL import Image
-from skimage.util import random_noise
-
-from test_LSTM_model import LABEL_CHOICES_LIST
-from anaylse import gen_gauss_code, gene_code_clean
+from config import LABEL_CHOICES
+from gen_type_codes import *
 import numpy as np
+import csv
+import matplotlib.pyplot as plt
+
+
 def gen_oppose():
-    for num in range(1000):
-        slice = random.sample(LABEL_CHOICES_LIST, 4)
-        captcha = ''.join(slice)
-        img = gene_code_clean(captcha)
-        img.save("images/%s.png" % (captcha))
+    with open('data.csv', 'w')as f:
+        f = csv.writer(f)
+        arr = []
+        for num in range(50):
+            for i in range(0, 51, 5):
+                slice = random.sample(LABEL_CHOICES, 1)
+                captcha = ''.join(slice)
+                img = add_gauss(captcha, i)
+                plt.axis('off')
+                filname = "images/%s_%s_%s.png" % (num, i, captcha)
+                # plt.imsave(filname,img)
+                arr.append(filname)
+            if num % 2 == 0 and num != 0:
+                f.writerow(arr)
+                arr = []
 
-def add_gauss(img_name,level,show=False):
-    img = Image.open(img_name)
+
+def add_gauss(captcha, level):
+    img = gene_code_clean_one(captcha)
     img = np.asarray(img).astype(np.float32) / 255.
-    img.flags.writeable = True
-    for j in range(level):
-        img = random_noise(img)
-    np.clip(img, 0, 1)
-    if show:
-        plt.imshow(img)
-        plt.show()
-    return img
 
-def add_gauss(img_name,level,show=False):
-    img = np.asarray(img_name).astype(np.float32) / 255.
     img.flags.writeable = True
     for j in range(level):
         img = random_noise(img)
-        
+    # np.clip(img, 0, 1)
+    # img = Image.fromarray(img.astype('uint8')).convert('RGB')
     return img
-#
-# for i in range(30):
-#
+arr=[]
+for i in LABEL_CHOICES:
+    arr.append(i)
+print(arr)
+print(LABEL_CHOICES.split(''))
+# gen_oppose()

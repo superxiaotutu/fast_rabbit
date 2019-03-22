@@ -15,6 +15,19 @@ image_channel = 3
 image_height = 64
 image_width = 192
 batch_size = 1
+LABEL_CHOICES = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+LABEL_CHOICES_LIST = [str(i) for i in LABEL_CHOICES]
+encode_maps = {}
+decode_maps = {}
+for i, char in enumerate(LABEL_CHOICES, 1):
+    encode_maps[char] = i
+    decode_maps[i] = char
+
+SPACE_INDEX = 0
+SPACE_TOKEN = ''
+encode_maps[SPACE_TOKEN] = SPACE_INDEX
+decode_maps[SPACE_INDEX] = SPACE_TOKEN
+
 def sparse_tuple_from_label(sequences, dtype=np.int32):
     """Create a sparse representention of x.
     Args:

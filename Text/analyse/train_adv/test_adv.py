@@ -308,6 +308,7 @@ def creat_adv(img_PATH):
     #0.004
     adv_step = 0
     # 50
+
     acc = [0 for i in range(50)]
     for item in range(50):
         feed = {model.inputs: imgs_input, target: target_creat, origin_inputs: imgs_input_before}

@@ -6,7 +6,8 @@ from PIL import ImageFont
 from PIL import ImageFilter
 from captcha.image import DEFAULT_FONTS
 from skimage.util import random_noise
-from config import *
+from config import image_height,image_width
+
 SALT_LEVEL = []
 NOISE_NUM = [i for i in range(0, 41, 7)]
 
@@ -22,7 +23,19 @@ def gene_code_clean(chars):
               font=font, fill=(100, 149, 237))
     im = im.filter(ImageFilter.SMOOTH)
     return im
-
+def gene_code_clean_one(chars):
+    image_width_1=image_width//4
+    image_height_1=image_height
+    font = ImageFont.truetype(DEFAULT_FONTS[0], size=random.choice([42, 50, 56]))
+    font_width, font_height = font.getsize(chars)
+    im = Image.new('RGB', (image_width_1, image_height_1), color=(255, 255, 255))
+    draw = ImageDraw.Draw(im)
+    per_width = (image_width_1- font_width)
+    per_height = (image_height_1 - font_height)
+    draw.text((per_width-10, per_height-10), chars,
+              font=font, fill=(100, 149, 237))
+    im = im.filter(ImageFilter.SMOOTH)
+    return im
 
 # 0.3-0.7 alpha个像素点保留原值
 def addsalt_pepper(img, alpha=0.7):
@@ -45,5 +58,5 @@ def gen_gauss_code(captcha):
     for j in range(level):
         img = random_noise(img)
     np.clip(img, 0, 1)
-    # img = Image.fromarray(img.astype('uint8')).convert('RGB')
+    img = Image.fromarray(img.astype('uint8')).convert('RGB')
     return img
