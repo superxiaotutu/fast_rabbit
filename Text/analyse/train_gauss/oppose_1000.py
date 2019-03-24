@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 def gen_oppose():
     with open('data.csv', 'w')as f:
         f = csv.writer(f)
+        f.writerow(['image_url'])
         arr = []
         for num in range(50):
             for i in range(0, 51, 5):
@@ -16,11 +17,9 @@ def gen_oppose():
                 img = add_gauss(captcha, i)
                 plt.axis('off')
                 filname = "images/%s_%s_%s.png" % (num, i, captcha)
-                # plt.imsave(filname,img)
-                arr.append(filname)
-            if num % 2 == 0 and num != 0:
-                f.writerow(arr)
-                arr = []
+                plt.imsave(filname,img)
+                f.writerow([filname])
+
 
 
 def add_gauss(captcha, level):
@@ -33,9 +32,9 @@ def add_gauss(captcha, level):
     # np.clip(img, 0, 1)
     # img = Image.fromarray(img.astype('uint8')).convert('RGB')
     return img
-arr=[]
-for i in LABEL_CHOICES:
-    arr.append(i)
-print(arr)
-print(LABEL_CHOICES.split(''))
-# gen_oppose()
+# arr=[]
+# for i in LABEL_CHOICES:
+#     arr.append(i)
+# print(arr)
+# print(LABEL_CHOICES.split(''))
+gen_oppose()

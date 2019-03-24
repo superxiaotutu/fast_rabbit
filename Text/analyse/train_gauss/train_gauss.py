@@ -3,22 +3,13 @@ import gauss_model as LSTM
 import time
 import os
 import datetime
-
-num_epochs = 2500
-num_batches_per_epoch = 100
-save_steps = 5000
-validation_steps = 1000
-
-image_height = 64
-image_width = 192
-image_channel = 3
-
+from config import *
 train_feeder = LSTM.DataIterator()
 val_feeder = LSTM.DataIterator()
 
 
-def train(restore=False, checkpoint_dir="train_3/model"):
-    os.environ["CUDA_VISIBLE_DEVICES"] = '2'
+def train(restore=False, checkpoint_dir="train_gauss/model"):
+    os.environ["CUDA_VISIBLE_DEVICES"] = '1'
     model = LSTM.LSTMOCR('train')
     model.build_graph()
 

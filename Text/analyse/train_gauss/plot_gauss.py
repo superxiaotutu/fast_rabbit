@@ -5,7 +5,7 @@ with open('gauss_result.txt','r')as f :
     ls=f.readlines()
     x=[]
     y=[]
-    for i,l in enumerate(ls):
+    for i,l in enumerate(ls[:40]):
         l=float(l.split()[1])
         x.append(i)
         y.append(l)

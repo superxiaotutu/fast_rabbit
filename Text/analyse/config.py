@@ -1,4 +1,3 @@
-
 import numpy as np
 import random
 import matplotlib.pyplot as plt
@@ -7,6 +6,7 @@ import os
 import datetime
 
 import cv2
+
 num_epochs = 2500
 num_batches_per_epoch = 100
 save_steps = 5000
@@ -14,7 +14,16 @@ validation_steps = 1000
 image_channel = 3
 image_height = 64
 image_width = 192
-batch_size = 1
+out_channels = 64
+cnn_count = 4
+leakiness = 0.01
+num_hidden = 128
+num_classes = 36 + 2
+initial_learning_rate = 0.001
+decay_steps = 4000
+decay_rate = 0.96
+output_keep_prob = 0.8
+batch_size = 128
 LABEL_CHOICES = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 LABEL_CHOICES_LIST = [str(i) for i in LABEL_CHOICES]
 encode_maps = {}
@@ -27,6 +36,7 @@ SPACE_INDEX = 0
 SPACE_TOKEN = ''
 encode_maps[SPACE_TOKEN] = SPACE_INDEX
 decode_maps[SPACE_INDEX] = SPACE_TOKEN
+
 
 def sparse_tuple_from_label(sequences, dtype=np.int32):
     """Create a sparse representention of x.
@@ -47,6 +57,8 @@ def sparse_tuple_from_label(sequences, dtype=np.int32):
     shape = np.asarray([len(sequences), np.asarray(indices).max(0)[1] + 1], dtype=np.int64)
 
     return indices, values, shape
+
+
 def accuracy_calculation(original_seq, decoded_seq, ignore_value=-1, isPrint=False):
     if len(original_seq) != len(decoded_seq):
         if isPrint:
@@ -60,4 +72,3 @@ def accuracy_calculation(original_seq, decoded_seq, ignore_value=-1, isPrint=Fal
     if isPrint:
         print('seq{0:4d}: origin: {1} decoded:{2}'.format(i, origin_label, decoded_label))
     return count * 1.0 / len(original_seq)
-
