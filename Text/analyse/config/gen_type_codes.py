@@ -14,7 +14,7 @@ image = ImageCaptcha(width=image_width, height=image_height)
 SALT_LEVEL = []
 NOISE_NUM = [i for i in range(0, 41, 7)]
 
-def gene_code(chars):
+def gene_code_all(chars):
     flag = random.randint(0, 99)
     im = gene_code_normal(chars) if flag else gene_code_clean_one(chars)
     im = preprocess(im)
@@ -113,10 +113,10 @@ def gene_code_normal(chars):
     background = random_color(238, 255)
     color = random_color(10, 200, random.randint(220, 255))
     im = image.create_captcha_image(chars, color, background)
-    dot, line = normal_choice()
-    image.create_noise_dots(im, color, number=dot)
-    for i in range(line):
-        image.create_noise_curve(im, color)
+    # dot, line = normal_choice()
+    # image.create_noise_dots(im, color, number=dot)
+    # for i in range(line):
+    #     image.create_noise_curve(im, color)
     im = im.filter(ImageFilter.SMOOTH)
     return im
 

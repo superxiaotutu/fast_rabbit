@@ -1,16 +1,22 @@
 import tensorflow as tf
-import gauss_model as LSTM
+from model_one import *
 import time
+import numpy as np
 import os
 import datetime
-from config import *
-train_feeder = LSTM.DataIterator()
-val_feeder = LSTM.DataIterator()
+import cv2
+import matplotlib.pyplot as plt
+import random
+
+train_feeder = DataIterator()
+val_feeder = DataIterator()
 
 
-def train(restore=False, checkpoint_dir="train_gauss/model"):
-    os.environ["CUDA_VISIBLE_DEVICES"] = '1'
-    model = LSTM.LSTMOCR('train')
+def train(restore=False, cnn_name="cnn"):
+
+
+    checkpoint_dir = "train_%s/model"%cnn_name
+    model = LSTMOCR(cnn_name)
     model.build_graph()
 
     config = tf.ConfigProto()
@@ -79,11 +85,11 @@ def train(restore=False, checkpoint_dir="train_gauss/model"):
 
                     dense_decoded, err, lr = sess.run([model.dense_decoded, model.cost, model.lrn_rate], val_feed)
                     # print the decode result
-                    acc = LSTM.accuracy_calculation(val_rar_label, dense_decoded, ignore_value=-1, isPrint=False)
+                    acc = accuracy_calculation(val_rar_label, dense_decoded, ignore_value=-1, isPrint=False)
                     acc_batch_total += acc
                     lastbatch_err += err
 
-                LSTM.accuracy_calculation(val_rar_label, dense_decoded, ignore_value=-1, isPrint=True)
+                accuracy_calculation(val_rar_label, dense_decoded, ignore_value=-1, isPrint=True)
 
                 accuracy = acc_batch_total / 2
                 acc_sum.value.add(tag='acc', simple_value=accuracy)
@@ -103,6 +109,12 @@ def train(restore=False, checkpoint_dir="train_gauss/model"):
                                  accuracy, avg_train_cost, err, time.time() - start_time, lr))
 
 
+
+
+def main():
+    print(batch_size)
+    os.environ["CUDA_VISIBLE_DEVICES"] = '0'
+    train(restore=False,cnn_name="one_char")
+
 if __name__ == '__main__':
-    checkpoint_dir = "train_gauss/model"
-    train(False, checkpoint_dir)
+    main()
