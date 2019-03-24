@@ -12,7 +12,9 @@ image_width = image_width // 4
 image = ImageCaptcha(width=image_width, height=image_height)
 
 SALT_LEVEL = []
-NOISE_NUM = [i for i in range(0, 41, 7)]
+NOISE_NUM = [i for i in range(0, 46, 5)]
+print(NOISE_NUM)
+
 
 def gene_code_all(chars):
     flag = random.randint(0, 99)
@@ -95,7 +97,9 @@ def preprocess(image):
         image = image.point(lambda x: 255 if x > 255 // 2 else 0)
         image = image.convert('RGB')
     else:
+        image = np.asarray(image).astype(np.float32) / 255.
         return image
+    image = np.asarray(image).astype(np.float32) / 255.
     return image
 
 
@@ -113,10 +117,10 @@ def gene_code_normal(chars):
     background = random_color(238, 255)
     color = random_color(10, 200, random.randint(220, 255))
     im = image.create_captcha_image(chars, color, background)
-    # dot, line = normal_choice()
-    # image.create_noise_dots(im, color, number=dot)
-    # for i in range(line):
-    #     image.create_noise_curve(im, color)
+    dot, line = normal_choice()
+    image.create_noise_dots(im, color, number=dot)
+    for i in range(line):
+        image.create_noise_curve(im, color)
     im = im.filter(ImageFilter.SMOOTH)
     return im
 
@@ -129,7 +133,27 @@ def random_color(start, end, opacity=None):
         return (red, green, blue)
     return (red, green, blue, opacity)
 
-#
+
+def gen_code_analy(chars):
+    flag = random.randint(0, 10)
+    if flag == 0:
+        im = gene_code_clean_one(chars)
+        im = np.asarray(im).astype(np.float32) / 255.
+    elif 1<= flag <7:
+        im = gen_gauss_code(chars)
+    else:
+        image = gene_code_clean_one(chars)
+        image = image.convert('L')
+        image = image.point(lambda x: 255 if x > np.mean(image) else 0)
+        im = image.convert('RGB')
+        im = np.asarray(im).astype(np.float32) / 255.
+
+    return im
+
+
+# a=gen_code_analy('S')
+# plt.imshow(a)
+# plt.imsave('a.png',a)
 # m=gen_gauss_code('A')
 # plt.imshow(m)
 # plt.show()

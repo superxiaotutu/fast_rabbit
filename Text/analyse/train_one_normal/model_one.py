@@ -23,8 +23,7 @@ class DataIterator:
         for num in range(batch_size):
             slice = random.sample(LABEL_CHOICES_LIST, 1)
             captcha = ''.join(slice)
-            img = gene_code_all(captcha)
-            img = np.asarray(img).astype(np.float32) / 255.
+            img = gen_code_analy(captcha)
             code = [SPACE_INDEX if captcha == SPACE_TOKEN else encode_maps[c] for c in list(captcha)]
             self.labels.append(code)
             self.image.append(img)
@@ -37,16 +36,14 @@ class DataIterator:
         target = random.randint(0, batch_size - 1)
         slice = random.sample(LABEL_CHOICES_LIST, 1)
         captcha = ''.join(slice)
-        img = gene_code_all(captcha)
-        img = np.asarray(img).astype(np.float32) / 255.
+        img = gen_code_analy(captcha)
         code = [SPACE_INDEX if captcha == SPACE_TOKEN else encode_maps[c] for c in list(captcha)]
         self.image[target], self.labels[target] = img, code
 
     def get_test_img(self, num_line, num_point):
         slice = random.sample(LABEL_CHOICES_LIST, 1)
         captcha = ''.join(slice)
-        img = gene_code_all(captcha)
-        img = np.asarray(img).astype(np.float32) / 255.
+        img = gen_code_analy(captcha)
         code = [SPACE_INDEX if captcha == SPACE_TOKEN else encode_maps[c] for c in list(captcha)]
         return img, captcha
 
