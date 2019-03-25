@@ -7,7 +7,7 @@ import tensorflow.contrib.slim as slim
 # from image_process import gene_codeµ
 
 image_height = 64
-image_width = 192//4
+image_width = 192
 image_channel = 3
 out_channels = 64
 cnn_count = 4
@@ -89,7 +89,7 @@ class DataIterator:
         self.image = []
         self.labels = []
         for num in range(batch_size):
-            slice = random.sample(LABEL_CHOICES_LIST, 4)
+            slice = random.sample(LABEL_CHOICES_LIST, 1)
             captcha = ''.join(slice)
             img = gene_code(captcha)
             img = np.asarray(img).astype(np.float32) / 255.
@@ -99,7 +99,7 @@ class DataIterator:
 
     def modify_data(self):
         target = random.randint(0, batch_size - 1)
-        slice = random.sample(LABEL_CHOICES_LIST, 4)
+        slice = random.sample(LABEL_CHOICES_LIST, 1)
         captcha = ''.join(slice)
         img = gene_code(captcha)
         img = np.asarray(img).astype(np.float32) / 255.
@@ -107,7 +107,7 @@ class DataIterator:
         self.image[target], self.labels[target] = img, code
 
     def get_test_img(self, num_line, num_point):
-        slice = random.sample(LABEL_CHOICES_LIST, 4)
+        slice = random.sample(LABEL_CHOICES_LIST, 1)
         captcha = ''.join(slice)
         img = gene_code(captcha)
         img = np.asarray(img).astype(np.float32) / 255.
@@ -117,6 +117,9 @@ class DataIterator:
     @property
     def size(self):
         return len(self.labels)
+
+    def input_original_batch(self):
+        return self.image, self.labels
 
     def input_index_generate_batch(self):
         image_batch = self.image
@@ -137,20 +140,12 @@ class LSTMOCR(object):
         self.mode = mode
         # image
         self.inputs = tf.placeholder(tf.float32, [None, image_height, image_width, image_channel])
-
-        # SparseTensor required by ctc_loss op
         self.labels = tf.sparse_placeholder(tf.int32)
-        # 1d array of size [batch_size]
-        # self.seq_len = tf.placeholder(tf.int32, [None])
-        # l2
         self._extra_train_ops = []
 
     def build_graph(self):
         self._bulid_CNN_with_FC()
-
         self.merged_summay = tf.summary.merge_all()
-
-
 
 
     def _bulid_CNN_with_FC(self):
@@ -266,66 +261,6 @@ class LSTMOCR(object):
                               strides=[1, strides, strides, 1],
                               padding='SAME',
                               name='avg_pool')
-
-    def _residual_block(self, input_layer, output_channel, if_first=False, name=None):
-        input_channel = input_layer.get_shape().as_list()[-1]
-
-        # When it's time to "shrink" the image size, we use stride = 2
-        if input_channel * 2 == output_channel:
-            increase_dim = True
-            stride = 2
-        elif input_channel == output_channel:
-            increase_dim = False
-            stride = 1
-        else:
-            raise ValueError('Output and input channel does not match in residual blocks!!!')
-
-        with tf.variable_scope('conv1_in_block'):
-            if if_first:
-                x = self._conv2d(input_layer, 'cnn1' + name, 3, input_channel, output_channel, 1)
-            else:
-                x = self._conv2d(input_layer, 'cnn1' + name, 3, input_channel, output_channel, stride)
-                x = self._batch_norm('bn1' + name, x)
-                x = self._leaky_relu(x, leakiness)
-
-        with tf.variable_scope('conv2_in_block'):
-            x = self._conv2d(x, 'cnn2' + name, 3, output_channel, output_channel, 1)
-            x = self._batch_norm('bn2' + name, x)
-            conv2 = self._leaky_relu(x, leakiness)
-
-        # When the channels of input layer and conv2 does not match, we add zero pads to increase the
-        #  depth of input layers
-        if increase_dim is True:
-            pooled_input = tf.nn.max_pool(input_layer, ksize=[1, 2, 2, 1],
-                                          strides=[1, 2, 2, 1], padding='VALID')
-            padded_input = tf.pad(pooled_input, [[0, 0], [0, 0], [0, 0], [input_channel // 2,
-                                                                          input_channel // 2]])
-        else:
-            padded_input = input_layer
-
-        output = conv2 + padded_input
-        return output
-
-    def _inception_block(self, input, input_channel, name=None):
-        branch_0 = self._conv2d(input, name + 'Conv2d_0a_1x1', 1, input_channel, 32, 1)
-
-        branch_1 = self._conv2d(input, name + 'Conv2d_1a_1x1', 1, input_channel, 32, 1)
-        branch_1 = self._batch_norm(name + "branch_1_bn", branch_1)
-        branch_1 = self._leaky_relu(branch_1, leakiness)
-        branch_1 = self._conv2d(branch_1, name + 'Conv2d_1b_3x3', 3, 32, 48, 1)
-
-        branch_2 = self._conv2d(input, name + 'Conv2d_2a_1x1', 1, input_channel, 8, 1)
-        branch_2 = self._batch_norm(name + "branch_2_bn", branch_2)
-        branch_2 = self._leaky_relu(branch_2, leakiness)
-        branch_2 = self._conv2d(branch_2, name + 'Conv2d_2b_3x3', 3, 8, 24, 1)
-
-        branch_3 = self._max_pool(input, 3, 1)
-        branch_3 = self._conv2d(branch_3, name + 'Conv2d_3b_1x1', 1, input_channel, 16, 1)
-
-        net = tf.concat(axis=3, values=[branch_0, branch_1, branch_2, branch_3])
-        net = self._batch_norm(name + "net_bn", net)
-        net = self._leaky_relu(net, leakiness)
-        return net
 
     def _bulid_fc(self, x, out_num, name):
         with tf.variable_scope('fc' + name):

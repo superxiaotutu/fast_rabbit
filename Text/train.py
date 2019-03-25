@@ -375,9 +375,9 @@ def infer_many(Checkpoint_PATH, img_PATH):
 
 
 def main():
-    # train(restore=False, checkpoint_dir="test")
+    train(restore=False, checkpoint_dir="test")
     # infer("train_all/model", "example/1.png")
-    creat_adv("test/model", "example/2.png")
+    # creat_adv("test/model", "example/2.png")
     # test()
     # darw_table("train_2/model")
 
