@@ -1,10 +1,8 @@
 import numpy as np
 import matplotlib as mpl
-
-mpl.use('Agg')
+# mpl.use('Agg')
 import random
 import matplotlib.pyplot as plt
-import matplotlib as mpl
 import os
 import datetime
 
@@ -26,7 +24,7 @@ initial_learning_rate = 0.001
 decay_steps = 4000
 decay_rate = 0.96
 output_keep_prob = 0.8
-batch_size = 250
+batch_size = 1
 LABEL_CHOICES = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 LABEL_CHOICES_LIST = [str(i) for i in LABEL_CHOICES]
 encode_maps = {}
@@ -39,7 +37,8 @@ SPACE_INDEX = 0
 SPACE_TOKEN = ''
 encode_maps[SPACE_TOKEN] = SPACE_INDEX
 decode_maps[SPACE_INDEX] = SPACE_TOKEN
-
+encode_maps[''] = 37
+decode_maps[37] = ''
 
 def sparse_tuple_from_label(sequences, dtype=np.int32):
     """Create a sparse representention of x.
