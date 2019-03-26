@@ -28,3 +28,5 @@ def plot():
 
         plt.plot(x,y)
         plt.show()
+
+a=[[]]

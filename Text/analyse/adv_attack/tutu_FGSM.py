@@ -72,6 +72,7 @@ for index1,i in enumerate(imgs):
     label_inputs = []
     labels_arr = []
     imgs_input = [np.asarray(Image.open('ori/' + i)) / 255]
+
     code= sess.run(LL_targeet, feed_dict={model.inputs: imgs_input})
     label_arr[code[0][0]] = 1
     labels_arr.append([label_arr])
@@ -97,7 +98,13 @@ for index1,i in enumerate(imgs):
                 acc += 1
                 result[level] += 1
         print(acc,result,expression)
-
 print(result)
     # cv2.imshow("tu", imgs_input[0])
     # cv2.waitKey(0)
+n=[]
+result=[50, 0, 0, 0, 0, 50, 0, 0, 0, 0, 50, 0, 0, 0, 0, 47, 0, 0, 0, 0, 40, 0, 0, 0, 0, 28, 0, 0, 0, 0, 9, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+
+for i in result:
+    if i!=0:
+        n.append(i)
+print(n)
