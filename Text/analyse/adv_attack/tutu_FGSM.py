@@ -52,7 +52,7 @@ sess.run(tf.global_variables_initializer())
 Var_restore = tf.global_variables()
 saver = tf.train.Saver(Var_restore, max_to_keep=5, allow_empty=True)
 # ckpt = tf.train.latest_checkpoint('../train_one_normal/train_one_char/model')
-ckpt = tf.train.latest_checkpoint('../train_gauss/train_gauss/model')
+ckpt = tf.train.latest_checkpoint('/home/kaiyuan_xu/PycharmProjects/fast_rabbit/Text/analyse/train_one_normal/train_one_char/model')
 if ckpt:
     saver.restore(sess, ckpt)
     print('restore from ckpt{}'.format(ckpt))
@@ -60,8 +60,8 @@ else:
     print('cannot restore')
 
 imgs=os.listdir('ori')
-shutil.rmtree('adv')
-os.mkdir('adv')
+shutil.rmtree('simple_adv')
+os.mkdir('simple_adv')
 acc = 0
 levels = [i for i in range(50)]
 result = [0 for i in range(50)]
@@ -80,10 +80,11 @@ for index1,i in enumerate(imgs):
     for level in [k for k in range(0,42,5)]:
         for l in range(level):
             g = sess.run(grad_y2x, feed_dict=feed)
-            imgs_input = imgs_input - 0.0005 * g
+            imgs_input = imgs_input - 0.001 * g
             imgs_input=np.clip(imgs_input,0,1)
             feed = {model.inputs: imgs_input, target_label: labels_arr}
-        plt.imsave("adv/%s_%s_%s.png" % (index1, level, label_inputs[0]), imgs_input[0])
+        plt.imsave("simple_adv/%s_%s_%s.png" % (index1, level, label_inputs[0]), imgs_input[0])
+
         dense_decoded_code = sess.run(model.dense_decoded, feed)
         for index, j in enumerate(dense_decoded_code):
             expression = ''

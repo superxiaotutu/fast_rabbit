@@ -2,7 +2,7 @@ import tensorflow as tf
 from tensorflow.contrib import slim
 import matplotlib as mpl
 
-mpl.use('Agg')
+# mpl.use('Agg')
 import sys
 sys.path.append('../config')
 from config import *

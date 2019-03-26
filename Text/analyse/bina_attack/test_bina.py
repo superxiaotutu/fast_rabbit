@@ -7,7 +7,7 @@ from gen_type_codes import *
 import tensorflow as tf
 plt.switch_backend('agg')
 
-os.environ["CUDA_VISIBLE_DEVICES"] = '1'
+os.environ["CUDA_VISIBLE_DEVICES"] = '0'
 model = LSTMOCR("test", "lenet")
 model.build_graph()
 config = tf.ConfigProto()
@@ -129,12 +129,8 @@ def adv_many(Checkpoint_PATH, img_PATH):
 
 def main():
     arr = []
-    for i in range(batch_size):
-        slice = random.sample(LABEL_CHOICES_LIST, 4)
-        captcha = ''.join(slice)
-        img = gene_code_clean(captcha)
-        arr.append([img, captcha])
-    adv_many('../../train/train_lenet/model', arr)
+
+    adv_many('/home/kaiyuan_xu/PycharmProjects/fast_rabbit/Text/analyse/train_one_normal/train_one_char/model')
 
 
 if __name__ == '__main__':
