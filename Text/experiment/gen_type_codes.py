@@ -94,7 +94,6 @@ def preprocess(image):
     elif flag == 2:
         image = add_gauss(image)
         image = binary(image)
-
     elif flag == 3:
         image = image.convert('L')
         image = image.point(lambda x: 255 if x > np.mean(image) else 0)

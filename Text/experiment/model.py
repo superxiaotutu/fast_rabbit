@@ -100,12 +100,9 @@ class DataIterator:
 
 
 class LSTMOCR(object):
-    def __init__(self, mode_name, mode, gauss, bnf, all):
+    def __init__(self, mode_name, mode):
         self.mode_name = mode_name
         self.mode = mode
-        self.gauss = gauss
-        self.bnf = bnf
-        self.all = all
 
         # image
         self.inputs = tf.placeholder(tf.float32, [None, image_height, image_width, image_channel])
