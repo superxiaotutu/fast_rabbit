@@ -13,6 +13,7 @@ from config import *
 from gen_type_codes import *
 
 os.environ["CUDA_VISIBLE_DEVICES"] = '0'
+RELEASE = False
 
 
 def cnn_generate(Checkpoint_PATH, model_name):
@@ -65,7 +66,7 @@ def cnn_generate(Checkpoint_PATH, model_name):
     adv_step = 0.01
     adv_count = 100
     file_count = 1000
-    with open('result_cnn.txt', 'w')as f:
+    with open('cnn_result.txt', 'w')as f:
         for type in range(4):
             acc = 0
             prec_acc = 0
@@ -129,8 +130,9 @@ def cnn_generate(Checkpoint_PATH, model_name):
                     imgs_input = np.clip(imgs_input, 0, 1)
                     feed = {model.inputs: imgs_input, CNN_target: target_creat, origin_inputs: imgs_input_before}
                 imgs_input_after = imgs_input
-                # for i, v in enumerate(imgs_input_after):
-                #     plt.imsave("../images/cnn_adv/%s_%s_%s_%s.png" % (type, epoch, i, imgs_label[i]), v)
+                if RELEASE:
+                    for i, v in enumerate(imgs_input_after):
+                        plt.imsave("../images/cnn_adv/%s_%s_%s_%s.png" % (type, epoch, i, imgs_label[i]), v)
                 feed = {model.inputs: imgs_input, CNN_target: target_creat, origin_inputs: imgs_input_before}
                 dense_decoded_code = sess.run(model.dense_decoded, feed)
                 for index, j in enumerate(dense_decoded_code):
@@ -147,9 +149,10 @@ def cnn_generate(Checkpoint_PATH, model_name):
 
                     print("True:{} BEFORE:{} ,AFTER:{}".format(imgs_label[index], imgs_pred[index], expression))
                     print(acc)
-
-                    f.write(
-                        "%s %s %s %s %s %s\n" % (type, imgs_label[index], imgs_pred[index], expression, prec_acc, acc,))
+                    if RELEASE:
+                        f.write(
+                            "%s %s %s %s %s %s\n" % (
+                                type, imgs_label[index], imgs_pred[index], expression, prec_acc, acc,))
 
 
 def ocr_generate(Checkpoint_PATH, model_name):
@@ -203,7 +206,7 @@ def ocr_generate(Checkpoint_PATH, model_name):
     adv_step = 0.1
     adv_count = 100
     file_count = 1000
-    with open('result.txt', 'w')as f:
+    with open('ocr_result.txt', 'w')as f:
         for type in range(4):
             acc = 0
             prec_acc = 0
@@ -264,8 +267,9 @@ def ocr_generate(Checkpoint_PATH, model_name):
                     imgs_input = imgs_input - grad * adv_step
                     feed = {model.inputs: imgs_input, target: target_creat, origin_inputs: imgs_input_before}
                 imgs_input_after = imgs_input
-                # for i, v in enumerate(imgs_input_after):
-                #     plt.imsave("../images/ocr_adv/%s_%s_%s_%s.png" % (type, epoch, i, imgs_label[i]), v)
+                if RELEASE:
+                    for i, v in enumerate(imgs_input_after):
+                        plt.imsave("../images/ocr_adv/%s_%s_%s_%s.png" % (type, epoch, i, imgs_label[i]), v)
                 feed = {model.inputs: imgs_input, target: target_creat, origin_inputs: imgs_input_before}
                 dense_decoded_code = sess.run(model.dense_decoded, feed)
                 for index, j in enumerate(dense_decoded_code):
@@ -282,9 +286,10 @@ def ocr_generate(Checkpoint_PATH, model_name):
 
                     print("True:{} BEFORE:{} ,AFTER:{}".format(imgs_label[index], imgs_pred[index], expression))
                     print(acc)
-
-                    f.write(
-                        "%s %s %s %s %s %s\n" % (type, imgs_label[index], imgs_pred[index], expression, prec_acc, acc,))
+                    if RELEASE:
+                        f.write(
+                            "%s %s %s %s %s %s\n" % (
+                                type, imgs_label[index], imgs_pred[index], expression, prec_acc, acc,))
                 # plt.subplot(1, 2, 1)
                 # plt.imshow(imgs_input_before[0])
                 # plt.subplot(1, 2, 2)
@@ -323,10 +328,10 @@ def test_model(Checkpoint_PATH, model_name, head=False):
     for loop in range(2):
         if loop == 0:
             img_files = glob.glob("../images/%s_adv/*.png" % model_name)
-            filename = '%s_vs_%s_sample_%s_result.txt' % (model_name,model_name, 'head' if head else '')
+            filename = '%s_vs_%s_sample_%s_result.txt' % (model_name, model_name, 'head' if head else '')
         else:
             img_files = glob.glob("../images/%s_adv/*.png" % taget_name)
-            filename = '%s_vs_%s_sample_%s_result.txt' % (model_name,taget_name, 'head' if head else '')
+            filename = '%s_vs_%s_sample_%s_result.txt' % (model_name, taget_name, 'head' if head else '')
         acc = 0
         acc_0 = 0
         with open(filename, 'w')as f:
@@ -357,16 +362,16 @@ def test_model(Checkpoint_PATH, model_name, head=False):
                         else:
                             expression += LSTM.decode_maps[i]
                     if expression == imgs_label[index]:
-                        if type_arr[index] == '0':
-                            acc_0 += 1
-                            print("acd%s" % acc_0)
+
                         acc += 1
-
-                    # print("True:{} BEFORE:{} ".format(imgs_label[index], expression))
-                    # print(acc)
-
-                    f.write(
-                        "%s %s %s %s\n" % (type_arr[index], imgs_label[index], expression, acc,))
+                    plt.imshow(imgs_input[index])
+                    plt.show()
+                    print("True:{} BEFORE:{} ".format(imgs_label[index], expression))
+                    print(acc)
+                    if RELEASE:
+                        f.write(
+                            "%s %s %s %s\n" % (type_arr[index], imgs_label[index], expression, acc,))
+            break
             plt.imshow(im)
             plt.show()
 
@@ -377,5 +382,5 @@ if __name__ == '__main__':
     # test_model('../train_lenet/model', 'lenet')
     # test_model('../train_cnn/model', 'cnn')
 
-    test_model('../train_cnn/model', 'cnn',head=True)
-    # test_model('../train_lenet/model', 'lenet', head=True)
+    # test_model('../train_cnn/model', 'cnn',head=True)
+    test_model('../train_lenet/model', 'lenet', head=True)
