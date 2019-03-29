@@ -8,7 +8,6 @@ from captcha.image import DEFAULT_FONTS, ImageCaptcha
 from skimage.util import random_noise
 from config import image_height, image_width, plt
 
-image_width = image_width // 4
 image = ImageCaptcha(width=image_width, height=image_height)
 
 SALT_LEVEL = []
@@ -74,19 +73,28 @@ def gen_gauss_code(captcha):
     return img
 
 
+def add_gauss(image):
+    image = image.filter(ImageFilter.GaussianBlur)
+    return image
+
+
+def binary(image):
+    image = image.convert('L')
+    image = image.point(lambda x: 255 if x > np.mean(image) else 0)
+    image = image.convert('RGB')
+    return image
+
+
 def preprocess(image):
     flag = random.randint(0, 5)
     if flag == 0:
-        image = image.convert('L')
-        image = image.point(lambda x: 255 if x > np.mean(image) else 0)
-        image = image.convert('RGB')
+        image = binary(image)
     elif flag == 1:
-        image.filter(ImageFilter.GaussianBlur)
+        image = add_gauss(image)
     elif flag == 2:
-        image.filter(ImageFilter.GaussianBlur)
-        image = image.convert('L')
-        image = image.point(lambda x: 255 if x > np.mean(image) else 0)
-        image = image.convert('RGB')
+        image = add_gauss(image)
+        image = binary(image)
+
     elif flag == 3:
         image = image.convert('L')
         image = image.point(lambda x: 255 if x > np.mean(image) else 0)
@@ -139,7 +147,7 @@ def gen_code_analy(chars):
     if flag == 0:
         im = gene_code_clean_one(chars)
         im = np.asarray(im).astype(np.float32) / 255.
-    elif 1<= flag <7:
+    elif 1 <= flag < 7:
         im = gen_gauss_code(chars)
     else:
         image = gene_code_clean_one(chars)
@@ -149,7 +157,6 @@ def gen_code_analy(chars):
         im = np.asarray(im).astype(np.float32) / 255.
 
     return im
-
 
 # a=gen_code_analy('S')
 # plt.imshow(a)
