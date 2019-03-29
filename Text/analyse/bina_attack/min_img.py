@@ -11,15 +11,18 @@ if __name__ == '__main__':
     adv = cv2.imread('images/23_40_A.png')
     adv = cv2.cvtColor(adv, cv2.COLOR_BGR2RGB)
     b_bin = cv2.imread('images/9.png')
-    c = (ori - adv)*2
+    c = (ori-adv)*2
+
+    imgs.append(c)
+    print(c)
     c = cv2.cvtColor(c, cv2.COLOR_RGB2GRAY)
     retval, c_bin = cv2.threshold(c, 0, 255, cv2.THRESH_OTSU)
     imgs.append(ori)
     imgs.append(adv)
     imgs.append(b_bin)
-    imgs.append(c)
+    # print(c_bin)
     imgs.append(c_bin)
-    print(c_bin)
+
     # cv2.imshow('s',c)
     # cv2.waitKey(0)
     for i, v in enumerate(imgs):

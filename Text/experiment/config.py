@@ -37,8 +37,8 @@ SPACE_INDEX = 0
 SPACE_TOKEN = ''
 encode_maps[SPACE_TOKEN] = SPACE_INDEX
 decode_maps[SPACE_INDEX] = SPACE_TOKEN
-encode_maps[''] = 37
-decode_maps[37] = ''
+# encode_maps[''] = 37
+# decode_maps[37] = ''
 
 def sparse_tuple_from_label(sequences, dtype=np.int32):
     """Create a sparse representention of x.
