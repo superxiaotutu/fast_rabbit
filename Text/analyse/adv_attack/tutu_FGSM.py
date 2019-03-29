@@ -1,7 +1,7 @@
 import shutil
 import sys
 import tensorflow as tf
-import one_char_model as LSTM
+from one_char_model import LSTMOCR
 import time
 import numpy as np
 import os
@@ -35,7 +35,7 @@ def gene_code_clean_one(chars):
     return im
 
 
-model = LSTM.LSTMOCR("test")
+model = LSTMOCR("test")
 model.build_graph()
 config = tf.ConfigProto()
 config.gpu_options.allow_growth = True
@@ -44,7 +44,6 @@ target_label = tf.placeholder(tf.int32, [None, 1, 38])
 
 ADV_LOSS = slim.losses.softmax_cross_entropy(model.logits, target_label)
 grad_y2x = tf.sign(tf.gradients(ADV_LOSS, model.inputs)[0])
-
 LL_targeet = tf.arg_min(model.logits, dimension=2)
 
 sess = tf.Session(config=config)
@@ -93,7 +92,7 @@ for index1,i in enumerate(imgs):
                 if i == -1:
                     expression += ''
                 else:
-                    expression += LSTM.decode_maps[i]
+                    expression += decode_maps[i]
             if expression == label_inputs[index]:
                 acc += 1
                 result[level] += 1

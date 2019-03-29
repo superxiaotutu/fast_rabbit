@@ -2,18 +2,146 @@ import glob
 import tensorflow as tf
 
 import matplotlib.pyplot as plt
-plt.switch_backend('agg')
+
+# plt.switch_backend('agg')
 import random
 import sys
+
+from tensorflow.contrib import slim
+
 sys.path.append('../')
 import model as LSTM
 from config import *
 from gen_type_codes import *
 
-os.environ["CUDA_VISIBLE_DEVICES"] = '1'
+os.environ["CUDA_VISIBLE_DEVICES"] = '0'
 
 
 def cnn_generate(Checkpoint_PATH, model_name):
+    model = LSTM.LSTMOCR(model_name, "infer")
+    model.build_graph()
+    config = tf.ConfigProto()
+    config.gpu_options.allow_growth = True
+    # adv_node
+    target_label = tf.placeholder(tf.int32, [None, 4, 38])
+    ADV_LOSS = slim.losses.softmax_cross_entropy(model.logits, target_label)
+    grad_y2x = tf.sign(tf.gradients(ADV_LOSS, model.inputs)[0])
+
+    LL_targeet = tf.arg_min(model.logits, dimension=2)
+    Var_restore = tf.global_variables()
+
+    saver = tf.train.Saver(Var_restore, max_to_keep=5, allow_empty=True)
+
+    sess = tf.Session(config=config)
+    sess.run(tf.global_variables_initializer())
+
+    ckpt = tf.train.latest_checkpoint(Checkpoint_PATH)
+
+    if ckpt:
+        saver.restore(sess, ckpt)
+        print('restore from ckpt{}'.format(ckpt))
+    else:
+        print('cannot restore')
+        return
+    adv_step = 0.01
+    adv_count = 100
+    file_count = 1000
+    with open('result.txt', 'w')as f:
+        for type in range(4):
+            acc = 0
+            img_files = glob.glob("../images/ori/*.png")
+            for epoch in range(file_count // batch_size):
+                ori_imgs_input = [img_files.pop() for i in range(batch_size)]
+                print(len(ori_imgs_input))
+                imgs_label = [i[-8:-4] for i in ori_imgs_input]
+                imgs_input = []
+                if type == 0:
+                    for index, i in enumerate(ori_imgs_input):
+                        im = Image.open(i)
+                        im = np.asarray(im).astype(np.float32) / 255.
+                        imgs_input.append(im)
+                if type == 1:
+                    for index, i in enumerate(ori_imgs_input):
+                        im = add_gauss(Image.open(i))
+                        im = np.asarray(im).astype(np.float32) / 255.
+                        imgs_input.append(im)
+                elif type == 2:
+                    for index, i in enumerate(ori_imgs_input):
+                        im = binary(Image.open(i))
+                        im = np.asarray(im).astype(np.float32) / 255.
+                        imgs_input.append(im)
+                elif type == 3:
+                    for index, i in enumerate(ori_imgs_input):
+                        im = add_gauss(Image.open(i))
+                        im = binary(im)
+                        im = np.asarray(im).astype(np.float32) / 255.
+                        imgs_input.append(im)
+                imgs_input_before = imgs_input
+                feed = {model.inputs: imgs_input}
+                dense_decoded_code = sess.run(model.dense_decoded, feed)
+                dense_decoded_code = sess.run(model.dense_decoded, feed)
+
+                print(dense_decoded_code)
+                for index, j in enumerate(dense_decoded_code):
+                    expression = ''
+                    for i in dense_decoded_code[0]:
+                        if i == -1:
+                            expression += '-'
+                        else:
+                            expression += LSTM.decode_maps[i]
+                    print(imgs_label[index])
+                    print("BEFORE:{}".format(expression))
+                exit()
+                labels_arr = []
+                label_arr = [0 for j in range(38)]
+                labels_arr.append(label_arr)
+                labels_arr.append(label_arr)
+                labels_arr.append(label_arr)
+                labels_arr.append(label_arr)
+                feed={model.inputs: imgs_input}
+                target = sess.run(LL_targeet, feed_dict=feed)
+                print(target)
+
+                label_arr[target[0][0]] = 1
+                feed={model.inputs: imgs_input,target_label:[labels_arr]}
+
+
+                for i in range(adv_count):
+                    g = sess.run(grad_y2x, feed_dict=feed)
+                    imgs_input = imgs_input - adv_step * g
+                    imgs_input = np.clip(imgs_input, 0, 1)
+                    feed = {model.inputs: imgs_input, target_label: [labels_arr]}
+                imgs_input_after = imgs_input
+                for i, v in enumerate(imgs_input_after):
+                    plt.imsave("../images/ocr_adv/%s_%s_%s_%s.png" % (type, epoch, i, imgs_label[i]), v)
+                feed = {model.inputs: imgs_input, target_label: [labels_arr]}
+                dense_decoded_code = sess.run(model.dense_decoded, feed)
+                for index, j in enumerate(dense_decoded_code):
+                    expression = ''
+                    for i in j:
+                        if i == -1:
+                            expression += ''
+                        else:
+                            expression += LSTM.decode_maps[i]
+                    if expression == imgs_label[index]:
+                        acc += 1
+
+                    print("BEFORE:{} ,AFTER:{}".format(imgs_label[index], expression))
+                    print(acc)
+
+                    f.write("%s %s %s %s \n" % (type, imgs_label[index], expression, acc,))
+                # plt.subplot(1, 2, 1)
+                # plt.imshow(imgs_input_before[0])
+                # plt.subplot(1, 2, 2)
+                # plt.imshow(imgs_input_after[0])
+                # plt.show()
+                # plt.show()
+                # plt.imshow(imgs_input_after[0])
+                # plt.show()
+                # return
+
+
+def ocr_generate(Checkpoint_PATH, model_name):
     shuff_dir = {}
     lst = [i for i in range(36)]
     random.shuffle(lst)
@@ -68,28 +196,28 @@ def cnn_generate(Checkpoint_PATH, model_name):
         for type in range(4):
             acc = 0
             img_files = glob.glob("../images/ori/*.png")
-            for epoch in range(file_count  // batch_size):
+            for epoch in range(file_count // batch_size):
                 ori_imgs_input = [img_files.pop() for i in range(batch_size)]
                 print(len(ori_imgs_input))
                 imgs_label = [i[-8:-4] for i in ori_imgs_input]
                 imgs_input = []
                 if type == 0:
-                    for i in ori_imgs_input:
+                    for index, i in enumerate(ori_imgs_input):
                         im = Image.open(i)
                         im = np.asarray(im).astype(np.float32) / 255.
                         imgs_input.append(im)
                 if type == 1:
-                    for i in ori_imgs_input:
+                    for index, i in enumerate(ori_imgs_input):
                         im = add_gauss(Image.open(i))
                         im = np.asarray(im).astype(np.float32) / 255.
                         imgs_input.append(im)
                 elif type == 2:
-                    for i in ori_imgs_input:
+                    for index, i in enumerate(ori_imgs_input):
                         im = binary(Image.open(i))
                         im = np.asarray(im).astype(np.float32) / 255.
                         imgs_input.append(im)
                 elif type == 3:
-                    for i in ori_imgs_input:
+                    for index, i in enumerate(ori_imgs_input):
                         im = add_gauss(Image.open(i))
                         im = binary(im)
                         im = np.asarray(im).astype(np.float32) / 255.
@@ -121,6 +249,8 @@ def cnn_generate(Checkpoint_PATH, model_name):
                     imgs_input = imgs_input - grad * adv_step
                     feed = {model.inputs: imgs_input, target: target_creat, origin_inputs: imgs_input_before}
                 imgs_input_after = imgs_input
+                for i, v in enumerate(imgs_input_after):
+                    plt.imsave("../images/ocr_adv/%s_%s_%s_%s.png"% (type, epoch, i, imgs_label[i]),v)
                 feed = {model.inputs: imgs_input, target: target_creat, origin_inputs: imgs_input_before}
                 dense_decoded_code = sess.run(model.dense_decoded, feed)
                 for index, j in enumerate(dense_decoded_code):
@@ -137,11 +267,11 @@ def cnn_generate(Checkpoint_PATH, model_name):
                     print(acc)
 
                     f.write("%s %s %s %s \n" % (type, imgs_label[index], expression, acc,))
-                plt.subplot(1, 2, 1)
-                plt.imshow(imgs_input_before[0])
-                plt.subplot(1, 2, 2)
-                plt.imshow(imgs_input_after[0])
-                plt.show()
+                # plt.subplot(1, 2, 1)
+                # plt.imshow(imgs_input_before[0])
+                # plt.subplot(1, 2, 2)
+                # plt.imshow(imgs_input_after[0])
+                # plt.show()
                 # plt.show()
                 # plt.imshow(imgs_input_after[0])
                 # plt.show()
@@ -190,5 +320,7 @@ def test_model(Checkpoint_PATH):
 
 
 if __name__ == '__main__':
-    cnn_generate('../train_lenet/model', 'lenet')
+    # ocr_generate('../train_lenet/model', 'lenet')
+    cnn_generate('../train_cnn/model', 'cnn')
+
     # test_model('../train_cnn/model', )
