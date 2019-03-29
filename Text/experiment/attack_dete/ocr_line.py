@@ -334,6 +334,7 @@ def test_model(Checkpoint_PATH, model_name, head=False):
             filename = '%s_vs_%s_sample_%s_result.txt' % (model_name, taget_name, 'head' if head else '')
         acc = 0
         acc_0 = 0
+        type_acc_arr=[0  for i in range(4)]
         with open(filename, 'w')as f:
             for index in range(40):
                 imgs_input = []
@@ -362,18 +363,19 @@ def test_model(Checkpoint_PATH, model_name, head=False):
                         else:
                             expression += LSTM.decode_maps[i]
                     if expression == imgs_label[index]:
-
+                        type_acc_arr[int(type_arr[index])]+=1
                         acc += 1
-                    plt.imshow(imgs_input[index])
-                    plt.show()
-                    print("True:{} BEFORE:{} ".format(imgs_label[index], expression))
-                    print(acc)
+                    # plt.imshow(imgs_input[index])
+                    # plt.show()
+                    # print("True:{} BEFORE:{} ".format(imgs_label[index], expression))
+                    # print(acc)
                     if RELEASE:
                         f.write(
                             "%s %s %s %s\n" % (type_arr[index], imgs_label[index], expression, acc,))
-            break
-            plt.imshow(im)
-            plt.show()
+            print(type_acc_arr)
+            # break
+            # plt.imshow(im)
+            # plt.show()
 
 
 if __name__ == '__main__':
@@ -382,5 +384,5 @@ if __name__ == '__main__':
     # test_model('../train_lenet/model', 'lenet')
     # test_model('../train_cnn/model', 'cnn')
 
-    # test_model('../train_cnn/model', 'cnn',head=True)
-    test_model('../train_lenet/model', 'lenet', head=True)
+    test_model('../train_cnn/model', 'cnn',head=True)
+    # test_model('../train_lenet/model', 'lenet', head=True)
