@@ -265,6 +265,7 @@ def ocr_generate(Checkpoint_PATH, model_name):
                     if (i + 1) % 10 == 0:
                         print("LOSS:{}".format(np.max(grad)))
                     imgs_input = imgs_input - grad * adv_step
+                    imgs_input = np.clip(imgs_input, 0, 1)
                     feed = {model.inputs: imgs_input, target: target_creat, origin_inputs: imgs_input_before}
                 imgs_input_after = imgs_input
                 if RELEASE:
@@ -379,7 +380,7 @@ def test_model(Checkpoint_PATH, model_name, head=False):
 
 
 if __name__ == '__main__':
-    # ocr_generate('../train_lenet/model', 'lenet')
+    ocr_generate('../train_lenet/model', 'lenet')
     # cnn_generate('../train_cnn/model', 'cnn')
     # test_model('../train_lenet/model', 'lenet')
     # test_model('../train_cnn/model', 'cnn')

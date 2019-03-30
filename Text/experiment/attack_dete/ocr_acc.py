@@ -68,6 +68,7 @@ def attack(sess, imgs_input):
         if (i + 1) % 10 == 0:
             print("LOSS:{}".format(np.max(grad)))
         imgs_input = imgs_input - grad * adv_step
+        imgs_input = np.clip(imgs_input,0,1)
         feed = {model.inputs: imgs_input, target: target_creat, origin_inputs: imgs_input_before}
     imgs_input_after = imgs_input
     return imgs_input_after

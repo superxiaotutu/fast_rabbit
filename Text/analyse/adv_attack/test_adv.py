@@ -94,6 +94,7 @@ def fgsm(Checkpoint_PATH):
         for i in range(level):
             loss_now, grad = sess.run([ADV_LOSS, grad_y2x], feed_dict=feed)
             imgs_input = imgs_input - grad * adv_step
+            imgs_input = np.clip(imgs_input, 0, 1)
             feed = {model.inputs: imgs_input,labels:labels_arr}
         print(loss_now)
 
