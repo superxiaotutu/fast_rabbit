@@ -13,7 +13,7 @@ from config import *
 from gen_type_codes import *
 
 os.environ["CUDA_VISIBLE_DEVICES"] = '0'
-RELEASE = False
+RELEASE = True
 
 
 def cnn_generate(Checkpoint_PATH, model_name):
@@ -63,12 +63,12 @@ def cnn_generate(Checkpoint_PATH, model_name):
     else:
         print('cannot restore')
         return
-    adv_step = 0.01
+    adv_step = 0.90
     adv_count = 100
     file_count = 1000
     with open('cnn_result.txt', 'w')as f:
         for type in range(4):
-            acc = 0
+            adv_acc = 0
             prec_acc = 0
             img_files = glob.glob("../images/ori/*.png")
             for epoch in range(file_count // batch_size):
@@ -84,7 +84,7 @@ def cnn_generate(Checkpoint_PATH, model_name):
                         imgs_input.append(im)
                 if type == 1:
                     for index, i in enumerate(ori_imgs_input):
-                        im = add_gauss(Image.open(i))
+                        im = add_gauss(Image.open(i),radius=0.8)
                         im = np.asarray(im).astype(np.float32) / 255.
                         imgs_input.append(im)
                 elif type == 2:
@@ -94,7 +94,7 @@ def cnn_generate(Checkpoint_PATH, model_name):
                         imgs_input.append(im)
                 elif type == 3:
                     for index, i in enumerate(ori_imgs_input):
-                        im = add_gauss(Image.open(i))
+                        im = add_gauss(Image.open(i),radius=0.8)
                         im = binary(im)
                         im = np.asarray(im).astype(np.float32) / 255.
                         imgs_input.append(im)
@@ -111,18 +111,18 @@ def cnn_generate(Checkpoint_PATH, model_name):
                 target_creat = np.repeat(target_creat, batch_size, 0)
                 dense_decoded_code = sess.run(model.dense_decoded, feed)
                 feed = {model.inputs: imgs_input, CNN_target: target_creat, origin_inputs: imgs_input_before}
-
-                print(dense_decoded_code)
-                dense_decoded_code = sess.run(model.dense_decoded, feed)
-                for index, j in enumerate(dense_decoded_code):
-                    expression = ''
-                    for i in j:
-                        if i == -1:
-                            expression += ''
-                        else:
-                            expression += LSTM.decode_maps[i]
-                    print(imgs_label[index])
-                    imgs_pred.append(expression)
+                #
+                # dense_decoded_code = sess.run(model.dense_decoded, feed)
+                # for index, j in enumerate(dense_decoded_code):
+                #     expression = ''
+                #     for i in j:
+                #         if i == -1:
+                #             expression += ''
+                #         else:
+                #             expression += LSTM.decode_maps[i]
+                #     if expression == imgs_label[index]:
+                #         prec_acc += 1
+                #     imgs_pred.append(expression)
 
                 for i in range(adv_count):
                     g = sess.run(grad_y2x, feed_dict=feed)
@@ -142,17 +142,15 @@ def cnn_generate(Checkpoint_PATH, model_name):
                             expression += ''
                         else:
                             expression += LSTM.decode_maps[i]
-                    if expression == imgs_label[index]:
-                        acc += 1
-                    if imgs_label[index] == imgs_pred[index]:
-                        prec_acc += 1
+
+                    if imgs_label[index] == expression:
+                        adv_acc += 1
 
                     print("True:{} BEFORE:{} ,AFTER:{}".format(imgs_label[index], imgs_pred[index], expression))
-                    print(acc)
                     if RELEASE:
                         f.write(
                             "%s %s %s %s %s %s\n" % (
-                                type, imgs_label[index], imgs_pred[index], expression, prec_acc, acc,))
+                                type, imgs_label[index], imgs_pred[index], expression, prec_acc, adv_acc,))
 
 
 def ocr_generate(Checkpoint_PATH, model_name):
@@ -203,12 +201,12 @@ def ocr_generate(Checkpoint_PATH, model_name):
     else:
         print('cannot restore')
         return
-    adv_step = 0.1
+    adv_step = 0.90
     adv_count = 100
     file_count = 1000
     with open('ocr_result.txt', 'w')as f:
         for type in range(4):
-            acc = 0
+            adv_acc = 0
             prec_acc = 0
             img_files = glob.glob("../images/ori/*.png")
             for epoch in range(file_count // batch_size):
@@ -224,7 +222,7 @@ def ocr_generate(Checkpoint_PATH, model_name):
                         imgs_input.append(im)
                 if type == 1:
                     for index, i in enumerate(ori_imgs_input):
-                        im = add_gauss(Image.open(i))
+                        im = add_gauss(Image.open(i), radius=0.8)
                         im = np.asarray(im).astype(np.float32) / 255.
                         imgs_input.append(im)
                 elif type == 2:
@@ -234,7 +232,7 @@ def ocr_generate(Checkpoint_PATH, model_name):
                         imgs_input.append(im)
                 elif type == 3:
                     for index, i in enumerate(ori_imgs_input):
-                        im = add_gauss(Image.open(i))
+                        im = add_gauss(Image.open(i), radius=0.8)
                         im = binary(im)
                         im = np.asarray(im).astype(np.float32) / 255.
                         imgs_input.append(im)
@@ -257,13 +255,15 @@ def ocr_generate(Checkpoint_PATH, model_name):
                             expression += ''
                         else:
                             expression += decode_maps[i]
-                    print("BEFORE:{} :{}".format(expression, imgs_label[index]))
+                    if expression == imgs_label[index]:
+                        prec_acc += 1
                     imgs_pred.append(expression)
                 feed = {model.inputs: imgs_input, target: target_creat, origin_inputs: imgs_input_before}
+
                 for i in range(adv_count):
                     loss_now, grad = sess.run([ADV_LOSS, grad_y2x], feed)
-                    # if (i + 1) % 10 == 0:
-                    #     print("LOSS:{}".format(np.max(grad)))
+                    if (i + 1) % 10 == 0:
+                        print("LOSS:{}".format(np.max(grad)))
                     imgs_input = imgs_input - grad * adv_step
                     feed = {model.inputs: imgs_input, target: target_creat, origin_inputs: imgs_input_before}
                 imgs_input_after = imgs_input
@@ -280,16 +280,14 @@ def ocr_generate(Checkpoint_PATH, model_name):
                         else:
                             expression += LSTM.decode_maps[i]
                     if expression == imgs_label[index]:
-                        acc += 1
-                    if imgs_label[index] == imgs_pred[index]:
-                        prec_acc += 1
-
-                    print("True:{} BEFORE:{} ,AFTER:{}".format(imgs_label[index], imgs_pred[index], expression))
-                    print(acc)
-                    if RELEASE:
-                        f.write(
-                            "%s %s %s %s %s %s\n" % (
-                                type, imgs_label[index], imgs_pred[index], expression, prec_acc, acc,))
+                        adv_acc += 1
+                    # print("True:{} BEFORE:{} ,AFTER:{}".format(imgs_label[index], imgs_pred[index], expression))
+                print("%s %s %s\n" % (
+                            type, prec_acc, adv_acc,))
+                if RELEASE:
+                    f.write(
+                        "%s %s %s\n" % (
+                            type, prec_acc, adv_acc,))
                 # plt.subplot(1, 2, 1)
                 # plt.imshow(imgs_input_before[0])
                 # plt.subplot(1, 2, 2)
@@ -325,7 +323,7 @@ def test_model(Checkpoint_PATH, model_name, head=False):
         taget_name = 'cnn'
     else:
         taget_name = 'ocr'
-    for loop in range(2):
+    for loop in range(0,1):
         if loop == 0:
             img_files = glob.glob("../images/%s_adv/*.png" % model_name)
             filename = '%s_vs_%s_sample_%s_result.txt' % (model_name, model_name, 'head' if head else '')
@@ -334,20 +332,21 @@ def test_model(Checkpoint_PATH, model_name, head=False):
             filename = '%s_vs_%s_sample_%s_result.txt' % (model_name, taget_name, 'head' if head else '')
         acc = 0
         acc_0 = 0
-        type_acc_arr=[0  for i in range(4)]
+        type_acc_arr = [0 for i in range(4)]
         with open(filename, 'w')as f:
-            for index in range(40):
+            for index in range(4000//batch_size):
                 imgs_input = []
                 imgs_label = []
                 type_arr = []
-                for im in img_files[index * 100:(index + 1) * 100]:
+                for im in img_files[index * batch_size:(index + 1) * batch_size]:
                     str_file = im[len("../images/%s_adv/" % model_name):-4]
                     arr_file = str_file.split('_')
                     type, label = arr_file[0], arr_file[3]
                     im = Image.open(im).convert("RGB")
                     if head:
-                        im = add_gauss(im)
+                        # im = add_gauss(im,radius=0.5)
                         im = binary(im)
+
                     im = np.asarray(im).astype(np.float32) / 255.
                     type_arr.append(type)
                     imgs_label.append(label)
@@ -363,11 +362,12 @@ def test_model(Checkpoint_PATH, model_name, head=False):
                         else:
                             expression += LSTM.decode_maps[i]
                     if expression == imgs_label[index]:
-                        type_acc_arr[int(type_arr[index])]+=1
+                        type_acc_arr[int(type_arr[index])] += 1
                         acc += 1
                     # plt.imshow(imgs_input[index])
                     # plt.show()
-                    # print("True:{} BEFORE:{} ".format(imgs_label[index], expression))
+
+                    print("True:{} BEFORE:{} ".format(imgs_label[index], expression))
                     # print(acc)
                     if RELEASE:
                         f.write(
@@ -384,5 +384,5 @@ if __name__ == '__main__':
     # test_model('../train_lenet/model', 'lenet')
     # test_model('../train_cnn/model', 'cnn')
 
-    test_model('../train_cnn/model', 'cnn',head=True)
-    # test_model('../train_lenet/model', 'lenet', head=True)
+    test_model('../train_cnn/model', 'cnn', head=True)
+    # test_model('../train_cnn/model', 'cnn', head=False)

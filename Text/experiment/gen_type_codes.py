@@ -15,6 +15,16 @@ NOISE_NUM = [i for i in range(0, 46, 5)]
 print(NOISE_NUM)
 
 
+class MyGaussianBlur(ImageFilter.Filter):
+    name = "GaussianBlur"
+
+    def __init__(self, radius=2):
+        self.radius = radius
+
+    def filter(self, image):
+        return image.gaussian_blur(self.radius)
+
+
 def gene_code_all(chars):
     flag = random.randint(0, 99)
     im = gene_code_normal(chars) if flag else gene_code_clean_one(chars)
@@ -73,10 +83,10 @@ def gen_gauss_code(captcha):
     return img
 
 
-def add_gauss(image):
-    image = image.filter(ImageFilter.GaussianBlur)
+def add_gauss(image, radius=2):
+    image = image.filter(MyGaussianBlur(radius))
     return image
-
+# add_gauss(gene_code_clean('sdf1'),radius=0.5).show()
 
 def binary(image):
     image = image.convert('L')
@@ -156,6 +166,42 @@ def gen_code_analy(chars):
         im = np.asarray(im).astype(np.float32) / 255.
 
     return im
+
+
+def gen_type_1(chars):
+    background = random_color(238, 255)
+    color = random_color(10, 200, random.randint(220, 255))
+    im = image.create_captcha_image(chars, color, background)
+    im = im.filter(ImageFilter.SMOOTH)
+    return im
+
+
+def gen_type_2(chars):
+    background = random_color(238, 255)
+    color = random_color(10, 200, random.randint(220, 255))
+    im = image.create_captcha_image(chars, color, background)
+    dot, line = 10, 1
+    image.create_noise_dots(im, color, number=dot)
+    for i in range(line):
+        image.create_noise_curve(im, color)
+    im = im.filter(ImageFilter.SMOOTH)
+    return im
+
+
+def gen_type_3(chars):
+    background = random_color(238, 255)
+    color = random_color(10, 200, random.randint(220, 255))
+    im = image.create_captcha_image(chars, color, background)
+    dot, line = 180, 50
+    image.create_noise_dots(im, color, number=dot)
+    for i in range(line):
+        image.create_noise_curve(im, color)
+    im = im.filter(ImageFilter.SMOOTH)
+    return im
+
+#
+# gen_type_2("BASD").show()
+# gen_type_3("BASD").show()
 
 # a=gen_code_analy('S')
 # plt.imshow(a)
