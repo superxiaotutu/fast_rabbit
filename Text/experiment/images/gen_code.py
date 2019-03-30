@@ -3,7 +3,7 @@ import shutil
 
 from config import LABEL_CHOICES_LIST
 from gen_type_codes import *
-
+import shutil
 def remo(dir):
     shutil.rmtree(dir)
     os.mkdir(dir)
