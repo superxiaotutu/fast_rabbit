@@ -1,3 +1,4 @@
+import cv2
 import random
 import numpy as np
 from PIL import Image
@@ -12,9 +13,8 @@ image = ImageCaptcha(width=image_width, height=image_height)
 
 SALT_LEVEL = []
 NOISE_NUM = [i for i in range(0, 46, 5)]
-print(NOISE_NUM)
 
-
+radius=1
 class MyGaussianBlur(ImageFilter.Filter):
     name = "GaussianBlur"
 
@@ -26,8 +26,8 @@ class MyGaussianBlur(ImageFilter.Filter):
 
 
 def gene_code_all(chars):
-    flag = random.randint(0, 5)
-    im = gene_code_normal(chars) if flag else gene_code_clean_one(chars)
+    flag = random.randint(0, 4)
+    im = gene_code_normal(chars) if flag else gene_code_clean(chars)
     im = preprocess(im)
     return im
 
@@ -79,14 +79,13 @@ def gen_gauss_code(captcha):
     for j in range(level):
         img = random_noise(img)
     np.clip(img, 0, 1)
-    # img = Image.fromarray(img.astype('uint8')).convert('RGB')
     return img
 
 
 def add_gauss(image, radius=2):
     image = image.filter(MyGaussianBlur(radius))
     return image
-# add_gauss(gene_code_clean('sdf1'),radius=0.5).show()
+
 
 def binary(image):
     image = image.convert('L')
@@ -94,25 +93,29 @@ def binary(image):
     image = image.convert('RGB')
     return image
 
+def throsh_binary(image):
+    img = cv2.cvtColor(np.asarray(image), cv2.COLOR_RGB2BGR)
+    c = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+    retval, image = cv2.threshold(c, 0, 255, cv2.THRESH_OTSU)
+    image = Image.fromarray(image).convert('RGB')
+    return image
 
 def preprocess(image):
     flag = random.randint(0, 5)
+    # flag=4
     if flag == 0:
         image = binary(image)
     elif flag == 1:
-        image = add_gauss(image)
+        image = add_gauss(image, radius)
     elif flag == 2:
-        image = add_gauss(image)
-        image = binary(image)
+        image=throsh_binary(image)
     elif flag == 3:
-        image = image.convert('L')
-        image = image.point(lambda x: 255 if x > np.mean(image) else 0)
-        image.filter(ImageFilter.GaussianBlur)
+        image=throsh_binary(image)
+        image = add_gauss(image, radius)
         image = image.convert('RGB')
     elif flag == 4:
-        image = image.convert('L')
-        image = image.point(lambda x: 255 if x > 255 // 2 else 0)
-        image = image.convert('RGB')
+        image = add_gauss(image, radius)
+        image=throsh_binary(image)
     else:
         image = np.asarray(image).astype(np.float32) / 255.
         return image

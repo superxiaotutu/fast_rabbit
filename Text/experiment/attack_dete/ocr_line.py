@@ -18,9 +18,10 @@ from gen_type_codes import *
 os.environ["CUDA_VISIBLE_DEVICES"] = '0'
 RELEASE = True
 adv_step = 0.01
-adv_count = 20
-c = 10
+adv_count = 30
+c = 15
 radius = 0.8
+file_count=500
 log_file = open("log/%s.log" % datetime.datetime.now(), 'a')
 config = tf.ConfigProto()
 config.gpu_options.allow_growth = True
@@ -183,10 +184,10 @@ def ocr_generate(Checkpoint_PATH, model_name='lenet'):
     else:
         print('cannot restore')
         return
-    file_count = 1000
+    file_count = 500
     with open('ocr_result.txt', 'w')as f:
         # -,G,B,gb
-        for type in range(4):
+        for type in range(0,4):
             adv_acc = 0
             prec_acc = 0
             img_files = glob.glob("../images/ori/*.png")
@@ -253,7 +254,7 @@ def test_model(Checkpoint_PATH, model_name, head=False):
         acc_0 = 0
         type_acc_arr = [0 for i in range(4)]
         with open(filename, 'w')as f:
-            for index in range(4000 // batch_size):
+            for index in range(2000 // batch_size):
                 imgs_input = []
                 imgs_label = []
                 type_arr = []
@@ -262,10 +263,10 @@ def test_model(Checkpoint_PATH, model_name, head=False):
                     arr_file = str_file.split('_')
                     type, label = arr_file[0], arr_file[3]
                     im = Image.open(im).convert("RGB")
-                    if head:
-                        im = add_gauss(im,radius=radius)
-                        im = binary(im)
-
+                    # if head:
+                    #     im = add_gauss(im, radius=radius)
+                    #     im = throsh_binary(im)
+                    #
                     im = np.asarray(im).astype(np.float32) / 255.
                     type_arr.append(type)
                     imgs_label.append(label)
@@ -283,7 +284,7 @@ def test_model(Checkpoint_PATH, model_name, head=False):
                     if imgs_label[index] == expression:
                         acc += 1
                         type_acc_arr[int(type_arr[index])] += 1
-                print("%s  ".format(type_acc_arr))
+                print("%s  "%(type_acc_arr))
                 if RELEASE:
                     f.write(
                         "%s %s\n" % (acc, type_acc_arr))
@@ -312,7 +313,7 @@ def get_process(ori_imgs_input, type):
     if type == 0:
         for index, i in enumerate(ori_imgs_input):
             im = Image.open(i)
-            im = np.asarray(im).astype(np.float32) / 255.
+            im = np.asarray(im).astype(np.float32) /  255.
             imgs_input.append(im)
     if type == 1:
         for index, i in enumerate(ori_imgs_input):
@@ -321,23 +322,25 @@ def get_process(ori_imgs_input, type):
             imgs_input.append(im)
     elif type == 2:
         for index, i in enumerate(ori_imgs_input):
-            im = binary(Image.open(i))
+            im = throsh_binary(Image.open(i))
             im = np.asarray(im).astype(np.float32) / 255.
             imgs_input.append(im)
     elif type == 3:
         for index, i in enumerate(ori_imgs_input):
-            im = add_gauss(Image.open(i), radius=radius)
-            im = binary(im)
+            im = throsh_binary(Image.open(i))
+            im = add_gauss(im, radius=2)
+
             im = np.asarray(im).astype(np.float32) / 255.
             imgs_input.append(im)
     return imgs_input
 
 
 if __name__ == '__main__':
-    ocr_generate('../train_lenet/model')
+    # ocr_generate('../train_lenet/model')
     # cnn_generate('../train_cnn/model')
     # test_model('../train_lenet/model', 'lenet')
     # test_model('../train_cnn/model', 'cnn')
 
-    # test_model('../train_lenet/model', 'lenet', head=True)
+    # test_model('../train_lenet_fine/model', 'lenet', head=True)
+    test_model('/home/kirin/Python_Code/fast_rabbit/train_model/train_lenet_fine/model', 'lenet', head=True)
     # test_model('../train_cnn/model', 'cnn', head=False)

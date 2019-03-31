@@ -68,7 +68,7 @@ def attack(sess, imgs_input):
         if (i + 1) % 10 == 0:
             print("LOSS:{}".format(np.max(grad)))
         imgs_input = imgs_input - grad * adv_step
-        imgs_input = np.clip(imgs_input,0,1)
+        imgs_input = np.clip(imgs_input, 0, 1)
         feed = {model.inputs: imgs_input, target: target_creat, origin_inputs: imgs_input_before}
     imgs_input_after = imgs_input
     return imgs_input_after
@@ -87,15 +87,18 @@ def test_model(Checkpoint_PATH):
         print('cannot restore')
         return
     type_acc_arr = [0 for i in range(4)]
-    adv_acc=0
-    for level in range(1, 4):
-
-        dir_name = "../images/ori_type_%s/*.png" % level
+    adv_acc = 0
+    for level in range(0, 4):
+        if level == 0:
+            dir_name = "../images/ori/*.png"
+        else:
+            dir_name = "../images/ori_type_%s/*.png" % level
         img_files = glob.glob(dir_name)
         filename = 'ocr_accuracy.txt'
+
         acc = 0
         with open(filename, 'w')as f:
-            for index in range(1000//batch_size):
+            for index in range(1000 // batch_size):
                 imgs_input = []
                 imgs_label = []
                 type_arr = []
@@ -118,7 +121,7 @@ def test_model(Checkpoint_PATH):
                         type_acc_arr[level] += 1
                         acc += 1
                 if level == 1:
-                    imgs_input_after = attack(sess,imgs_input)
+                    imgs_input_after = attack(sess, imgs_input)
                     feed = {model.inputs: imgs_input_after}
                     dense_decoded_code = sess.run(model.dense_decoded, feed)
                     for index, j in enumerate(dense_decoded_code):
@@ -131,9 +134,9 @@ def test_model(Checkpoint_PATH):
                         if expression == imgs_label[index]:
                             adv_acc += 1
                             print("True:{} BEFORE:{} ".format(imgs_label[index], expression))
-            f.write(
-                "%s %s \n" % (
-                    adv_acc, type_acc_arr,))
+                f.write(
+                    "%s %s \n" % (
+                        adv_acc, type_acc_arr,))
             print(adv_acc)
             print(type_acc_arr)
             # break
@@ -141,4 +144,4 @@ def test_model(Checkpoint_PATH):
             # plt.show()
 
 
-test_model('../train_lenet/model')
+test_model('/home/kirin/Python_Code/fast_rabbit/train_model/train_lenet_fine/model')
