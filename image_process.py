@@ -13,7 +13,7 @@ image = ImageCaptcha(width=image_width, height=image_height)
 SALT_LEVEL = []
 NOISE_NUM = [i for i in range(0, 46, 5)]
 
-
+radius=1
 class MyGaussianBlur(ImageFilter.Filter):
     name = "GaussianBlur"
 
@@ -25,8 +25,8 @@ class MyGaussianBlur(ImageFilter.Filter):
 
 
 def gene_code_all(chars):
-    flag = random.randint(0, 99)
-    im = gene_code_normal(chars) if flag else gene_code_clean_one(chars)
+    flag = random.randint(0, 5)
+    im = gene_code_normal(chars) if flag else gene_code_clean(chars)
     im = preprocess(im)
     return im
 
@@ -85,6 +85,7 @@ def add_gauss(image, radius=2):
     image = image.filter(MyGaussianBlur(radius))
     return image
 
+
 def binary(image):
     image = image.convert('L')
     image = image.point(lambda x: 255 if x > np.mean(image) else 0)
@@ -94,17 +95,18 @@ def binary(image):
 
 def preprocess(image):
     flag = random.randint(0, 5)
+    flag=4
+
     if flag == 0:
         image = binary(image)
     elif flag == 1:
-        image = add_gauss(image,1)
+        image = add_gauss(image, radius)
     elif flag == 2:
-        image = add_gauss(image,1)
+        image = add_gauss(image, radius)
         image = binary(image)
     elif flag == 3:
-        image = image.convert('L')
-        image = image.point(lambda x: 255 if x > np.mean(image) else 0)
-        image.filter(ImageFilter.GaussianBlur)
+        image = binary(image)
+        image = add_gauss(image, radius)
         image = image.convert('RGB')
     elif flag == 4:
         image = image.convert('L')

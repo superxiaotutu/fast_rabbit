@@ -7,16 +7,8 @@ import datetime
 import cv2
 import matplotlib.pyplot as plt
 import random
+from config import *
 
-num_epochs = 2500
-batch_size = 128
-num_batches_per_epoch = 100
-save_steps = 5000
-validation_steps = 1000
-
-image_height = 64
-image_width = 192
-image_channel = 3
 
 train_feeder = LSTM.DataIterator()
 val_feeder = LSTM.DataIterator()
@@ -76,9 +68,9 @@ def train(restore=False, cnn_name="lenet"):
             train_cost += batch_cost * batch_size
 
             train_writer.add_summary(summary_str, step)
-            print(step)
             # save the checkpoint
             if step % save_steps == 0 and step != 0:
+                print(step)
                 saver.save(sess, checkpoint_dir + '/ocr-model', global_step=step // 1000)
 
             # do validation

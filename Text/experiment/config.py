@@ -8,10 +8,10 @@ import datetime
 
 import cv2
 
-num_epochs = 2500
+num_epochs = 1000
 num_batches_per_epoch = 100
-save_steps = 5000
-validation_steps = 1000
+save_steps = 1000
+validation_steps = 10
 image_channel = 3
 image_height = 64
 image_width = 192
