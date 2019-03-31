@@ -106,6 +106,9 @@ class LSTMOCR(object):
 
         # image
         self.inputs = tf.placeholder(tf.float32, [None, image_height, image_width, image_channel])
+
+        self.processes=self.head_Gussian(self.inputs)
+
         # SparseTensor required by ctc_loss op
         self.labels = tf.sparse_placeholder(tf.int32)
         # 1d array of size [batch_size]
@@ -120,9 +123,6 @@ class LSTMOCR(object):
         # self._build_model_with_inception()
         # self._build_train_op()
         # else:
-
-
-
         if self.mode_name == 'cnn':
             self._bulid_CNN_with_4_FC()
         elif self.mode_name == 'lenet':
@@ -146,7 +146,8 @@ class LSTMOCR(object):
 
         # CNN part
         with tf.variable_scope('cnn'):
-            x = self.inputs
+            # [[17 34 24 28]]
+            x = self.processes
             for i in range(cnn_count):
                 with tf.variable_scope('unit-%d' % (i + 1)):
                     x = self._conv2d(x, 'cnn-%d' % (i + 1), 3, filters[i], filters[i + 1], strides[0])
@@ -445,7 +446,8 @@ class LSTMOCR(object):
 
         # CNN part
         with tf.variable_scope('cnn'):
-            x = self.inputs
+            x = self.processes
+
             for i in range(cnn_count):
                 with tf.variable_scope('unit-%d' % (i + 1)):
                     x = self._conv2d(x, 'cnn-%d' % (i + 1), 3, filters[i], filters[i + 1], strides[0])
@@ -620,13 +622,20 @@ class LSTMOCR(object):
             x = slim.layers.fully_connected(x, out_num, None)
             after_softmax_x = slim.softmax(x)
         return x, after_softmax_x
+        # self.inputs = 1 / (1 + tf.exp(-(self.inputs - phi)))
+        # self.inputs=self.inputs.convert_image_dtype(self.inputs,tf.float32)
 
     def head_B(self):
-        phi = 0.5
-        self.inputs = 1 / (1 + tf.exp(-(self.inputs - phi)))
+        self.inputs = tf.image.rgb_to_grayscale(self.inputs)
+        one = tf.ones_like(self.inputs)
+        zero = tf.zeros_like(self.inputs)
+        phi = tf.reduce_mean(self.inputs)
+        self.inputs = tf.where(self.inputs < phi, x=zero, y=one)
+        self.inputs = tf.image.grayscale_to_rgb(self.inputs)
 
-    def head_Gussian(self):
-        self.inputs = tf.add(self.inputs, tf.random_normal(shape=[image_height, image_width, image_channel]))
+    def head_Gussian(self, inputs):
+        inputs = tf.add(inputs, tf.random_normal(shape=[image_height, image_width, image_channel],stddev=gauss_stddev))
+        return inputs
 
     def head_Guss(self):
         def getGuessValue(kerStd, posX, posY):

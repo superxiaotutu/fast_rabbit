@@ -16,12 +16,7 @@ from config import *
 from gen_type_codes import *
 
 os.environ["CUDA_VISIBLE_DEVICES"] = '0'
-RELEASE = True
-adv_step = 0.01
-adv_count = 30
-c = 15
-radius = 0.8
-file_count=500
+
 log_file = open("log/%s.log" % datetime.datetime.now(), 'a')
 config = tf.ConfigProto()
 config.gpu_options.allow_growth = True
@@ -142,7 +137,7 @@ def cnn_generate(Checkpoint_PATH, model_name='cnn'):
     file_count = 1000
     with open('cnn_result.txt', 'w')as f:
         # ocr识别图片三种
-        for type in range(4):
+        for model_type in range(4):
             adv_acc = 0
             prec_acc = 0
             img_files = glob.glob("../images/ori/*.png")
@@ -150,20 +145,20 @@ def cnn_generate(Checkpoint_PATH, model_name='cnn'):
                 ori_imgs_input = [img_files.pop() for i in range(batch_size)]
                 print(len(ori_imgs_input))
                 imgs_label = [i[-8:-4] for i in ori_imgs_input]
-                imgs_input = get_process(ori_imgs_input, type)
+                imgs_input = get_process(ori_imgs_input, model_type)
 
                 # attack
                 distance, cost_time, imgs_input_after = attack(model, sess, imgs_input, imgs_label, 'cnn')
                 if RELEASE:
                     for i, v in enumerate(imgs_input_after):
-                        plt.imsave("../images/cnn_adv/%s_%s_%s_%s.png" % (type, epoch, i, imgs_label[i]), v)
+                        plt.imsave("../images/cnn_adv/%s_%s_%s_%s.png" % (model_type, epoch, i, imgs_label[i]), v)
                 feed = {model.inputs: imgs_input_after}
                 dense_decoded_code = sess.run(model.dense_decoded, feed)
                 adv_acc += get_acc(imgs_label, dense_decoded_code)
                 if RELEASE:
                     f.write(
                         "%s  %s %s\n" % (
-                            type, prec_acc, adv_acc,))
+                            model_type, prec_acc, adv_acc,))
 
 
 def ocr_generate(Checkpoint_PATH, model_name='lenet'):

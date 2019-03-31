@@ -24,7 +24,16 @@ initial_learning_rate = 0.001
 decay_steps = 4000
 decay_rate = 0.96
 output_keep_prob = 0.8
-batch_size = 128
+batch_size = 1
+
+gauss_stddev=0.1
+RELEASE = True
+adv_step = 0.01
+adv_count = 30
+c = 15
+radius = 0.8
+file_count=500
+
 LABEL_CHOICES = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 LABEL_CHOICES_LIST = [str(i) for i in LABEL_CHOICES]
 encode_maps = {}
