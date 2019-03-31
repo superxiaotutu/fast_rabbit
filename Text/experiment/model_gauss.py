@@ -99,7 +99,7 @@ class DataIterator:
         return batch_inputs, batch_seq_len, batch_labels, rar_label_batch
 
 
-class LSTMOCR(object):
+class LSTMOCR_GAUSS(object):
     def __init__(self, mode_name, mode):
         self.mode_name = mode_name
         self.mode = mode
@@ -108,7 +108,7 @@ class LSTMOCR(object):
         self.inputs = tf.placeholder(tf.float32, [None, image_height, image_width, image_channel])
 
         self.processes=self.head_Gussian(self.inputs)
-        self.processes=self.head_B(self.inputs)
+        # self.processes=self.head_B(self.inputs)
 
         # SparseTensor required by ctc_loss op
         self.labels = tf.sparse_placeholder(tf.int32)

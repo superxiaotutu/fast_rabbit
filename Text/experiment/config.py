@@ -24,10 +24,10 @@ initial_learning_rate = 0.001
 decay_steps = 4000
 decay_rate = 0.96
 output_keep_prob = 0.8
-batch_size = 1
+batch_size = 2
 
-gauss_stddev=0.1
-RELEASE = True
+gauss_stddev=10
+RELEASE = False
 adv_step = 0.01
 adv_count = 30
 c = 15

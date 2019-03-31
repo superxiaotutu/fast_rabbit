@@ -8,8 +8,6 @@ import matplotlib.pyplot as plt
 import random
 import sys
 
-from tensorflow.contrib import slim
-
 sys.path.append('../')
 import model as LSTM
 from config import *
@@ -91,7 +89,7 @@ def attack(model, sess, imgs_input, imgs_label, type, ):
             if (i + 1) % 2 == 0:
                 print("LOSS:{}".format(loss_now))
             imgs_input = imgs_input - grad * adv_step * is_attacked_matrix
-            imgs_input = np.clip(imgs_input, 0, 1)
+            # imgs_input = np.clip(imgs_input, 0, 1)
             dense_decoded_code = sess.run(model.dense_decoded, {model.inputs: imgs_input})
             is_attacked_matrix = update_matrix(is_attacked_matrix, imgs_label, dense_decoded_code)
             feed = {model.inputs: imgs_input, OCR_target: target_creat, origin_inputs: imgs_input_before}
@@ -190,7 +188,7 @@ def ocr_generate(Checkpoint_PATH, model_name='lenet'):
                 ori_imgs_input = [img_files.pop() for i in range(batch_size)]
                 print(len(ori_imgs_input))
                 imgs_label = [i[-8:-4] for i in ori_imgs_input]
-                imgs_input = get_process(ori_imgs_input, type)
+                imgs_input = get_process(ori_imgs_input, 0)
                 imgs_input_before = imgs_input
                 feed = {model.inputs: imgs_input_before}
                 dense_decoded_code = sess.run(model.dense_decoded, feed)
@@ -330,11 +328,11 @@ def get_process(ori_imgs_input, type):
 
 
 if __name__ == '__main__':
-    # ocr_generate('../train_lenet/model')
+    ocr_generate('/home/kirin/Python_Code/fast_rabbit/train_model/train_lenet_fine/model')
     # cnn_generate('../train_cnn/model')
     # test_model('../train_lenet/model', 'lenet')
     # test_model('../train_cnn/model', 'cnn')
 
     # test_model('../train_lenet_fine/model', 'lenet', head=True)
-    test_model('/home/kirin/Python_Code/fast_rabbit/train_model/train_lenet_fine/model', 'lenet', head=True)
+    # test_model('/home/kirin/Python_Code/fast_rabbit/train_model/train_lenet_fine/model', 'lenet', head=True)
     # test_model('../train_cnn/model', 'cnn', head=False)
