@@ -16,10 +16,10 @@ from config import *
 from gen_type_codes import *
 
 os.environ["CUDA_VISIBLE_DEVICES"] = '0'
-RELEASE = False
-adv_step = 0.05
-adv_count = 10
-c = 100
+RELEASE = True
+adv_step = 0.01
+adv_count = 20
+c = 10
 radius = 0.8
 log_file = open("log/%s.log" % datetime.datetime.now(), 'a')
 config = tf.ConfigProto()
@@ -56,7 +56,8 @@ def attack(model, sess, imgs_input, imgs_label, type, ):
     OCR_target = tf.placeholder(tf.float32, [12, batch_size, 38])
     CNN_target = tf.placeholder(tf.float32, [batch_size, 4, 38])
     origin_inputs = tf.placeholder(tf.float32, [None, image_height, image_width, image_channel])
-    predict = tf.nn.softmax(model.logits)
+    # predict = tf.nn.softmax(model.logits)
+    predict = model.logits
     current_status = tf.argmax(predict, axis=-1)
     current_mengban = tf.one_hot(current_status, 38, axis=0)
     current_mengban = tf.transpose(current_mengban, [1, 2, 0])
@@ -73,7 +74,8 @@ def attack(model, sess, imgs_input, imgs_label, type, ):
             tf.reduce_sum(predict * CNN_target) - tf.reduce_sum(predict * current_mengban))
 
     is_attacked_matrix = np.ones((batch_size, image_height, image_width, image_channel))
-    grad_y2x = tf.sign(tf.gradients(ADV_LOSS, model.inputs)[0])
+    # grad_y2x = tf.sign(tf.gradients(ADV_LOSS, model.inputs)[0])
+    grad_y2x = tf.gradients(ADV_LOSS, model.inputs)[0]
     imgs_input_before = imgs_input
     feed = {model.inputs: imgs_input}
     log = sess.run(model.logits, feed)
@@ -202,7 +204,7 @@ def ocr_generate(Checkpoint_PATH, model_name='lenet'):
                     for i, v in enumerate(imgs_input_after):
                         plt.imsave("%s/%s_%s_%s_%s.png" % (adv_sample_dir,type, epoch, i, imgs_label[i]), v)
 
-                log_file.write("distance: %s time: %ss" % (distance, cost_time))
+                log_file.write("epoch:%s distance:%s time:%s\n" % (epoch,distance, cost_time))
 
                 feed = {model.inputs: imgs_input_after}
                 dense_decoded_code = sess.run(model.dense_decoded, feed)
@@ -261,7 +263,7 @@ def test_model(Checkpoint_PATH, model_name, head=False):
                     type, label = arr_file[0], arr_file[3]
                     im = Image.open(im).convert("RGB")
                     if head:
-                        # im = add_gauss(im,radius=0.5)
+                        im = add_gauss(im,radius=radius)
                         im = binary(im)
 
                     im = np.asarray(im).astype(np.float32) / 255.
@@ -271,19 +273,21 @@ def test_model(Checkpoint_PATH, model_name, head=False):
 
                 feed = {model.inputs: imgs_input}
                 dense_decoded_code = sess.run(model.dense_decoded, feed)
-                acc += get_acc(imgs_label, dense_decoded_code)
-                # plt.imshow(imgs_input[index])
-                # plt.show()
-
-                print("True:{} BEFORE:{} ".format(imgs_label[index], acc))
-                # print(acc)
+                for index, j in enumerate(dense_decoded_code):
+                    expression = ''
+                    for i in j:
+                        if i == -1:
+                            expression += ''
+                        else:
+                            expression += LSTM.decode_maps[i]
+                    if imgs_label[index] == expression:
+                        acc += 1
+                        type_acc_arr[int(type_arr[index])] += 1
+                print("%s  ".format(type_acc_arr))
                 if RELEASE:
                     f.write(
                         "%s %s\n" % (acc, type_acc_arr))
             print(type_acc_arr)
-            # break
-            # plt.imshow(im)
-            # plt.show()
 
 
 def get_acc(imgs_label, dense_decoded_code):
@@ -312,7 +316,7 @@ def get_process(ori_imgs_input, type):
             imgs_input.append(im)
     if type == 1:
         for index, i in enumerate(ori_imgs_input):
-            im = add_gauss(Image.open(i), radius=0.8)
+            im = add_gauss(Image.open(i), radius=radius)
             im = np.asarray(im).astype(np.float32) / 255.
             imgs_input.append(im)
     elif type == 2:
@@ -322,7 +326,7 @@ def get_process(ori_imgs_input, type):
             imgs_input.append(im)
     elif type == 3:
         for index, i in enumerate(ori_imgs_input):
-            im = add_gauss(Image.open(i), radius=0.8)
+            im = add_gauss(Image.open(i), radius=radius)
             im = binary(im)
             im = np.asarray(im).astype(np.float32) / 255.
             imgs_input.append(im)
@@ -335,5 +339,5 @@ if __name__ == '__main__':
     # test_model('../train_lenet/model', 'lenet')
     # test_model('../train_cnn/model', 'cnn')
 
-    # test_model('../train_cnn/model', 'cnn', head=True)
+    # test_model('../train_lenet/model', 'lenet', head=True)
     # test_model('../train_cnn/model', 'cnn', head=False)

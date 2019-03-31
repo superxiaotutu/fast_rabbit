@@ -1,4 +1,3 @@
-import cv2
 import random
 import numpy as np
 from PIL import Image
@@ -7,21 +6,27 @@ from PIL import ImageFont
 from PIL import ImageFilter
 from captcha.image import DEFAULT_FONTS, ImageCaptcha
 from skimage.util import random_noise
+from config import image_height, image_width, plt
 
-image_height = 64
-image_width = 192
-image_channel = 3
 image = ImageCaptcha(width=image_width, height=image_height)
 
 SALT_LEVEL = []
 NOISE_NUM = [i for i in range(0, 46, 5)]
-print(NOISE_NUM)
+
+
+class MyGaussianBlur(ImageFilter.Filter):
+    name = "GaussianBlur"
+
+    def __init__(self, radius=2):
+        self.radius = radius
+
+    def filter(self, image):
+        return image.gaussian_blur(self.radius)
 
 
 def gene_code_all(chars):
-    flag = random.randint(0, 20)
-    flag = 1
-    im = gene_code_normal(chars) if flag else gene_code_clean(chars)
+    flag = random.randint(0, 99)
+    im = gene_code_normal(chars) if flag else gene_code_clean_one(chars)
     im = preprocess(im)
     return im
 
@@ -73,14 +78,12 @@ def gen_gauss_code(captcha):
     for j in range(level):
         img = random_noise(img)
     np.clip(img, 0, 1)
-    # img = Image.fromarray(img.astype('uint8')).convert('RGB')
     return img
 
 
-def add_gauss(image):
-    image = image.filter(ImageFilter.GaussianBlur)
+def add_gauss(image, radius=2):
+    image = image.filter(MyGaussianBlur(radius))
     return image
-
 
 def binary(image):
     image = image.convert('L')
@@ -89,27 +92,28 @@ def binary(image):
     return image
 
 
-def threeshold(image):
-    c = cv2.cvtColor(np.asarray(image), cv2.COLOR_RGB2GRAY)
-    retval, image = cv2.threshold(c, 0, 255, cv2.THRESH_OTSU)
-    image = Image.fromarray(cv2.cvtColor(image, cv2.COLOR_GRAY2RGB))
-    return image
-
-
 def preprocess(image):
-    flag = random.randint(0, 6)
+    flag = random.randint(0, 5)
     if flag == 0:
-        image = threeshold(image)
+        image = binary(image)
     elif flag == 1:
-        image = add_gauss(image)
+        image = add_gauss(image,1)
     elif flag == 2:
-        image = add_gauss(image)
-        image = threeshold(image)
+        image = add_gauss(image,1)
+        image = binary(image)
     elif flag == 3:
-        image = threeshold(image)
-        image = add_gauss(image)
+        image = image.convert('L')
+        image = image.point(lambda x: 255 if x > np.mean(image) else 0)
+        image.filter(ImageFilter.GaussianBlur)
+        image = image.convert('RGB')
+    elif flag == 4:
+        image = image.convert('L')
+        image = image.point(lambda x: 255 if x > 255 // 2 else 0)
+        image = image.convert('RGB')
     else:
+        image = np.asarray(image).astype(np.float32) / 255.
         return image
+    image = np.asarray(image).astype(np.float32) / 255.
     return image
 
 
@@ -161,7 +165,41 @@ def gen_code_analy(chars):
     return im
 
 
-gene_code_all("asd1").show()
+def gen_type_1(chars):
+    background = random_color(238, 255)
+    color = random_color(10, 200, random.randint(220, 255))
+    im = image.create_captcha_image(chars, color, background)
+    im = im.filter(ImageFilter.SMOOTH)
+    return im
+
+
+def gen_type_2(chars):
+    background = random_color(238, 255)
+    color = random_color(10, 200, random.randint(220, 255))
+    im = image.create_captcha_image(chars, color, background)
+    dot, line = 10, 1
+    image.create_noise_dots(im, color, number=dot)
+    for i in range(line):
+        image.create_noise_curve(im, color)
+    im = im.filter(ImageFilter.SMOOTH)
+    return im
+
+
+def gen_type_3(chars):
+    background = random_color(238, 255)
+    color = random_color(10, 200, random.randint(220, 255))
+    im = image.create_captcha_image(chars, color, background)
+    dot, line = 180, 50
+    image.create_noise_dots(im, color, number=dot)
+    for i in range(line):
+        image.create_noise_curve(im, color)
+    im = im.filter(ImageFilter.SMOOTH)
+    return im
+
+#
+# gen_type_2("BASD").show()
+# gen_type_3("BASD").show()
+
 # a=gen_code_analy('S')
 # plt.imshow(a)
 # plt.imsave('a.png',a)

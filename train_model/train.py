@@ -23,10 +23,8 @@ val_feeder = LSTM.DataIterator()
 
 
 def train(restore=False, cnn_name="lenet"):
-
-
-    checkpoint_dir = "train_%s/model"%cnn_name
-    model = LSTM.LSTMOCR('train',cnn_name)
+    checkpoint_dir = "train_%s_fine/model" % cnn_name
+    model = LSTM.LSTMOCR('train', cnn_name)
     model.build_graph()
 
     config = tf.ConfigProto()
@@ -78,9 +76,9 @@ def train(restore=False, cnn_name="lenet"):
             train_cost += batch_cost * batch_size
 
             train_writer.add_summary(summary_str, step)
-
+            print(step)
             # save the checkpoint
-            if step % save_steps == 1:
+            if step % save_steps == 0 and step != 0:
                 saver.save(sess, checkpoint_dir + '/ocr-model', global_step=step // 1000)
 
             # do validation
@@ -341,7 +339,7 @@ def infer_many(Checkpoint_PATH, img_PATH):
     else:
         print('cannot restore')
         return
-    p = [('adv_example/%s.png' % i) for i in range(66,76)]
+    p = [('adv_example/%s.png' % i) for i in range(66, 76)]
     imgs_input = []
     for img_PATH in p:
         im = cv2.imread(img_PATH).astype(np.float32) / 255.
@@ -360,16 +358,17 @@ def infer_many(Checkpoint_PATH, img_PATH):
                 expression += ''
             else:
                 expression += LSTM.decode_maps[i]
-        expression+=','
+        expression += ','
     print(expression)
 
 
 def main():
-    os.environ["CUDA_VISIBLE_DEVICES"] = '2'
-    train(restore=False,cnn_name="resnet")
-    train(restore=False,cnn_name="lenet")
-    train(restore=False,cnn_name="cnn")
-    train(restore=False, cnn_name="inception")
+    os.environ["CUDA_VISIBLE_DEVICES"] = '0'
+    # train(restore=False,cnn_name="resnet")
+    train(restore=True, cnn_name="lenet")
+    # train(restore=False,cnn_name="cnn")
+    # train(restore=False, cnn_name="inception")
+
 
 if __name__ == '__main__':
     main()
