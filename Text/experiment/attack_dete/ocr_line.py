@@ -266,7 +266,6 @@ def test_model(Checkpoint_PATH, model_name, head=False):
                     # if head:
                     #     im = add_gauss(im, radius=radius)
                     #     im = throsh_binary(im)
-                    #
                     im = np.asarray(im).astype(np.float32) / 255.
                     type_arr.append(type)
                     imgs_label.append(label)
