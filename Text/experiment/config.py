@@ -8,7 +8,7 @@ import datetime
 
 import cv2
 
-num_epochs = 100
+num_epochs = 50
 num_batches_per_epoch = 100
 save_steps = 10000
 validation_steps = 10
@@ -24,15 +24,14 @@ initial_learning_rate = 0.001
 decay_steps = 4000
 decay_rate = 0.96
 output_keep_prob = 0.8
-batch_size = 2
+batch_size = 100
 
-gauss_stddev=10
-RELEASE = False
+RELEASE = True
 adv_step = 0.01
-adv_count = 30
-c = 15
+adv_count = 20
+c = 30
 radius = 0.8
-file_count=500
+file_count = 500
 
 LABEL_CHOICES = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 LABEL_CHOICES_LIST = [str(i) for i in LABEL_CHOICES]
@@ -46,6 +45,8 @@ SPACE_INDEX = 0
 SPACE_TOKEN = ''
 encode_maps[SPACE_TOKEN] = SPACE_INDEX
 decode_maps[SPACE_INDEX] = SPACE_TOKEN
+
+
 # encode_maps[''] = 37
 # decode_maps[37] = ''
 

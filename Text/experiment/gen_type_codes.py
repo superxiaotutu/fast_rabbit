@@ -26,8 +26,8 @@ class MyGaussianBlur(ImageFilter.Filter):
 
 
 def gene_code_all(chars):
-    flag = random.randint(0, 4)
-    im = gene_code_normal(chars) if flag else gene_code_clean(chars)
+    flag = random.randint(0, 50)
+    im = gene_code_clean(chars) if flag else gene_code_normal(chars)
     im = preprocess(im)
     return im
 

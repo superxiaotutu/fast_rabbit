@@ -3,27 +3,7 @@ import tensorflow.contrib.slim as slim
 from config import *
 from PIL import Image, ImageFont, ImageDraw, ImageFilter
 from captcha.image import ImageCaptcha
-
-image = ImageCaptcha(width=image_width, height=image_height)
-
-
-def gene_code(chars):
-    def random_color(start, end, opacity=None):
-        red = random.randint(start, end)
-        green = random.randint(start, end)
-        blue = random.randint(start, end)
-        if opacity is None:
-            return (red, green, blue)
-        return (red, green, blue, opacity)
-
-    background = random_color(238, 255)
-    color = random_color(10, 200, random.randint(220, 255))
-    im = image.create_captcha_image(chars, color, background)
-    image.create_noise_dots(im, color, number=30)
-    image.create_noise_curve(im, color)
-    im = im.filter(ImageFilter.SMOOTH)
-    return im
-
+from gen_type_codes import *
 
 def sparse_tuple_from_label(sequences, dtype=np.int32):
     """Create a sparse representention of x.
@@ -58,26 +38,29 @@ class DataIterator:
         for num in range(batch_size):
             slice = random.sample(LABEL_CHOICES_LIST, 4)
             captcha = ''.join(slice)
-            img = gene_code(captcha)
-            img = np.asarray(img).astype(np.float32) / 255.
+            img = gene_code_all(captcha)
+            # img = np.asarray(img).astype(np.float32) / 255.
             code = [SPACE_INDEX if captcha == SPACE_TOKEN else encode_maps[c] for c in list(captcha)]
             self.labels.append(code)
             self.image.append(img)
-
+        for i in self.image:
+            # plt.imshow(i)
+            # plt.show()
+            break
     def modify_data(self):
         target = random.randint(0, batch_size - 1)
         slice = random.sample(LABEL_CHOICES_LIST, 4)
         captcha = ''.join(slice)
-        img = gene_code(captcha)
-        img = np.asarray(img).astype(np.float32) / 255.
+        img = gene_code_all(captcha)
+        # img = np.asarray(img).astype(np.float32) / 255.
         code = [SPACE_INDEX if captcha == SPACE_TOKEN else encode_maps[c] for c in list(captcha)]
         self.image[target], self.labels[target] = img, code
 
     def get_test_img(self, num_line, num_point):
         slice = random.sample(LABEL_CHOICES_LIST, 4)
         captcha = ''.join(slice)
-        img = gene_code(captcha)
-        img = np.asarray(img).astype(np.float32) / 255.
+        img = gene_code_all(captcha)
+        # img = np.asarray(img).astype(np.float32) / 255.
         code = [SPACE_INDEX if captcha == SPACE_TOKEN else encode_maps[c] for c in list(captcha)]
         return img, captcha
 
@@ -100,15 +83,26 @@ class DataIterator:
 
 
 class LSTMOCR(object):
-    def __init__(self, mode_name, mode):
+    def __init__(self, mode_name, mode, process_type='ori'):
         self.mode_name = mode_name
         self.mode = mode
 
         # image
         self.inputs = tf.placeholder(tf.float32, [None, image_height, image_width, image_channel])
+        if process_type == 'ori':
+            print('ori')
+            self.pre_inputs = self.inputs
+        if process_type == 'bin':
+            print('bin')
+            self.pre_inputs = self.head_B(self.inputs)
+        if process_type == 'gauss':
+            print('gauss')
 
-        self.processes=self.head_Gussian(self.inputs)
-        self.processes=self.head_B(self.inputs)
+            self.pre_inputs = self.head_Guss(self.inputs)
+        if process_type == 'all':
+            print('all')
+            self.inputs1 = self.head_Guss(self.inputs,kerStd=0.8)
+            self.pre_inputs = self.head_B(self.inputs1)
 
         # SparseTensor required by ctc_loss op
         self.labels = tf.sparse_placeholder(tf.int32)
@@ -148,7 +142,8 @@ class LSTMOCR(object):
         # CNN part
         with tf.variable_scope('cnn'):
             # [[17 34 24 28]]
-            x = self.processes
+            x = self.pre_inputs
+
             for i in range(cnn_count):
                 with tf.variable_scope('unit-%d' % (i + 1)):
                     x = self._conv2d(x, 'cnn-%d' % (i + 1), 3, filters[i], filters[i + 1], strides[0])
@@ -626,48 +621,38 @@ class LSTMOCR(object):
         # self.inputs = 1 / (1 + tf.exp(-(self.inputs - phi)))
         # self.inputs=self.inputs.convert_image_dtype(self.inputs,tf.float32)
 
-    def head_B(self,inputs):
-        inputs = tf.image.rgb_to_grayscale(inputs)
-        one = tf.ones_like(inputs)
-        zero = tf.zeros_like(inputs)
-        phi = tf.reduce_mean(inputs)
-        inputs = tf.where(inputs < phi, x=zero, y=one)
-        inputs = tf.image.grayscale_to_rgb(inputs)
-        return inputs
-    def head_Gussian(self, inputs):
-        inputs = tf.add(inputs, tf.random_normal(shape=[image_height, image_width, image_channel],stddev=gauss_stddev))
-        return inputs
+    def head_B(self, input, phi=0.8):
+        kernel_3_1 = np.ones([1, 1, 3, 1]) / 3
+        kernel_1_3 = np.ones([1, 1, 1, 3])
+        a = tf.nn.conv2d(input, kernel_3_1, strides=[1, 1, 1, 1], padding="SAME")
+        b = tf.nn.conv2d(a, kernel_1_3, strides=[1, 1, 1, 1], padding="SAME")
+        S = 1 / (1 + tf.exp(- 20 * (b - phi)))
+        return S
 
-    def head_Guss(self):
+    def head_Guss(self, inputs, kerStd=0.8):
         def getGuessValue(kerStd, posX, posY):
             return 1. / (2. * np.pi * (np.power(kerStd, 2))) * np.exp(
                 -(np.power(posX, 2) + np.power(posY, 2)) / (2. * (np.power(kerStd, 2))))
 
         def getGuessKernel(kerStd):
-            K11 = np.column_stack(
-                (np.row_stack((np.eye(3) * getGuessValue(kerStd, -1, 1), [0., 0., 0.])), np.array([0., 0., 0., 1.])))
-            K12 = np.column_stack(
-                (np.row_stack((np.eye(3) * getGuessValue(kerStd, 0, 1), [0., 0., 0.])), np.array([0., 0., 0., 1.])))
-            K13 = np.column_stack(
-                (np.row_stack((np.eye(3) * getGuessValue(kerStd, 1, 1), [0., 0., 0.])), np.array([0., 0., 0., 1.])))
-            K21 = np.column_stack(
-                (np.row_stack((np.eye(3) * getGuessValue(kerStd, -1, 0), [0., 0., 0.])), np.array([0., 0., 0., 1.])))
-            K22 = np.column_stack(
-                (np.row_stack((np.eye(3) * getGuessValue(kerStd, 0, 0), [0., 0., 0.])), np.array([0., 0., 0., 1.])))
-            K23 = np.column_stack(
-                (np.row_stack((np.eye(3) * getGuessValue(kerStd, 1, 0), [0., 0., 0.])), np.array([0., 0., 0., 1.])))
-            K31 = np.column_stack(
-                (np.row_stack((np.eye(3) * getGuessValue(kerStd, -1, -1), [0., 0., 0.])), np.array([0., 0., 0., 1.])))
-            K32 = np.column_stack(
-                (np.row_stack((np.eye(3) * getGuessValue(kerStd, 0, -1), [0., 0., 0.])), np.array([0., 0., 0., 1.])))
-            K33 = np.column_stack(
-                (np.row_stack((np.eye(3) * getGuessValue(kerStd, 1, -1), [0., 0., 0.])), np.array([0., 0., 0., 1.])))
+            K11 = np.eye(3) * getGuessValue(kerStd, -1, 1)
+            K12 = np.eye(3) * getGuessValue(kerStd, 0, 1)
+            K13 = np.eye(3) * getGuessValue(kerStd, 1, 1)
+            K21 = np.eye(3) * getGuessValue(kerStd, -1, 0)
+            K22 = np.eye(3) * getGuessValue(kerStd, 0, 0)
+            K23 = np.eye(3) * getGuessValue(kerStd, 1, 0)
+            K31 = np.eye(3) * getGuessValue(kerStd, -1, -1)
+            K32 = np.eye(3) * getGuessValue(kerStd, 0, -1)
+            K33 = np.eye(3) * getGuessValue(kerStd, 1, -1)
             kernel = tf.constant(np.array([[K11, K12, K13], [K21, K22, K23], [K31, K32, K33]]),
                                  dtype=tf.float32)  # 3*3*4*4
             return kernel
 
-        kernel = getGuessKernel(0.8)
-        self.inputs = tf.nn.conv2d(self.inputs, kernel, strides=[1, 1, 1, 1], padding="SAME")
+        kernel = getGuessKernel(kerStd)
+        return tf.nn.conv2d(inputs, kernel, strides=[1, 1, 1, 1], padding="SAME")
+
+
+# np.row_stack((np.eye(3) * getGuessValue(kerStd, -1, 1), [0., 0., 0.]))
 
 
 def accuracy_calculation(original_seq, decoded_seq, ignore_value=-1, isPrint=False):

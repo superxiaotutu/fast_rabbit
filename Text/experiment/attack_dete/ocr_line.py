@@ -44,6 +44,10 @@ def attack(model, sess, imgs_input, imgs_label, type, ):
         re[num - 1] = 1
         return re
 
+    for i in range(batch_size):
+        plt.imshow(imgs_input[9])
+        plt.show()
+        break
     for i in range(36):
         shuff_dir.update({i + 1: creat_onehot(lst[i])})
     shuff_dir.update({37: creat_onehot(37)})
@@ -89,7 +93,7 @@ def attack(model, sess, imgs_input, imgs_label, type, ):
             if (i + 1) % 2 == 0:
                 print("LOSS:{}".format(loss_now))
             imgs_input = imgs_input - grad * adv_step * is_attacked_matrix
-            # imgs_input = np.clip(imgs_input, 0, 1)
+            imgs_input = np.clip(imgs_input, 0, 1)
             dense_decoded_code = sess.run(model.dense_decoded, {model.inputs: imgs_input})
             is_attacked_matrix = update_matrix(is_attacked_matrix, imgs_label, dense_decoded_code)
             feed = {model.inputs: imgs_input, OCR_target: target_creat, origin_inputs: imgs_input_before}
@@ -111,7 +115,7 @@ def attack(model, sess, imgs_input, imgs_label, type, ):
     distance = np.linalg.norm(imgs_input_after - imgs_input_before)
     cost_time = end - start
     for i in range(batch_size):
-        plt.imshow(imgs_input_after[i])
+        plt.imshow(imgs_input_after[10])
         plt.show()
         break
 
@@ -159,12 +163,13 @@ def cnn_generate(Checkpoint_PATH, model_name='cnn'):
                             model_type, prec_acc, adv_acc,))
 
 
-def ocr_generate(Checkpoint_PATH, model_name='lenet'):
-    adv_sample_dir='../images/ocr_adv'
-    if os.path.isdir(adv_sample_dir):
-        shutil.rmtree(adv_sample_dir)
+def ocr_generate(Checkpoint_PATH, model_name='lenet', process_type='bin'):
+    if RELEASE:
+        adv_sample_dir = '../images/ocr_adv_%s' % process_type
+        if os.path.isdir(adv_sample_dir):
+            shutil.rmtree(adv_sample_dir)
         os.mkdir(adv_sample_dir)
-    model = LSTM.LSTMOCR(model_name, "infer")
+    model = LSTM.LSTMOCR(model_name, "infer", process_type)
     model.build_graph()
     Var_restore = tf.global_variables()
     saver = tf.train.Saver(Var_restore, max_to_keep=5, allow_empty=True)
@@ -177,10 +182,9 @@ def ocr_generate(Checkpoint_PATH, model_name='lenet'):
     else:
         print('cannot restore')
         return
-    file_count = 500
     with open('ocr_result.txt', 'w')as f:
         # -,G,B,gb
-        for type in range(0,4):
+        for type in range(0, 1):
             adv_acc = 0
             prec_acc = 0
             img_files = glob.glob("../images/ori/*.png")
@@ -196,10 +200,8 @@ def ocr_generate(Checkpoint_PATH, model_name='lenet'):
                 distance, cost_time, imgs_input_after = attack(model, sess, imgs_input, imgs_label, 'ocr')
                 if RELEASE:
                     for i, v in enumerate(imgs_input_after):
-                        plt.imsave("%s/%s_%s_%s_%s.png" % (adv_sample_dir,type, epoch, i, imgs_label[i]), v)
-
-                log_file.write("epoch:%s distance:%s time:%s\n" % (epoch,distance, cost_time))
-
+                        plt.imsave("%s/%s_%s_%s_%s.png" % (adv_sample_dir, type, epoch, i, imgs_label[i]), v)
+                log_file.write("epoch:%s distance:%s time:%s\n" % (epoch, distance, cost_time))
                 feed = {model.inputs: imgs_input_after}
                 dense_decoded_code = sess.run(model.dense_decoded, feed)
                 adv_acc += get_acc(imgs_label, dense_decoded_code)
@@ -212,9 +214,9 @@ def ocr_generate(Checkpoint_PATH, model_name='lenet'):
                             type, prec_acc, adv_acc,))
 
 
-def test_model(Checkpoint_PATH, model_name, head=False):
+def test_model(Checkpoint_PATH, model_name, process_type='ori', sample_type='ori'):
     os.environ["CUDA_VISIBLE_DEVICES"] = '0'
-    model = LSTM.LSTMOCR(model_name, "infer")
+    model = LSTM.LSTMOCR(model_name, "infer", process_type)
     model.build_graph()
     config = tf.ConfigProto()
     config.gpu_options.allow_growth = True
@@ -238,33 +240,42 @@ def test_model(Checkpoint_PATH, model_name, head=False):
         taget_name = 'ocr'
     for loop in range(0, 1):
         if loop == 0:
-            img_files = glob.glob("../images/%s_adv/*.png" % model_name)
-            filename = '%s_vs_%s_sample_%s_result.txt' % (model_name, model_name, 'head' if head else '')
+            dir_name = '../images/%s_adv_%s/' % (model_name, sample_type)
+            img_files = glob.glob(dir_name + "*.png")
+            filename = '%s_vs_%s_sample_%s_result.txt' % (model_name, model_name, sample_type)
         else:
+            dir_name = '"../images/%s_adv_0/'
+
             img_files = glob.glob("../images/%s_adv/*.png" % taget_name)
-            filename = '%s_vs_%s_sample_%s_result.txt' % (model_name, taget_name, 'head' if head else '')
+            filename = '%s_vs_%s_sample_%s_result.txt' % (model_name, taget_name, sample_type)
         acc = 0
+        print(len(img_files))
         acc_0 = 0
         type_acc_arr = [0 for i in range(4)]
         with open(filename, 'w')as f:
-            for index in range(2000 // batch_size):
+            for index in range(file_count // batch_size):
+                print(file_count // batch_size)
                 imgs_input = []
                 imgs_label = []
                 type_arr = []
                 for im in img_files[index * batch_size:(index + 1) * batch_size]:
-                    str_file = im[len("../images/%s_adv/" % model_name):-4]
+                    str_file = im[len(dir_name):-4]
                     arr_file = str_file.split('_')
                     type, label = arr_file[0], arr_file[3]
                     im = Image.open(im).convert("RGB")
                     # if head:
                     #     im = add_gauss(im, radius=radius)
-                    #     im = throsh_binary(im)
                     im = np.asarray(im).astype(np.float32) / 255.
                     type_arr.append(type)
                     imgs_label.append(label)
                     imgs_input.append(im)
 
                 feed = {model.inputs: imgs_input}
+
+                tutu_img = sess.run(model.pre_inputs, feed)
+                plt.imshow(tutu_img[0])
+                plt.show()
+
                 dense_decoded_code = sess.run(model.dense_decoded, feed)
                 for index, j in enumerate(dense_decoded_code):
                     expression = ''
@@ -273,10 +284,11 @@ def test_model(Checkpoint_PATH, model_name, head=False):
                             expression += ''
                         else:
                             expression += LSTM.decode_maps[i]
+                    print(expression, imgs_label[index])
                     if imgs_label[index] == expression:
                         acc += 1
                         type_acc_arr[int(type_arr[index])] += 1
-                print("%s  "%(type_acc_arr))
+                print("%s  " % (type_acc_arr))
                 if RELEASE:
                     f.write(
                         "%s %s\n" % (acc, type_acc_arr))
@@ -293,9 +305,9 @@ def get_acc(imgs_label, dense_decoded_code):
             else:
                 expression += LSTM.decode_maps[i]
         if imgs_label[index] == expression:
-            # print(imgs_label[index], expression)
+            print(imgs_label[index], expression)
             acc += 1
-        # print("True:{} ; AFTER:{}".format(imgs_label[index], expression))
+        print("True:{} ; AFTER:{}".format(imgs_label[index], expression))
 
     return acc
 
@@ -305,7 +317,7 @@ def get_process(ori_imgs_input, type):
     if type == 0:
         for index, i in enumerate(ori_imgs_input):
             im = Image.open(i)
-            im = np.asarray(im).astype(np.float32) /  255.
+            im = np.asarray(im).astype(np.float32) / 255.
             imgs_input.append(im)
     if type == 1:
         for index, i in enumerate(ori_imgs_input):
@@ -321,18 +333,45 @@ def get_process(ori_imgs_input, type):
         for index, i in enumerate(ori_imgs_input):
             im = throsh_binary(Image.open(i))
             im = add_gauss(im, radius=2)
-
             im = np.asarray(im).astype(np.float32) / 255.
             imgs_input.append(im)
     return imgs_input
 
 
 if __name__ == '__main__':
-    ocr_generate('/home/kirin/Python_Code/fast_rabbit/train_model/train_lenet_fine/model')
-    # cnn_generate('../train_cnn/model')
-    # test_model('../train_lenet/model', 'lenet')
-    # test_model('../train_cnn/model', 'cnn')
+    # ocr_generate('/home/kirin/Python_Code/fast_rabbit'
+    #              '/train_model/train_lenet_fine/model', process_type='ori')
+    # ocr_generate('/home/kirin/Python_Code/fast_rabbit'
+    #              '/train_model/train_lenet_fine/model', process_type='gauss')
+    # ocr_generate('/home/kirin/Python_Code/fast_rabbit'
+    #              '/train_model/train_lenet_fine/model', process_type='bin')
+    # ocr_generate('/home/kirin/Python_Code/fast_rabbit'
+    #              '/train_model/train_lenet_fine/model', process_type='all')
 
-    # test_model('../train_lenet_fine/model', 'lenet', head=True)
-    # test_model('/home/kirin/Python_Code/fast_rabbit/train_model/train_lenet_fine/model', 'lenet', head=True)
+    # test_model('/home/kirin/Python_Code/fast_rabbit/train_model/train_lenet_fine/model',
+    #            'lenet', process_type='ori', sample_type='all')
+    # test_model('/home/kirin/Python_Code/fast_rabbit/train_model/train_lenet_fine/model',
+    #            'lenet', process_type='gauss', sample_type='all')
+    # test_model('/home/kirin/Python_Code/fast_rabbit/train_model/train_lenet_fine/model',
+    #            'lenet', process_type='bin', sample_type='all')
+
+    # test_model('/home/kirin/Python_Code/fast_rabbit/train_model/train_lenet_fine/model',
+    #            'lenet', process_type='all', sample_type='ori')
+    # test_model('/home/kirin/Python_Code/fast_rabbit/train_model/train_lenet_fine/model',
+    #            'lenet', process_type='all', sample_type='gauss')
+    # test_model('/home/kirin/Python_Code/fast_rabbit/train_model/train_lenet_fine/model',
+    #            'lenet', process_type='all', sample_type='bin')
+
+    # test_model('/home/kirin/Python_Code/fast_rabbit/train_model/train_lenet_fine/model',
+    #            'lenet', process_type='ori', sample_type='gauss')
+    # test_model('/home/kirin/Python_Code/fast_rabbit/train_model/train_lenet_fine/model',
+    #            'lenet', process_type='ori', sample_type='bin')
+    # test_model('/home/kirin/Python_Code/fast_rabbit/train_model/train_lenet_fine/model',
+    #            'lenet', process_type='gauss', sample_type='ori')
+    # test_model('/home/kirin/Python_Code/fast_rabbit/train_model/train_lenet_fine/model',
+    #            'lenet', process_type='gauss', sample_type='bin')
+    # test_model('/home/kirin/Python_Code/fast_rabbit/train_model/train_lenet_fine/model',
+    #            'lenet', process_type='bin', sample_type='ori')
+    test_model('/home/kirin/Python_Code/fast_rabbit/train_model/train_lenet_fine/model',
+               'lenet', process_type='bin', sample_type='gauss')
     # test_model('../train_cnn/model', 'cnn', head=False)

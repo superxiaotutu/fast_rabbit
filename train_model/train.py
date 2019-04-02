@@ -1,5 +1,5 @@
 import tensorflow as tf
-import LSTM_model as LSTM
+import model as LSTM
 import time
 import numpy as np
 import os
@@ -15,24 +15,17 @@ val_feeder = LSTM.DataIterator()
 
 
 def train(restore=False, cnn_name="lenet"):
-    checkpoint_dir = "train_%s_fine/model" % cnn_name
-    model = LSTM.LSTMOCR('train', cnn_name)
+    checkpoint_dir = "/home/kirin/Python_Code/fast_rabbit/train_model/train_lenet_fine/model"
+    model = LSTM.LSTMOCR('lenet', 'train',"all")
     model.build_graph()
-
     config = tf.ConfigProto()
     config.gpu_options.allow_growth = True
-
     sess = tf.Session(config=config)
-
     sess.run(tf.global_variables_initializer())
-
     Var_restore = tf.global_variables()
-
     saver = tf.train.Saver(Var_restore, max_to_keep=5, allow_empty=True)
-
     train_writer = tf.summary.FileWriter(checkpoint_dir.replace('model', 'log'), sess.graph)
     acc_sum = tf.Summary()
-
     if restore:
         ckpt = tf.train.latest_checkpoint(checkpoint_dir)
         if ckpt:
