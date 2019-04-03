@@ -5,7 +5,7 @@ import tensorflow.contrib.image
 
 import tensorflow.contrib.slim as slim
 
-# from image_process import gene_code
+from gen_type_codes import gene_code_all as gene_code
 
 image_height = 64
 image_width = 192
@@ -38,25 +38,25 @@ decode_maps[SPACE_INDEX] = SPACE_TOKEN
 from PIL import Image, ImageFont, ImageDraw, ImageFilter
 from captcha.image import ImageCaptcha
 
-image = ImageCaptcha(width=image_width, height=image_height)
-
-
-def gene_code(chars):
-    def random_color(start, end, opacity=None):
-        red = random.randint(start, end)
-        green = random.randint(start, end)
-        blue = random.randint(start, end)
-        if opacity is None:
-            return (red, green, blue)
-        return (red, green, blue, opacity)
-
-    background = random_color(238, 255)
-    color = random_color(10, 200, random.randint(220, 255))
-    im = image.create_captcha_image(chars, color, background)
-    image.create_noise_dots(im, color, number=30)
-    image.create_noise_curve(im, color)
-    im = im.filter(ImageFilter.SMOOTH)
-    return im
+# image = ImageCaptcha(width=image_width, height=image_height)
+#
+#
+# def gene_code(chars):
+#     def random_color(start, end, opacity=None):
+#         red = random.randint(start, end)
+#         green = random.randint(start, end)
+#         blue = random.randint(start, end)
+#         if opacity is None:
+#             return (red, green, blue)
+#         return (red, green, blue, opacity)
+#
+#     background = random_color(238, 255)
+#     color = random_color(10, 200, random.randint(220, 255))
+#     im = image.create_captcha_image(chars, color, background)
+#     image.create_noise_dots(im, color, number=30)
+#     image.create_noise_curve(im, color)
+#     im = im.filter(ImageFilter.SMOOTH)
+#     return im
 
 
 def sparse_tuple_from_label(sequences, dtype=np.int32):
@@ -136,24 +136,14 @@ class DataIterator:
 class LSTMOCR(object):
     def __init__(self, mode):
         self.mode = mode
-        # image
-        self.inputs = tf.placeholder(tf.float32, [None, image_height, image_width, image_channel])
 
-        # SparseTensor required by ctc_loss op
+        self.inputs = tf.placeholder(tf.float32, [None, image_height, image_width, image_channel])
         self.labels = tf.sparse_placeholder(tf.int32)
-        # 1d array of size [batch_size]
-        # self.seq_len = tf.placeholder(tf.int32, [None])
-        # l2
         self._extra_train_ops = []
 
     def build_graph(self):
-        # if LSTM:
-        # self._build_model()
-        # self._build_model_with_resnet()
-        self._build_model_with_inception()
+        self._build_model()
         self._build_train_op()
-        # else:
-        # self._bulid_CNN_with_4_FC()
 
         self.merged_summay = tf.summary.merge_all()
 
@@ -169,7 +159,6 @@ class LSTMOCR(object):
         while min_size > 1:
             min_size = (min_size + 1) // 2
             count_ += 1
-        assert (cnn_count <= count_, "FLAGS.cnn_count should be <= {}!".format(count_))
 
         # CNN part
         with tf.variable_scope('cnn'):
@@ -184,6 +173,9 @@ class LSTMOCR(object):
                     # print('----x.get_shape().as_list(): {}'.format(x.get_shape().as_list()))
                     _, feature_h, feature_w, _ = x.get_shape().as_list()
                     print('\nfeature_h: {}, feature_w: {}'.format(feature_h, feature_w))
+
+        self.attention_pool = x
+        x = self.attention_pool
 
         # LSTM part
         with tf.variable_scope('lstm'):
@@ -255,7 +247,6 @@ class LSTMOCR(object):
         while min_size > 1:
             min_size = (min_size + 1) // 2
             count_ += 1
-        assert (cnn_count <= count_, "FLAGS.cnn_count should be <= {}!".format(count_))
 
         # CNN part
         with tf.variable_scope('mini-resnet'):
@@ -335,7 +326,6 @@ class LSTMOCR(object):
         while min_size > 1:
             min_size = (min_size + 1) // 2
             count_ += 1
-        assert (cnn_count <= count_, "FLAGS.cnn_count should be <= {}!".format(count_))
 
         # CNN part
         with tf.variable_scope('mini-inception'):
@@ -468,7 +458,6 @@ class LSTMOCR(object):
         while min_size > 1:
             min_size = (min_size + 1) // 2
             count_ += 1
-        assert (cnn_count <= count_, "FLAGS.cnn_count should be <= {}!".format(count_))
 
         # CNN part
         with tf.variable_scope('cnn'):

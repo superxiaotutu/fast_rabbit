@@ -1,0 +1,6 @@
+model_checkpoint_path: "ocr-model-130"
+all_model_checkpoint_paths: "ocr-model-110"
+all_model_checkpoint_paths: "ocr-model-115"
+all_model_checkpoint_paths: "ocr-model-120"
+all_model_checkpoint_paths: "ocr-model-125"
+all_model_checkpoint_paths: "ocr-model-130"

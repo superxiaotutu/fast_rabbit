@@ -7,14 +7,19 @@ from PIL import ImageFont
 from PIL import ImageFilter
 from captcha.image import DEFAULT_FONTS, ImageCaptcha
 from skimage.util import random_noise
-from config import image_height, image_width, plt
+import matplotlib.pyplot as plt
 
+image_channel = 3
+image_height = 64
+image_width = 192
 image = ImageCaptcha(width=image_width, height=image_height)
 
 SALT_LEVEL = []
 NOISE_NUM = [i for i in range(0, 46, 5)]
 
-radius=1
+radius = 1
+
+
 class MyGaussianBlur(ImageFilter.Filter):
     name = "GaussianBlur"
 
@@ -27,7 +32,7 @@ class MyGaussianBlur(ImageFilter.Filter):
 
 def gene_code_all(chars):
     flag = random.randint(0, 50)
-    im = gene_code_clean(chars) if flag else gene_code_normal(chars)
+    im = gene_code_normal(chars) if flag else gene_code_clean(chars)
     im = preprocess(im)
     return im
 
@@ -58,19 +63,6 @@ def gene_code_clean_one(chars):
     return im
 
 
-# 0.3-0.7 alpha个像素点保留原值
-def addsalt_pepper(img, alpha=0.7):
-    img = np.asarray(img)
-    h, w, c = img.shape
-    img.flags.writeable = True
-    mask = np.random.choice((0, 1, 2), size=(h, w, 1), p=[alpha, (1 - alpha) / 2., (1 - alpha) / 2.])
-    mask = np.repeat(mask, 3, axis=2)
-    img[mask == 1] = 255
-    img[mask == 2] = 0
-    img = Image.fromarray(img.astype('uint8')).convert('RGB')
-    return img
-
-
 def gen_gauss_code(captcha):
     img = gene_code_clean_one(captcha)
     img = np.asarray(img).astype(np.float32) / 255.
@@ -93,6 +85,7 @@ def binary(image):
     image = image.convert('RGB')
     return image
 
+
 def throsh_binary(image):
     img = cv2.cvtColor(np.asarray(image), cv2.COLOR_RGB2BGR)
     c = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
@@ -100,22 +93,22 @@ def throsh_binary(image):
     image = Image.fromarray(image).convert('RGB')
     return image
 
+
 def preprocess(image):
     flag = random.randint(0, 5)
-    # flag=4
     if flag == 0:
         image = binary(image)
     elif flag == 1:
         image = add_gauss(image, radius)
     elif flag == 2:
-        image=throsh_binary(image)
+        image = throsh_binary(image)
     elif flag == 3:
-        image=throsh_binary(image)
+        image = throsh_binary(image)
         image = add_gauss(image, radius)
         image = image.convert('RGB')
     elif flag == 4:
         image = add_gauss(image, radius)
-        image=throsh_binary(image)
+        image = throsh_binary(image)
     else:
         image = np.asarray(image).astype(np.float32) / 255.
         return image
@@ -154,23 +147,6 @@ def random_color(start, end, opacity=None):
     return (red, green, blue, opacity)
 
 
-def gen_code_analy(chars):
-    flag = random.randint(0, 10)
-    if flag == 0:
-        im = gene_code_clean_one(chars)
-        im = np.asarray(im).astype(np.float32) / 255.
-    elif 1 <= flag < 7:
-        im = gen_gauss_code(chars)
-    else:
-        image = gene_code_clean_one(chars)
-        image = image.convert('L')
-        image = image.point(lambda x: 255 if x > np.mean(image) else 0)
-        im = image.convert('RGB')
-        im = np.asarray(im).astype(np.float32) / 255.
-
-    return im
-
-
 def gen_type_1(chars):
     background = random_color(238, 255)
     color = random_color(10, 200, random.randint(220, 255))
@@ -201,15 +177,3 @@ def gen_type_3(chars):
         image.create_noise_curve(im, color)
     im = im.filter(ImageFilter.SMOOTH)
     return im
-
-#
-# gen_type_2("BASD").show()
-# gen_type_3("BASD").show()
-
-# a=gen_code_analy('S')
-# plt.imshow(a)
-# plt.imsave('a.png',a)
-# m=gen_gauss_code('A')
-# plt.imshow(m)
-# plt.show()
-# gene_code('A').show()

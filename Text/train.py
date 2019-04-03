@@ -7,6 +7,7 @@ import datetime
 import cv2
 import matplotlib.pyplot as plt
 import random
+from skimage.transform import resize
 
 num_epochs = 2500
 batch_size = 32
@@ -22,8 +23,8 @@ train_feeder = LSTM.DataIterator()
 val_feeder = LSTM.DataIterator()
 
 
-def train(restore=False, checkpoint_dir="train_3/model"):
-    os.environ["CUDA_VISIBLE_DEVICES"] = '0'
+def train(restore=False, checkpoint_dir="train/model"):
+    os.environ["CUDA_VISIBLE_DEVICES"] = '1'
     model = LSTM.LSTMOCR('train')
     model.build_graph()
 
@@ -109,10 +110,6 @@ def train(restore=False, checkpoint_dir="train_3/model"):
                 log = "{}/{} {}:{}:{} Epoch {}/{}, " \
                       "accuracy = {:.3f}, avg_train_cost = {:.3f}, " \
                       "lastbatch_err = {:.3f}, time = {:.3f}, lr={:.8f}"
-                with open(checkpoint_dir.replace('model', 'log') + '/test_acc.txt', 'a')as f:
-                    f.write(str(log.format(now.month, now.day, now.hour, now.minute, now.second,
-                                           cur_epoch + 1, num_epochs, accuracy, avg_train_cost,
-                                           err, time.time() - start_time, lr)) + "\n")
                 print(log.format(now.month, now.day, now.hour, now.minute, now.second, cur_epoch + 1, num_epochs,
                                  accuracy, avg_train_cost, err, time.time() - start_time, lr))
 
@@ -136,7 +133,6 @@ def infer(Checkpoint_PATH, img_PATH):
         print('restore from ckpt{}'.format(ckpt))
     else:
         print('cannot restore')
-        # return
 
     im = cv2.imread(img_PATH).astype(np.float32) / 255.
     imgs_input = []
@@ -180,7 +176,7 @@ def creat_adv(Checkpoint_PATH, img_PATH):
     target = tf.placeholder(tf.float32, [12, batch_size, 38])
     origin_inputs = tf.placeholder(tf.float32, [None, image_height, image_width, image_channel])
     predict = tf.nn.softmax(model.logits)
-    # ADV_LOSS = tf.reduce_sum(tf.square(predict - target)) + tf.reduce_mean(tf.square(origin_inputs - model.inputs))
+
     current_status = tf.argmax(predict, axis=-1)
     current_mengban = tf.one_hot(current_status, 38, axis=0)
     current_mengban = tf.transpose(current_mengban, [1, 2, 0])
@@ -197,13 +193,6 @@ def creat_adv(Checkpoint_PATH, img_PATH):
     sess.run(tf.global_variables_initializer())
 
     ckpt = tf.train.latest_checkpoint(Checkpoint_PATH)
-
-    # if ckpt:
-    #     saver.restore(sess, ckpt)
-    #     print('restore from ckpt{}'.format(ckpt))
-    # else:
-    #     print('cannot restore')
-    #     return
 
     im = cv2.imread(img_PATH).astype(np.float32) / 255.
     im = cv2.resize(im, (192, 64))
@@ -266,78 +255,32 @@ def creat_adv(Checkpoint_PATH, img_PATH):
     return
 
 
-def test():
-    num_test = 128
-    t = 0
-    train_feeder.refresh_data()
-    for e in range(num_test // batch_size):
-        for i in range(batch_size):
-            plt.imsave("temp.png", train_feeder.image[i])
-            expression = creat_adv("train_1/model", "temp.png")
-            if expression != train_feeder.labels[i]:
-                t += 1
-            print()
-    print(t / num_test)
+def grad_cam(pool, init, Y):
+    conv_layer = pool
+    signal = tf.multiply(init, Y)
+    loss = tf.reduce_mean(signal)
+
+    grads = tf.gradients(loss, conv_layer)[0]
+    norm_grads = tf.div(grads, tf.sqrt(tf.reduce_mean(tf.square(grads))) + tf.constant(1e-5))
+
+    weights = tf.reduce_mean(norm_grads, axis=(1, 2))
+    weights = tf.expand_dims(weights, 1)
+    weights = tf.expand_dims(weights, 1)
+    weights = tf.tile(weights, [1, 4, 12, 1])
+
+    pre_cam = tf.multiply(weights, conv_layer)
+    cam = tf.reduce_sum(pre_cam, 3)
+    cam = tf.nn.relu(cam)
+    return cam
 
 
-def darw_table(Checkpoint_PATH):
-    img_table = np.zeros([10, 10])
-
+def GRADCAM_infer(Checkpoint_PATH, img_PATH):
     os.environ["CUDA_VISIBLE_DEVICES"] = '0'
     model = LSTM.LSTMOCR("infer")
     model.build_graph()
     config = tf.ConfigProto()
     config.gpu_options.allow_growth = True
 
-    Var_restore = tf.global_variables()
-    saver = tf.train.Saver(Var_restore, max_to_keep=5, allow_empty=True)
-
-    sess = tf.Session(config=config)
-    sess.run(tf.global_variables_initializer())
-
-    ckpt = tf.train.latest_checkpoint(Checkpoint_PATH)
-    if ckpt:
-        saver.restore(sess, ckpt)
-        print('restore from ckpt{}'.format(ckpt))
-    else:
-        print('cannot restore')
-        return
-
-    for i in range(10):
-        for j in range(10):
-            count = 0
-            for k in range(100):
-                im, la = train_feeder.get_test_img(i * 2, j * 10)
-
-                imgs_input = []
-                imgs_input.append(im)
-                imgs_input = np.asarray(imgs_input)
-                imgs_input = np.repeat(imgs_input, batch_size, axis=0)
-
-                feed = {model.inputs: imgs_input}
-
-                dense_decoded_code = sess.run(model.dense_decoded, feed)
-                expression = ''
-                for c in dense_decoded_code[0]:
-                    if c == -1:
-                        expression += ''
-                    else:
-                        expression += LSTM.decode_maps[c]
-                if expression == la:
-                    count += 1
-                    # print(expression, la)
-            img_table[i, j] = count / 100
-            print("i:{}, j:{}, p={}".format(i, j, img_table[i, j]))
-    np.save("table2.npy", img_table)
-
-
-def infer_many(Checkpoint_PATH, img_PATH):
-    os.environ["CUDA_VISIBLE_DEVICES"] = '1'
-    model = LSTM.LSTMOCR("infer")
-    model.build_graph()
-    config = tf.ConfigProto()
-    config.gpu_options.allow_growth = True
-
     sess = tf.Session(config=config)
     sess.run(tf.global_variables_initializer())
 
@@ -350,36 +293,42 @@ def infer_many(Checkpoint_PATH, img_PATH):
         print('restore from ckpt{}'.format(ckpt))
     else:
         print('cannot restore')
-        return
-    p = [('adv_example/%s.png' % i) for i in range(66, 76)]
+
+    im = cv2.imread(img_PATH).astype(np.float32) / 255.
     imgs_input = []
-    for img_PATH in p:
-        im = cv2.imread(img_PATH).astype(np.float32) / 255.
-        imgs_input.append(im)
+    imgs_input.append(im)
 
     imgs_input = np.asarray(imgs_input)
-    # imgs_input = np.repeat(imgs_input, batch_size, axis=0)
+    imgs_input = np.repeat(imgs_input, batch_size, axis=0)
+
+    onehot_out = tf.one_hot(tf.argmax(model.logits, axis=2), 38)
+    tar = np.ones([12, 32, 38])
+    tar[:, :, 0] = 0
+    tar[:, :, 37] = 0
+    tar_tensor = tf.convert_to_tensor(tar, dtype=tf.float32)
+    onehot_out = tf.multiply(tar_tensor, onehot_out)
+
+    gradcam = grad_cam(model.attention_pool, model.logits, onehot_out)
 
     feed = {model.inputs: imgs_input}
-    dense_decoded_code = sess.run(model.dense_decoded, feed)
-    expression = ''
-    print(dense_decoded_code)
-    for j in dense_decoded_code:
-        for i in j:
-            if i == -1:
-                expression += ''
-            else:
-                expression += LSTM.decode_maps[i]
-        expression += ','
-    print(expression)
+    g_img = sess.run(gradcam, feed_dict=feed)
+
+    ori_img = imgs_input[0]
+    prehot_img = resize(g_img[0], (64, 192))
+
+    prehot_img /= prehot_img.max()
+    heatmap = cv2.applyColorMap(np.uint8(255 * prehot_img), cv2.COLORMAP_JET)
+    heatmap = cv2.cvtColor(heatmap, cv2.COLOR_BGR2RGB)
+    alpha = 0.0072
+    heatmap = ori_img + alpha * heatmap
+    heatmap /= heatmap.max()
+    plt.imshow(heatmap)
+    plt.show()
 
 
 def main():
-    train(restore=False, checkpoint_dir="test")
-    # infer("train_all/model", "example/1.png")
-    # creat_adv("test/model", "example/2.png")
-    # test()
-    # darw_table("train_2/model")
+    train(True, "train/model")
+    # GRADCAM_infer("train/model", "/home/kirin/Python_Code/Ensambel/fast_rabbit/example_img/example_1.png")
 
 
 if __name__ == '__main__':

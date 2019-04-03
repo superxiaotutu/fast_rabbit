@@ -214,30 +214,15 @@ class Model_base():
 
 class CNN4_OCR(Model_base):
     def __init__(self, mode):
-        self.graph = tf.Graph()
-        with self.graph.as_default():
-            self.saver = tf.train.Saver(max_to_keep=5, allow_empty=True)
-        self.sess = tf.Session(graph=self.graph)
-        with self.sess.as_default():
-            with self.graph.as_default():
-                self.saver.restore(self.sess, 'tem')
+        self.mode = mode
+        self.inputs = tf.placeholder(tf.float32, [None, image_height, image_width, image_channel])
+        self.labels = tf.sparse_placeholder(tf.int32)
+        self._extra_train_ops = []
 
-                self.mode = mode
-                self.inputs = tf.placeholder(tf.float32, [None, image_height, image_width, image_channel])
-                self.labels = tf.sparse_placeholder(tf.int32)
-                self._extra_train_ops = []
-
-                self.build_graph()
+        self.build_graph()
 
     def build_graph(self):
         with tf.variable_scope("CNN4"):
-            config = tf.ConfigProto()
-            config.gpu_options.allow_growth = True
-            self.graph = tf.Graph()
-            self.sess = tf.Session(graph=self.graph, config=config)
-            self.var = tf.trainable_variables()
-            self.saver = tf.train.Saver(self.var, max_to_keep=5, allow_empty=True)
-
             self._build_model()
             self._build_train_op()
             self.merged_summay = tf.summary.merge_all()
@@ -357,30 +342,15 @@ class CNN4_OCR(Model_base):
 
 class RESNET_OCR(Model_base):
     def __init__(self, mode):
-        self.graph = tf.Graph()
-        with self.graph.as_default():
-            self.saver = tf.train.Saver(max_to_keep=5, allow_empty=True)
-        self.sess = tf.Session(graph=self.graph)
-        with self.sess.as_default():
-            with self.graph.as_default():
-                self.saver.restore(self.sess, 'tem')
+        self.mode = mode
+        self.inputs = tf.placeholder(tf.float32, [None, image_height, image_width, image_channel])
+        self.labels = tf.sparse_placeholder(tf.int32)
+        self._extra_train_ops = []
 
-                self.mode = mode
-                self.inputs = tf.placeholder(tf.float32, [None, image_height, image_width, image_channel])
-                self.labels = tf.sparse_placeholder(tf.int32)
-                self._extra_train_ops = []
-
-                self.build_graph()
+        self.build_graph()
 
     def build_graph(self):
         with tf.variable_scope("Resnet"):
-            config = tf.ConfigProto()
-            config.gpu_options.allow_growth = True
-            self.graph = tf.Graph()
-            self.sess = tf.Session(graph=self.graph, config=config)
-            self.var = tf.trainable_variables()
-            self.saver = tf.train.Saver(self.var, max_to_keep=5, allow_empty=True)
-
             self._build_model_with_resnet()
             self._build_train_op()
             self.merged_summay = tf.summary.merge_all()
@@ -500,35 +470,19 @@ class RESNET_OCR(Model_base):
 
 class INCEPTIONNET_OCR(Model_base):
     def __init__(self, mode):
-        self.graph = tf.Graph()
-        with self.graph.as_default():
-            self.saver = tf.train.Saver(max_to_keep=5, allow_empty=True)
-        self.sess = tf.Session(graph=self.graph)
-        with self.sess.as_default():
-            with self.graph.as_default():
-                self.saver.restore(self.sess, 'tem')
+        self.mode = mode
+        self.inputs = tf.placeholder(tf.float32, [None, image_height, image_width, image_channel])
+        self.labels = tf.sparse_placeholder(tf.int32)
+        self._extra_train_ops = []
 
-                self.mode = mode
-                self.inputs = tf.placeholder(tf.float32, [None, image_height, image_width, image_channel])
-                self.labels = tf.sparse_placeholder(tf.int32)
-                self._extra_train_ops = []
-
-                self.build_graph()
+        self.build_graph()
 
     def build_graph(self):
         with tf.variable_scope("Inception/"):
-            config = tf.ConfigProto()
-            config.gpu_options.allow_growth = True
-            self.graph = tf.Graph()
-            self.sess = tf.Session(graph=self.graph, config=config)
+            self._build_model_with_inception()
+            self._build_train_op()
+            self.merged_summay = tf.summary.merge_all()
 
-            with self.graph as g:
-                self._build_model_with_inception()
-                self._build_train_op()
-                self.merged_summay = tf.summary.merge_all()
-
-                self.var = tf.trainable_variables()
-                self.saver = tf.train.Saver(self.var, max_to_keep=5, allow_empty=True)
 
     def _build_model_with_inception(self):
         count_ = 0
