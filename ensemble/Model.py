@@ -62,14 +62,6 @@ class DataIterator:
 
 
 class Model_base():
-    def build_graph(self):
-        config = tf.ConfigProto()
-        config.gpu_options.allow_growth = True
-        self.graph = tf.Graph()
-        self.sess = tf.Session(graph=self.graph, config=config)
-        self.var = tf.trainable_variables()
-        self.saver = tf.train.Saver(self.var, max_to_keep=5, allow_empty=True)
-
     def _conv2d(self, x, name, filter_size, in_channels, out_channels, strides):
         with tf.variable_scope(name):
             kernel = tf.get_variable(name='W',
@@ -219,15 +211,33 @@ class Model_base():
         kernel = getGuessKernel(kerStd)
         return tf.nn.conv2d(inputs, kernel, strides=[1, 1, 1, 1], padding="SAME")
 
+
 class CNN4_OCR(Model_base):
-    def __init__(self):
-        self.mode = mode
-        self.inputs = tf.placeholder(tf.float32, [None, image_height, image_width, image_channel])
-        self.labels = tf.sparse_placeholder(tf.int32)
-        self._extra_train_ops = []
+    def __init__(self, mode):
+        self.graph = tf.Graph()
+        with self.graph.as_default():
+            self.saver = tf.train.Saver(max_to_keep=5, allow_empty=True)
+        self.sess = tf.Session(graph=self.graph)
+        with self.sess.as_default():
+            with self.graph.as_default():
+                self.saver.restore(self.sess, 'tem')
+
+                self.mode = mode
+                self.inputs = tf.placeholder(tf.float32, [None, image_height, image_width, image_channel])
+                self.labels = tf.sparse_placeholder(tf.int32)
+                self._extra_train_ops = []
+
+                self.build_graph()
 
     def build_graph(self):
-        with tf.name_scope("CNN4/"):
+        with tf.variable_scope("CNN4"):
+            config = tf.ConfigProto()
+            config.gpu_options.allow_growth = True
+            self.graph = tf.Graph()
+            self.sess = tf.Session(graph=self.graph, config=config)
+            self.var = tf.trainable_variables()
+            self.saver = tf.train.Saver(self.var, max_to_keep=5, allow_empty=True)
+
             self._build_model()
             self._build_train_op()
             self.merged_summay = tf.summary.merge_all()
@@ -244,7 +254,6 @@ class CNN4_OCR(Model_base):
         while min_size > 1:
             min_size = (min_size + 1) // 2
             count_ += 1
-        assert (cnn_count <= count_, "FLAGS.cnn_count should be <= {}!".format(count_))
 
         # CNN part
         with tf.variable_scope('cnn'):
@@ -258,7 +267,7 @@ class CNN4_OCR(Model_base):
 
                     # print('----x.get_shape().as_list(): {}'.format(x.get_shape().as_list()))
                     _, feature_h, feature_w, _ = x.get_shape().as_list()
-                    print('\nfeature_h: {}, feature_w: {}'.format(feature_h, feature_w))
+                    print('feature_h: {}, feature_w: {}'.format(feature_h, feature_w))
 
         # LSTM part
         with tf.variable_scope('lstm'):
@@ -318,7 +327,6 @@ class CNN4_OCR(Model_base):
             self.logits = tf.transpose(self.logits, (1, 0, 2))
             print(self.logits)
 
-
     def _build_train_op(self):
         self.global_step = tf.train.get_or_create_global_step()
 
@@ -346,19 +354,36 @@ class CNN4_OCR(Model_base):
         # self.decoded, self.log_prob = tf.nn.ctc_greedy_decoder(logits, seq_len, merge_repeated=False)
         self.dense_decoded = tf.sparse_tensor_to_dense(self.decoded[0], default_value=-1)
 
+
 class RESNET_OCR(Model_base):
-    def __init__(self):
-        self.mode = mode
-        self.inputs = tf.placeholder(tf.float32, [None, image_height, image_width, image_channel])
-        self.labels = tf.sparse_placeholder(tf.int32)
-        self._extra_train_ops = []
+    def __init__(self, mode):
+        self.graph = tf.Graph()
+        with self.graph.as_default():
+            self.saver = tf.train.Saver(max_to_keep=5, allow_empty=True)
+        self.sess = tf.Session(graph=self.graph)
+        with self.sess.as_default():
+            with self.graph.as_default():
+                self.saver.restore(self.sess, 'tem')
+
+                self.mode = mode
+                self.inputs = tf.placeholder(tf.float32, [None, image_height, image_width, image_channel])
+                self.labels = tf.sparse_placeholder(tf.int32)
+                self._extra_train_ops = []
+
+                self.build_graph()
 
     def build_graph(self):
-        with tf.name_scope("resnet/"):
+        with tf.variable_scope("Resnet"):
+            config = tf.ConfigProto()
+            config.gpu_options.allow_growth = True
+            self.graph = tf.Graph()
+            self.sess = tf.Session(graph=self.graph, config=config)
+            self.var = tf.trainable_variables()
+            self.saver = tf.train.Saver(self.var, max_to_keep=5, allow_empty=True)
+
             self._build_model_with_resnet()
             self._build_train_op()
             self.merged_summay = tf.summary.merge_all()
-
 
     def _build_model_with_resnet(self):
         filters = [3, 64, 128, 128, out_channels]
@@ -372,7 +397,6 @@ class RESNET_OCR(Model_base):
         while min_size > 1:
             min_size = (min_size + 1) // 2
             count_ += 1
-        assert (cnn_count <= count_, "FLAGS.cnn_count should be <= {}!".format(count_))
 
         # CNN part
         with tf.variable_scope('mini-resnet'):
@@ -446,7 +470,6 @@ class RESNET_OCR(Model_base):
             self.logits = tf.transpose(self.logits, (1, 0, 2))
             print(self.logits)
 
-
     def _build_train_op(self):
         self.global_step = tf.train.get_or_create_global_step()
 
@@ -474,19 +497,38 @@ class RESNET_OCR(Model_base):
         # self.decoded, self.log_prob = tf.nn.ctc_greedy_decoder(logits, seq_len, merge_repeated=False)
         self.dense_decoded = tf.sparse_tensor_to_dense(self.decoded[0], default_value=-1)
 
+
 class INCEPTIONNET_OCR(Model_base):
-    def __init__(self):
-        self.mode = mode
-        self.inputs = tf.placeholder(tf.float32, [None, image_height, image_width, image_channel])
-        self.labels = tf.sparse_placeholder(tf.int32)
-        self._extra_train_ops = []
+    def __init__(self, mode):
+        self.graph = tf.Graph()
+        with self.graph.as_default():
+            self.saver = tf.train.Saver(max_to_keep=5, allow_empty=True)
+        self.sess = tf.Session(graph=self.graph)
+        with self.sess.as_default():
+            with self.graph.as_default():
+                self.saver.restore(self.sess, 'tem')
+
+                self.mode = mode
+                self.inputs = tf.placeholder(tf.float32, [None, image_height, image_width, image_channel])
+                self.labels = tf.sparse_placeholder(tf.int32)
+                self._extra_train_ops = []
+
+                self.build_graph()
 
     def build_graph(self):
-        with tf.name_scope("inception/"):
-            self._build_model_with_inception()
-            self._build_train_op()
-            self.merged_summay = tf.summary.merge_all()
+        with tf.variable_scope("Inception/"):
+            config = tf.ConfigProto()
+            config.gpu_options.allow_growth = True
+            self.graph = tf.Graph()
+            self.sess = tf.Session(graph=self.graph, config=config)
 
+            with self.graph as g:
+                self._build_model_with_inception()
+                self._build_train_op()
+                self.merged_summay = tf.summary.merge_all()
+
+                self.var = tf.trainable_variables()
+                self.saver = tf.train.Saver(self.var, max_to_keep=5, allow_empty=True)
 
     def _build_model_with_inception(self):
         count_ = 0
@@ -494,7 +536,6 @@ class INCEPTIONNET_OCR(Model_base):
         while min_size > 1:
             min_size = (min_size + 1) // 2
             count_ += 1
-        assert (cnn_count <= count_, "FLAGS.cnn_count should be <= {}!".format(count_))
 
         # CNN part
         with tf.variable_scope('mini-inception'):
@@ -606,4 +647,3 @@ class INCEPTIONNET_OCR(Model_base):
         self.decoded, self.log_prob = tf.nn.ctc_beam_search_decoder(self.logits, self.seq_len, merge_repeated=False)
         # self.decoded, self.log_prob = tf.nn.ctc_greedy_decoder(logits, seq_len, merge_repeated=False)
         self.dense_decoded = tf.sparse_tensor_to_dense(self.decoded[0], default_value=-1)
-

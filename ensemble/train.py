@@ -1,13 +1,18 @@
 import ensemble.Model as M
 
-CNN4 = M.CNN4_OCR()
-RES = M.RESNET_OCR()
-INCE = M.INCEPTIONNET_OCR()
+CNN4 = M.CNN4_OCR('train')
+CNN4.build_graph()
+
+RES = M.RESNET_OCR('train')
+RES.build_graph()
+
+INCE = M.INCEPTIONNET_OCR('train')
+INCE.build_graph()
+
 data_train = M.DataIterator()
 
 if __name__ == '__main__':
     for i in range(100):
-        data_batch = 0
         batch_inputs, _, batch_labels, _ = data_train.input_index_generate_batch()
 
         feed_CNN4 = {CNN4.inputs: batch_inputs, CNN4.labels: batch_labels}
