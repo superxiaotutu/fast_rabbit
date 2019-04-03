@@ -1,14 +1,9 @@
-import sys
 import os
-from PIL import Image
 from config import *
 import tensorflow as tf
-import tensorflow.contrib.image
-import tensorflow.contrib.slim as slim
-import time
 
 # from image_process import gene_code
-from gen_type_codes import gene_code_clean
+from ensemble.gen_type_codes import gene_code_clean
 
 image_channel = 3
 out_channels = 64

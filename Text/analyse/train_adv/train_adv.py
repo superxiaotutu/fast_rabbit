@@ -1,13 +1,9 @@
-import sys
 import os
-
-from PIL import Image
 
 from config import *
 
-from gen_type_codes import gene_code_clean
+from ensemble.gen_type_codes import gene_code_clean
 import tensorflow as tf
-import tensorflow.contrib.image
 import tensorflow.contrib.slim as slim
 import time
 
