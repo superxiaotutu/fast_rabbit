@@ -10,8 +10,6 @@ plt.plot(x,y)
 plt.show()
 
 
-
-
 def plot():
     with open('res.txt','r')as f :
         ls=f.readlines()

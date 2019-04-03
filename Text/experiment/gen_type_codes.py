@@ -48,9 +48,9 @@ def gene_code_clean(chars):
 def gene_code_clean_one(chars):
     font = ImageFont.truetype(DEFAULT_FONTS[0], size=random.choice([42, 50, 56]))
     font_width, font_height = font.getsize(chars)
-    im = Image.new('RGB', (image_width, image_height), color=(255, 255, 255))
+    im = Image.new('RGB', (image_width//4, image_height), color=(255, 255, 255))
     draw = ImageDraw.Draw(im)
-    per_width = (image_width - font_width)
+    per_width = (image_width//4 - font_width)
     per_height = (image_height - font_height)
     draw.text((per_width - 10, per_height - 10), chars,
               font=font, fill=(100, 149, 237))
