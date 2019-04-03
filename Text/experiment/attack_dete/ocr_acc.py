@@ -17,10 +17,6 @@ model = LSTM.LSTMOCR('lenet', "infer")
 model.build_graph()
 config = tf.ConfigProto()
 config.gpu_options.allow_growth = True
-RELEASE = False
-adv_step = 0.9
-adv_count = 100
-
 
 def attack(sess, imgs_input):
     # adv_node

@@ -24,11 +24,11 @@ initial_learning_rate = 0.001
 decay_steps = 4000
 decay_rate = 0.96
 output_keep_prob = 0.8
-batch_size = 100
+batch_size = 1
 
 RELEASE = True
 adv_step = 0.01
-adv_count = 20
+adv_count = 100
 c = 30
 radius = 0.8
 file_count = 500
