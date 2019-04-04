@@ -37,6 +37,21 @@ def gene_code_clean(chars):
     im = im.filter(ImageFilter.SMOOTH)
     return im
 
+0,5,10,15,20,25,30,35,40
+def gene_code_clean_one(chars):
+    image_width1=48
+    image_height1=64
+    font = ImageFont.truetype(DEFAULT_FONTS[0], size=56)
+    font_width, font_height = font.getsize(chars)
+    im = Image.new('RGB', (image_width1, image_height1), color=(255, 255, 255))
+    draw = ImageDraw.Draw(im)
+    per_width = (image_width1 - font_width)
+    per_height = (image_height1 - font_height)
+    draw.text((per_width - 10, per_height - 10), chars,
+              font=font, fill=(100, 149, 237))
+    im = im.filter(ImageFilter.SMOOTH)
+    return im
+
 
 # 0.3-0.7 alpha个像素点保留原值
 def addsalt_pepper(img, alpha=0.7):
@@ -53,15 +68,15 @@ def addsalt_pepper(img, alpha=0.7):
 
 def gen_gauss_code(captcha):
     img = gene_code_clean(captcha)
-    img = np.asarray(img).astype(np.float32) / 255.
-    img.flags.writeable = True
+    # img = np.asarray(img).astype(np.float32) / 255.
+    # img.flags.writeable = True
     level = random.choice(NOISE_NUM)
     for j in range(level):
         img = random_noise(img)
-    np.clip(img, 0, 1)
+    # np.clip(img, 0, 1)
     # img = Image.fromarray(img.astype('uint8')).convert('RGB')
     return img
 
 
-im = gene_code_clean_font('R4GQ')
+im = gene_code_clean_one('A')
 im.save('a.png')

@@ -29,14 +29,17 @@ def add_gauss(captcha, level):
     img.flags.writeable = True
     for j in range(level):
         img = random_noise(img)
-    # np.clip(img, 0, 1)
+    np.clip(img, 0, 1)
     # img = Image.fromarray(img.astype('uint8')).convert('RGB')
     return img
 
 
+plt.axis('off')
+filname = "A.png"
+plt.imsave(filname, add_gauss('A',1))
 # arr=[]
 # for i in LABEL_CHOICES:
 #     arr.append(i)
 # print(arr)
 # print(LABEL_CHOICES.split(''))
-gen_oppose()
+# gen_oppose()
