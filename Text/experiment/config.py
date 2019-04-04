@@ -45,7 +45,10 @@ SPACE_INDEX = 0
 SPACE_TOKEN = ''
 encode_maps[SPACE_TOKEN] = SPACE_INDEX
 decode_maps[SPACE_INDEX] = SPACE_TOKEN
-
+SPACE_INDEX = 37
+SPACE_TOKEN = ''
+encode_maps[SPACE_TOKEN] = SPACE_INDEX
+decode_maps[SPACE_INDEX] = SPACE_TOKEN
 
 # encode_maps[''] = 37
 # decode_maps[37] = ''

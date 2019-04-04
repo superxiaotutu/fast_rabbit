@@ -195,7 +195,7 @@ def gen_type_3(chars):
     background = random_color(238, 255)
     color = random_color(10, 200, random.randint(220, 255))
     im = image.create_captcha_image(chars, color, background)
-    dot, line = 180, 50
+    dot, line = 60, 20
     image.create_noise_dots(im, color, number=dot)
     for i in range(line):
         image.create_noise_curve(im, color)

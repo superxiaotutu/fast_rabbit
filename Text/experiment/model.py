@@ -5,6 +5,7 @@ from PIL import Image, ImageFont, ImageDraw, ImageFilter
 from captcha.image import ImageCaptcha
 from gen_type_codes import *
 
+
 def sparse_tuple_from_label(sequences, dtype=np.int32):
     """Create a sparse representention of x.
     Args:
@@ -47,6 +48,7 @@ class DataIterator:
             # plt.imshow(i)
             # plt.show()
             break
+
     def modify_data(self):
         target = random.randint(0, batch_size - 1)
         slice = random.sample(LABEL_CHOICES_LIST, 4)
@@ -97,11 +99,10 @@ class LSTMOCR(object):
             self.pre_inputs = self.head_B(self.inputs)
         if process_type == 'gauss':
             print('gauss')
-
             self.pre_inputs = self.head_Guss(self.inputs)
         if process_type == 'all':
             print('all')
-            self.inputs1 = self.head_Guss(self.inputs,kerStd=0.8)
+            self.inputs1 = self.head_Guss(self.inputs, kerStd=0.8)
             self.pre_inputs = self.head_B(self.inputs1)
 
         # SparseTensor required by ctc_loss op

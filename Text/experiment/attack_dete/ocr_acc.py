@@ -18,8 +18,7 @@ model.build_graph()
 config = tf.ConfigProto()
 config.gpu_options.allow_growth = True
 RELEASE = False
-adv_step = 0.9
-adv_count = 100
+
 
 
 def attack(sess, imgs_input):
@@ -98,7 +97,7 @@ def test_model(Checkpoint_PATH):
 
         acc = 0
         with open(filename, 'w')as f:
-            for index in range(1000 // batch_size):
+            for index in range(file_count // batch_size):
                 imgs_input = []
                 imgs_label = []
                 type_arr = []
