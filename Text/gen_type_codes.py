@@ -177,6 +177,3 @@ def gen_type_3(chars):
         image.create_noise_curve(im, color)
     im = im.filter(ImageFilter.SMOOTH)
     return im
-a=gene_code_all('ASDF')
-plt.imshow(a)
-plt.show()

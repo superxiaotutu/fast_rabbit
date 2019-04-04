@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import random
 from skimage.transform import resize
 
-num_epochs = 2500
+num_epochs = 500
 batch_size = 32
 num_batches_per_epoch = 100
 save_steps = 5000
@@ -250,8 +250,11 @@ def creat_adv(Checkpoint_PATH, img_PATH):
 
     test = (sess.run([predict, current_status, current_mengban], feed_dict=feed))
 
+    plt.imsave("/home/kirin/Python_Code/Ensambel/fast_rabbit/example_img/cleam_example_1.png", imgs_input[0])
+    plt.imsave("/home/kirin/Python_Code/Ensambel/fast_rabbit/example_img/adv_example_1.png", imgs_input_after[0])
     plt.imshow(imgs_input_after[0])
     plt.show()
+
     return
 
 
@@ -328,7 +331,9 @@ def GRADCAM_infer(Checkpoint_PATH, img_PATH):
 
 def main():
     train(True, "train/model")
-    # GRADCAM_infer("train/model", "/home/kirin/Python_Code/Ensambel/fast_rabbit/example_img/example_1.png")
+    # infer("train/model", batch_inputs[0])
+    # creat_adv("train/model", "/home/kirin/Python_Code/Ensambel/fast_rabbit/example_img/example_1.png")
+    # GRADCAM_infer("train/model", "/home/kirin/Python_Code/Ensambel/fast_rabbit/example_img/adv_example_1.png")
 
 
 if __name__ == '__main__':

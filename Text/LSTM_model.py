@@ -21,7 +21,7 @@ decay_steps = 4000
 decay_rate = 0.96
 output_keep_prob = 0.8
 
-batch_size = 32
+batch_size = 1
 LABEL_CHOICES = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 LABEL_CHOICES_LIST = [str(i) for i in LABEL_CHOICES]
 encode_maps = {}
@@ -38,25 +38,10 @@ decode_maps[SPACE_INDEX] = SPACE_TOKEN
 from PIL import Image, ImageFont, ImageDraw, ImageFilter
 from captcha.image import ImageCaptcha
 
-# image = ImageCaptcha(width=image_width, height=image_height)
-#
-#
-# def gene_code(chars):
-#     def random_color(start, end, opacity=None):
-#         red = random.randint(start, end)
-#         green = random.randint(start, end)
-#         blue = random.randint(start, end)
-#         if opacity is None:
-#             return (red, green, blue)
-#         return (red, green, blue, opacity)
-#
-#     background = random_color(238, 255)
-#     color = random_color(10, 200, random.randint(220, 255))
-#     im = image.create_captcha_image(chars, color, background)
-#     image.create_noise_dots(im, color, number=30)
-#     image.create_noise_curve(im, color)
-#     im = im.filter(ImageFilter.SMOOTH)
-#     return im
+image = ImageCaptcha(width=image_width, height=image_height)
+
+
+
 
 
 def sparse_tuple_from_label(sequences, dtype=np.int32):
@@ -93,7 +78,7 @@ class DataIterator:
             slice = random.sample(LABEL_CHOICES_LIST, 4)
             captcha = ''.join(slice)
             img = gene_code(captcha)
-            img = np.asarray(img).astype(np.float32) / 255.
+            img = np.asarray(img).astype(np.float32)
             code = [SPACE_INDEX if captcha == SPACE_TOKEN else encode_maps[c] for c in list(captcha)]
             self.labels.append(code)
             self.image.append(img)

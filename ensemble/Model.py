@@ -1,7 +1,29 @@
 import tensorflow as tf
 import tensorflow.contrib.slim as slim
 from config import *
-from ensemble.gen_type_codes import *
+
+from PIL import Image, ImageFont, ImageDraw, ImageFilter
+from captcha.image import ImageCaptcha
+
+image = ImageCaptcha(width=image_width, height=image_height)
+
+
+def gene_code(chars):
+    def random_color(start, end, opacity=None):
+        red = random.randint(start, end)
+        green = random.randint(start, end)
+        blue = random.randint(start, end)
+        if opacity is None:
+            return (red, green, blue)
+        return (red, green, blue, opacity)
+
+    background = random_color(238, 255)
+    color = random_color(10, 200, random.randint(220, 255))
+    im = image.create_captcha_image(chars, color, background)
+    image.create_noise_dots(im, color, number=30)
+    image.create_noise_curve(im, color)
+    im = im.filter(ImageFilter.SMOOTH)
+    return im
 
 
 class DataIterator:
@@ -16,30 +38,26 @@ class DataIterator:
         for num in range(batch_size):
             slice = random.sample(LABEL_CHOICES_LIST, 4)
             captcha = ''.join(slice)
-            img = gene_code_all(captcha)
-            # img = np.asarray(img).astype(np.float32) / 255.
+            img = gene_code(captcha)
+            img = np.asarray(img).astype(np.float32) / 255.
             code = [SPACE_INDEX if captcha == SPACE_TOKEN else encode_maps[c] for c in list(captcha)]
             self.labels.append(code)
             self.image.append(img)
-        for i in self.image:
-            # plt.imshow(i)
-            # plt.show()
-            break
 
     def modify_data(self):
         target = random.randint(0, batch_size - 1)
         slice = random.sample(LABEL_CHOICES_LIST, 4)
         captcha = ''.join(slice)
-        img = gene_code_all(captcha)
-        # img = np.asarray(img).astype(np.float32) / 255.
+        img = gene_code(captcha)
+        img = np.asarray(img).astype(np.float32) / 255.
         code = [SPACE_INDEX if captcha == SPACE_TOKEN else encode_maps[c] for c in list(captcha)]
         self.image[target], self.labels[target] = img, code
 
     def get_test_img(self, num_line, num_point):
         slice = random.sample(LABEL_CHOICES_LIST, 4)
         captcha = ''.join(slice)
-        img = gene_code_all(captcha)
-        # img = np.asarray(img).astype(np.float32) / 255.
+        img = gene_code(captcha)
+        img = np.asarray(img).astype(np.float32) / 255.
         code = [SPACE_INDEX if captcha == SPACE_TOKEN else encode_maps[c] for c in list(captcha)]
         return img, captcha
 
