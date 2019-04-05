@@ -395,5 +395,5 @@ if __name__ == '__main__':
     #            'lenet', process_type='bin', sample_type='gauss')
     # test_model('/home/kirin/Python_Code/fast_rabbit/train_model/train_lenet_fine/model',
     #            'lenet', process_type='bin', sample_type='bin')
-
+    pass
     # test_model('../train_cnn/model', 'cnn', head=False)

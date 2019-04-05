@@ -28,8 +28,8 @@ batch_size = 1
 
 RELEASE = True
 adv_step = 0.01
-adv_count = 100
-c = 30
+adv_count = 30
+c = 20
 radius = 0.8
 file_count = 500
 
