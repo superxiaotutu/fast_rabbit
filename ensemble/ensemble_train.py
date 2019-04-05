@@ -90,6 +90,7 @@ def test():
 
 
 def S2T(source_model, target_model, num):
+    log_file=open('%s_%s_%s.log'%(source_model,target_model,num),'w')
     saver.restore(sess, "/home/kirin/Python_Code/Ensambel/fast_rabbit/ensemble/4ens_model/4ens.ckpt")
 
     target = tf.placeholder(tf.float32, [12, batch_size, 38])
@@ -277,6 +278,7 @@ def S2T(source_model, target_model, num):
                 count[str(T)] += infer(T, adv_img, ori_label, sess)
         for T in target_model:
             print("\nSource:{}, Target:{}, Num_Success:{}/{}".format(str(source_model), str(T), count[str(T)], num))
+        log_file.write("\nSource:{}, Target:{}, Num_Success:{}/{}".format(str(source_model), str(T), count[str(T)], num))
     else:
         count = {}
         for T in target_model:
@@ -288,10 +290,11 @@ def S2T(source_model, target_model, num):
                 count[str(T)] += infer(T, adv_img, ori_label, sess)
         for T in target_model:
             print("\nSource:ENS3, Target:{}, Num_Success:{}/{}".format(str(T), count[str(T)], num))
+        log_file.write("\nSource:{}, Target:{}, Num_Success:{}/{}".format(str(source_model), str(T), count[str(T)], num))
 
 if __name__ == '__main__':
-    # train()
-    # test()
-    # source: CNN4, RES, INCE, ENS3, (DENSE)
-    # target: CNN4, RES, INCE, DENSE
-    S2T(CNN4, [CNN4, RES, INCE, DENSE], 2)
+#     # train()
+#     # test()
+#     # source: CNN4, RES, INCE, ENS3, (DENSE)
+#     # target: CNN4, RES, INCE, DENSE
+    S2T(CNN4, [CNN4, RES, INCE, DENSE], 50)
