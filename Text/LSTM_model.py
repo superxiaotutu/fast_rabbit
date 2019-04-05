@@ -21,7 +21,7 @@ decay_steps = 4000
 decay_rate = 0.96
 output_keep_prob = 0.8
 
-batch_size = 1
+batch_size = 32
 LABEL_CHOICES = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 LABEL_CHOICES_LIST = [str(i) for i in LABEL_CHOICES]
 encode_maps = {}
@@ -219,6 +219,8 @@ class LSTMOCR(object):
             # Time major
             self.logits = tf.transpose(self.logits, (1, 0, 2))
             print(self.logits)
+
+
 
     def _build_model_with_resnet(self):
         filters = [3, 64, 128, 128, out_channels]

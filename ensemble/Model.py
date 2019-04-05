@@ -1,29 +1,7 @@
 import tensorflow as tf
 import tensorflow.contrib.slim as slim
 from config import *
-
-from PIL import Image, ImageFont, ImageDraw, ImageFilter
-from captcha.image import ImageCaptcha
-
-image = ImageCaptcha(width=image_width, height=image_height)
-
-
-def gene_code(chars):
-    def random_color(start, end, opacity=None):
-        red = random.randint(start, end)
-        green = random.randint(start, end)
-        blue = random.randint(start, end)
-        if opacity is None:
-            return (red, green, blue)
-        return (red, green, blue, opacity)
-
-    background = random_color(238, 255)
-    color = random_color(10, 200, random.randint(220, 255))
-    im = image.create_captcha_image(chars, color, background)
-    image.create_noise_dots(im, color, number=30)
-    image.create_noise_curve(im, color)
-    im = im.filter(ImageFilter.SMOOTH)
-    return im
+from gen_type_codes import *
 
 
 class DataIterator:
@@ -32,14 +10,21 @@ class DataIterator:
         self.labels = []
         self.refresh_data()
 
+    def get_example(self):
+        slice = random.sample(LABEL_CHOICES_LIST, 4)
+        captcha = ''.join(slice)
+        img = gene_code_all(captcha)
+        code = [SPACE_INDEX if captcha == SPACE_TOKEN else encode_maps[c] for c in list(captcha)]
+        return img, code
+
     def refresh_data(self):
         self.image = []
         self.labels = []
         for num in range(batch_size):
             slice = random.sample(LABEL_CHOICES_LIST, 4)
             captcha = ''.join(slice)
-            img = gene_code(captcha)
-            img = np.asarray(img).astype(np.float32) / 255.
+            img = gene_code_all(captcha)
+            # img = np.asarray(img).astype(np.float32) / 255.
             code = [SPACE_INDEX if captcha == SPACE_TOKEN else encode_maps[c] for c in list(captcha)]
             self.labels.append(code)
             self.image.append(img)
@@ -48,16 +33,16 @@ class DataIterator:
         target = random.randint(0, batch_size - 1)
         slice = random.sample(LABEL_CHOICES_LIST, 4)
         captcha = ''.join(slice)
-        img = gene_code(captcha)
-        img = np.asarray(img).astype(np.float32) / 255.
+        img = gene_code_all(captcha)
+        # img = np.asarray(img).astype(np.float32) / 255.
         code = [SPACE_INDEX if captcha == SPACE_TOKEN else encode_maps[c] for c in list(captcha)]
         self.image[target], self.labels[target] = img, code
 
     def get_test_img(self, num_line, num_point):
         slice = random.sample(LABEL_CHOICES_LIST, 4)
         captcha = ''.join(slice)
-        img = gene_code(captcha)
-        img = np.asarray(img).astype(np.float32) / 255.
+        img = gene_code_all(captcha)
+        # img = np.asarray(img).astype(np.float32) / 255.
         code = [SPACE_INDEX if captcha == SPACE_TOKEN else encode_maps[c] for c in list(captcha)]
         return img, captcha
 
@@ -168,6 +153,32 @@ class Model_base():
             padded_input = input_layer
 
         output = conv2 + padded_input
+        return output
+
+    def _dense_block(self, input_layer, output_channel, name=None):
+        input_channel = input_layer.get_shape().as_list()[-1]
+
+        inconv1 = input_layer
+        x = self._conv2d(inconv1, 'cnn1' + name, 3, input_channel, output_channel, 1)
+        x = self._batch_norm('bn1' + name, x)
+        conv1 = self._leaky_relu(x, leakiness)
+
+        inconv2 = tf.concat(axis=3, values=[inconv1, conv1])
+        x = self._conv2d(inconv2, 'cnn2' + name, 3, output_channel + input_channel, output_channel, 1)
+        x = self._batch_norm('bn2' + name, x)
+        conv2 = self._leaky_relu(x, leakiness)
+
+        inconv3 = tf.concat(axis=3, values=[inconv2, conv2])
+        x = self._conv2d(inconv3, 'cnn3' + name, 3, output_channel * 2 + input_channel, output_channel, 1)
+        x = self._batch_norm('bn3' + name, x)
+        conv3 = self._leaky_relu(x, leakiness)
+
+        inconv4 = tf.concat(axis=3, values=[inconv3, conv3])
+        x = self._conv2d(inconv4, 'cnn4' + name, 3, output_channel * 3 + input_channel, output_channel, 1)
+        x = self._batch_norm('bn4' + name, x)
+        conv4 = self._leaky_relu(x, leakiness)
+
+        output = tf.concat(axis=3, values=[inconv4, conv4])
         return output
 
     def _inception_block(self, input, input_channel, name=None):
@@ -501,7 +512,6 @@ class INCEPTIONNET_OCR(Model_base):
             self._build_train_op()
             self.merged_summay = tf.summary.merge_all()
 
-
     def _build_model_with_inception(self):
         count_ = 0
         min_size = min(image_height, image_width)
@@ -619,3 +629,144 @@ class INCEPTIONNET_OCR(Model_base):
         self.decoded, self.log_prob = tf.nn.ctc_beam_search_decoder(self.logits, self.seq_len, merge_repeated=False)
         # self.decoded, self.log_prob = tf.nn.ctc_greedy_decoder(logits, seq_len, merge_repeated=False)
         self.dense_decoded = tf.sparse_tensor_to_dense(self.decoded[0], default_value=-1)
+
+
+class Dense_OCR(Model_base):
+    def __init__(self, mode):
+        self.mode = mode
+        self.inputs = tf.placeholder(tf.float32, [None, image_height, image_width, image_channel])
+        self.labels = tf.sparse_placeholder(tf.int32)
+        self._extra_train_ops = []
+
+        self.build_graph()
+
+    def build_graph(self):
+        with tf.variable_scope("Dense"):
+            self._build_model_with_dense()
+            self._build_train_op()
+            self.merged_summay = tf.summary.merge_all()
+
+    def _build_model_with_dense(self):
+        filters = [3, 64, 128, 128, out_channels]
+        strides = [1, 2]
+
+        feature_h = image_height
+        feature_w = image_width
+
+        count_ = 0
+        min_size = min(image_height, image_width)
+        while min_size > 1:
+            min_size = (min_size + 1) // 2
+            count_ += 1
+
+        # CNN part
+        with tf.variable_scope('mini-densenet'):
+            x = self.inputs
+
+            conv1 = self._dense_block(x, 4, 'block1')
+            conv1_cnn = self._conv2d(conv1, 'after_block1', 3, 19, 16, 1)
+            pool1 = self._max_pool(conv1_cnn, 2, 2)
+            x = pool1
+
+            conv2 = self._dense_block(x, 16, 'block2')
+            conv2_cnn = self._conv2d(conv2, 'after_block2', 3, 80, 64, 1)
+            pool2 = self._max_pool(conv2_cnn, 2, 2)
+            x = pool2
+
+            conv3 = self._dense_block(x, 64, 'block3')
+            conv3_cnn = self._conv2d(conv3, 'after_block3', 3, 320, 128, 1)
+            pool3 = self._max_pool(conv3_cnn, 2, 2)
+            x = pool3
+
+            conv4 = self._dense_block(x, 128, 'block4')
+            conv4_cnn = self._conv2d(conv4, 'after_block4', 3, 640, 64, 1)
+            pool4 = self._max_pool(conv4_cnn, 2, 2)
+            x = pool4
+
+            _, feature_h, feature_w, _ = x.get_shape().as_list()
+            print('\nfeature_h: {}, feature_w: {}'.format(feature_h, feature_w))
+        # LSTM part 4, 12
+        with tf.variable_scope('lstm'):
+            x = tf.transpose(x, [0, 2, 1, 3])  # [batch_size, feature_w, feature_h, FLAGS.out_channels]
+            # treat `feature_w` as max_timestep in lstm.
+            x = tf.reshape(x, [batch_size, feature_w, feature_h * out_channels])
+            print('lstm input shape: {}'.format(x.get_shape().as_list()))
+            self.seq_len = tf.fill([x.get_shape().as_list()[0]], feature_w)
+            # print('self.seq_len.shape: {}'.format(self.seq_len.shape.as_list()))
+
+            # tf.nn.rnn_cell.RNNCell, tf.nn.rnn_cell.GRUCell
+            cell = tf.nn.rnn_cell.LSTMCell(num_hidden, state_is_tuple=True)
+            if self.mode == 'train':
+                cell = tf.nn.rnn_cell.DropoutWrapper(cell=cell, output_keep_prob=output_keep_prob)
+
+            cell1 = tf.nn.rnn_cell.LSTMCell(num_hidden, state_is_tuple=True)
+            if self.mode == 'train':
+                cell1 = tf.nn.rnn_cell.DropoutWrapper(cell=cell1, output_keep_prob=output_keep_prob)
+
+            # Stacking rnn cells
+            stack = tf.nn.rnn_cell.MultiRNNCell([cell, cell1], state_is_tuple=True)
+            initial_state = stack.zero_state(batch_size, dtype=tf.float32)
+
+            # The second output is the last state and we will not use that
+            outputs, _ = tf.nn.dynamic_rnn(
+                cell=stack,
+                inputs=x,
+                sequence_length=self.seq_len,
+                initial_state=initial_state,
+                dtype=tf.float32,
+                time_major=False
+            )  # [batch_size, max_stepsize, FLAGS.num_hidden]
+
+            # Reshaping to apply the same weights over the timesteps
+            print(outputs.shape)
+
+            outputs = tf.reshape(outputs, [-1, num_hidden])  # [batch_size * max_stepsize, FLAGS.num_hidden]
+
+            W = tf.get_variable(name='W_out',
+                                shape=[num_hidden, num_classes],
+                                dtype=tf.float32,
+                                initializer=tf.glorot_uniform_initializer())  # tf.glorot_normal_initializer
+            b = tf.get_variable(name='b_out',
+                                shape=[num_classes],
+                                dtype=tf.float32,
+                                initializer=tf.constant_initializer())
+
+            self.logits = tf.matmul(outputs, W) + b
+            print(self.logits)
+
+            # Reshaping back to the original shape
+            shape = tf.shape(x)
+            self.logits = tf.reshape(self.logits, [shape[0], -1, num_classes])
+            print(self.logits)
+
+            # Time major
+            self.logits = tf.transpose(self.logits, (1, 0, 2))
+            print(self.logits)
+
+    def _build_train_op(self):
+        self.global_step = tf.train.get_or_create_global_step()
+
+        self.loss = tf.nn.ctc_loss(labels=self.labels,
+                                   inputs=self.logits,
+                                   sequence_length=self.seq_len)
+        self.cost = tf.reduce_mean(self.loss)
+        tf.summary.scalar('cost', self.cost)
+
+        self.lrn_rate = tf.train.exponential_decay(initial_learning_rate,
+                                                   self.global_step,
+                                                   decay_steps,
+                                                   decay_rate,
+                                                   staircase=True)
+        tf.summary.scalar('learning_rate', self.lrn_rate)
+
+        self.optimizer = tf.train.AdamOptimizer(learning_rate=self.lrn_rate).minimize(self.loss,
+                                                                                      global_step=self.global_step)
+        train_ops = [self.optimizer] + self._extra_train_ops
+        self.train_op = tf.group(*train_ops)
+
+        # Option 2: tf.nn.ctc_beam_search_decoder
+        # (it's slower but you'll get better results)
+        self.decoded, self.log_prob = tf.nn.ctc_beam_search_decoder(self.logits, self.seq_len, merge_repeated=False)
+        # self.decoded, self.log_prob = tf.nn.ctc_greedy_decoder(logits, seq_len, merge_repeated=False)
+        self.dense_decoded = tf.sparse_tensor_to_dense(self.decoded[0], default_value=-1)
+

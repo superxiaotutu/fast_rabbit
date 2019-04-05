@@ -24,7 +24,7 @@ val_feeder = LSTM.DataIterator()
 
 
 def train(restore=False, checkpoint_dir="train/model"):
-    os.environ["CUDA_VISIBLE_DEVICES"] = '1'
+    os.environ["CUDA_VISIBLE_DEVICES"] = '0'
     model = LSTM.LSTMOCR('train')
     model.build_graph()
 
@@ -115,8 +115,8 @@ def train(restore=False, checkpoint_dir="train/model"):
 
 
 def infer(Checkpoint_PATH, img_PATH):
-    os.environ["CUDA_VISIBLE_DEVICES"] = '1'
-    model = LSTM.LSTMOCR("infer")
+    os.environ["CUDA_VISIBLE_DEVICES"] = '0'
+    model = LSTM.LSTMOCR("train")
     model.build_graph()
     config = tf.ConfigProto()
     config.gpu_options.allow_growth = True
@@ -134,7 +134,10 @@ def infer(Checkpoint_PATH, img_PATH):
     else:
         print('cannot restore')
 
+    batch_inputs, _, batch_labels, _ = train_feeder.input_index_generate_batch()
+
     im = cv2.imread(img_PATH).astype(np.float32) / 255.
+
     imgs_input = []
     imgs_input.append(im)
 
@@ -167,7 +170,7 @@ def creat_adv(Checkpoint_PATH, img_PATH):
     shuff_dir.update({37: creat_onehot(37)})
 
     os.environ["CUDA_VISIBLE_DEVICES"] = '0'
-    model = LSTM.LSTMOCR("infer")
+    model = LSTM.LSTMOCR("train")
     model.build_graph()
     config = tf.ConfigProto()
     config.gpu_options.allow_growth = True
@@ -193,6 +196,12 @@ def creat_adv(Checkpoint_PATH, img_PATH):
     sess.run(tf.global_variables_initializer())
 
     ckpt = tf.train.latest_checkpoint(Checkpoint_PATH)
+    if ckpt:
+        saver.restore(sess, ckpt)
+        print('restore from ckpt{}'.format(ckpt))
+    else:
+        print('cannot restore')
+        return
 
     im = cv2.imread(img_PATH).astype(np.float32) / 255.
     im = cv2.resize(im, (192, 64))
@@ -229,7 +238,7 @@ def creat_adv(Checkpoint_PATH, img_PATH):
 
     adv_step = 0.01
     feed = {model.inputs: imgs_input, target: target_creat, origin_inputs: imgs_input_before}
-    for i in range(50):
+    for i in range(80):
         loss_now, grad = sess.run([ADV_LOSS, grad_y2x], feed)
         if (i + 1) % 10 == 0:
             print("LOSS:{}".format(loss_now))
@@ -250,11 +259,10 @@ def creat_adv(Checkpoint_PATH, img_PATH):
 
     test = (sess.run([predict, current_status, current_mengban], feed_dict=feed))
 
-    plt.imsave("/home/kirin/Python_Code/Ensambel/fast_rabbit/example_img/cleam_example_1.png", imgs_input[0])
+    plt.imsave("/home/kirin/Python_Code/Ensambel/fast_rabbit/example_img/clean_example_1.png", imgs_input_before[0])
     plt.imsave("/home/kirin/Python_Code/Ensambel/fast_rabbit/example_img/adv_example_1.png", imgs_input_after[0])
     plt.imshow(imgs_input_after[0])
     plt.show()
-
     return
 
 
@@ -274,12 +282,15 @@ def grad_cam(pool, init, Y):
     pre_cam = tf.multiply(weights, conv_layer)
     cam = tf.reduce_sum(pre_cam, 3)
     cam = tf.nn.relu(cam)
+    # effect
+    cam = tf.sqrt(cam)
+    # cam = tf.sqrt(cam)
     return cam
 
 
 def GRADCAM_infer(Checkpoint_PATH, img_PATH):
     os.environ["CUDA_VISIBLE_DEVICES"] = '0'
-    model = LSTM.LSTMOCR("infer")
+    model = LSTM.LSTMOCR("train")
     model.build_graph()
     config = tf.ConfigProto()
     config.gpu_options.allow_growth = True
@@ -309,7 +320,7 @@ def GRADCAM_infer(Checkpoint_PATH, img_PATH):
     tar[:, :, 0] = 0
     tar[:, :, 37] = 0
     tar_tensor = tf.convert_to_tensor(tar, dtype=tf.float32)
-    onehot_out = tf.multiply(tar_tensor, onehot_out)
+    onehot_out = tar_tensor * onehot_out
 
     gradcam = grad_cam(model.attention_pool, model.logits, onehot_out)
 
@@ -330,10 +341,10 @@ def GRADCAM_infer(Checkpoint_PATH, img_PATH):
 
 
 def main():
-    train(True, "train/model")
-    # infer("train/model", batch_inputs[0])
+    # train(True, "train/model")
+    # infer("train/model", "/home/kirin/Python_Code/Ensambel/fast_rabbit/example_img/example_1.png")
     # creat_adv("train/model", "/home/kirin/Python_Code/Ensambel/fast_rabbit/example_img/example_1.png")
-    # GRADCAM_infer("train/model", "/home/kirin/Python_Code/Ensambel/fast_rabbit/example_img/adv_example_1.png")
+    GRADCAM_infer("train/model", "/home/kirin/Python_Code/Ensambel/fast_rabbit/example_img/adv_example_1.png")
 
 
 if __name__ == '__main__':
