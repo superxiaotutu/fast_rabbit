@@ -31,18 +31,28 @@
           </provider>
         </entry>
       </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Text/train.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-2250">
+              <caret line="145" selection-start-line="145" selection-end-line="145" />
+              <folding>
+                <element signature="e#0#23#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/ensemble/ensemble_train.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="403">
-              <caret line="289" lean-forward="true" selection-start-line="289" selection-end-line="289" />
+            <state relative-caret-position="404">
+              <caret line="296" column="12" selection-start-line="296" selection-start-column="12" selection-end-line="296" selection-end-column="12" />
               <folding>
                 <element signature="e#0#17#0" expanded="true" />
                 <element signature="e#747#1990#0" />
                 <element signature="e#1782#3112#0" />
                 <element signature="e#4014#4091#0" />
-                <element signature="e#3262#5509#0" />
-                <element signature="e#7724#7728#0" />
               </folding>
             </state>
           </provider>
@@ -105,6 +115,11 @@
             <path>
               <item name="fast_rabbit" type="b2602c69:ProjectViewProjectNode" />
               <item name="fast_rabbit" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="fast_rabbit" type="b2602c69:ProjectViewProjectNode" />
+              <item name="fast_rabbit" type="462c0819:PsiDirectoryNode" />
+              <item name="Text" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -298,7 +313,7 @@
       <workItem from="1554254129797" duration="4829000" />
       <workItem from="1554281685362" duration="11521000" />
       <workItem from="1554293928505" duration="21214000" />
-      <workItem from="1554383245092" duration="12835000" />
+      <workItem from="1554383245092" duration="14555000" />
     </task>
     <task id="LOCAL-00001" summary="ensemble">
       <created>1554268460818</created>
@@ -318,18 +333,18 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="50399000" />
+    <option name="totallyTimeSpent" value="52119000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1920" height="1080" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.23105656" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.13553895" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.37433723" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.34676564" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.41993636" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -338,14 +353,14 @@
       <window_info anchor="bottom" id="Version Control" order="8" weight="0.3299363" />
       <window_info anchor="bottom" id="Database Changes" order="9" />
       <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="11" visible="true" weight="0.32873806" />
+      <window_info anchor="bottom" id="Terminal" order="11" weight="0.32873806" />
       <window_info anchor="bottom" id="Python Console" order="12" weight="0.32979852" />
-      <window_info anchor="right" x="0" y="0" width="430" height="880" id="Documentation" sideWeight="0.30805686" side_tool="true" visible="true" weight="0.25506938" />
+      <window_info anchor="right" x="0" y="0" width="430" height="880" id="Documentation" sideWeight="0.30844155" side_tool="true" visible="true" weight="0.16542156" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="right" id="Remote Host" order="3" />
-      <window_info anchor="right" id="SciView" order="4" sideWeight="0.6919431" visible="true" weight="0.25506938" />
+      <window_info anchor="right" id="SciView" order="4" sideWeight="0.6915584" visible="true" weight="0.16542156" />
       <window_info anchor="right" id="Database" order="5" />
     </layout>
   </component>
@@ -373,8 +388,8 @@
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/fast_rabbit$train__1_.coverage" NAME="train (1) Coverage Results" MODIFIED="1554386311827" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Text" />
-    <SUITE FILE_PATH="coverage/fast_rabbit$train.coverage" NAME="train Coverage Results" MODIFIED="1554429223332" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ensemble" />
+    <SUITE FILE_PATH="coverage/fast_rabbit$train__1_.coverage" NAME="train (1) Coverage Results" MODIFIED="1554432185520" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Text" />
+    <SUITE FILE_PATH="coverage/fast_rabbit$train.coverage" NAME="train Coverage Results" MODIFIED="1554433761693" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ensemble" />
   </component>
   <component name="debuggerHistoryManager">
     <expressions id="evaluateExpression">
@@ -561,16 +576,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Text/train.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1524">
-          <caret line="156" selection-start-line="156" selection-end-line="156" />
-          <folding>
-            <element signature="e#0#23#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/ensemble/UT.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="66">
@@ -591,17 +596,25 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/Text/train.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-2250">
+          <caret line="145" selection-start-line="145" selection-end-line="145" />
+          <folding>
+            <element signature="e#0#23#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/ensemble/ensemble_train.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="403">
-          <caret line="289" lean-forward="true" selection-start-line="289" selection-end-line="289" />
+        <state relative-caret-position="404">
+          <caret line="296" column="12" selection-start-line="296" selection-start-column="12" selection-end-line="296" selection-end-column="12" />
           <folding>
             <element signature="e#0#17#0" expanded="true" />
             <element signature="e#747#1990#0" />
             <element signature="e#1782#3112#0" />
             <element signature="e#4014#4091#0" />
-            <element signature="e#3262#5509#0" />
-            <element signature="e#7724#7728#0" />
           </folding>
         </state>
       </provider>
