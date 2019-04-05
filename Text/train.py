@@ -32,7 +32,8 @@ our_ori_flienames = glob.glob('images/ori_adv/*.png')
 common_ori_flienames = glob.glob('images/common_adv/*.png')
 adv_step = 0.01
 adv_count = 30
-gauss_level=2
+gauss_level = 2
+
 
 def train(restore=False, checkpoint_dir="train/model"):
     os.environ["CUDA_VISIBLE_DEVICES"] = '0'
@@ -379,7 +380,7 @@ def gen_clean():
         shutil.rmtree(dirname)
     os.mkdir(dirname)
     # 生成干净样本
-    for i in range(10):
+    for i in range(1):
         slice = random.sample(LABEL_CHOICES_LIST, 4)
         captcha = ''.join(slice)
         gene_code_clean(captcha).save('%s/%s_%s.png' % (dirname, i, captcha))
@@ -391,7 +392,7 @@ def gen_gauss_clean():
         shutil.rmtree(dirname)
     os.mkdir(dirname)
     # 生成高斯样本
-    for i in range(10):
+    for i in range(1):
         slice = random.sample(LABEL_CHOICES_LIST, 4)
         captcha = ''.join(slice)
         img = gene_code_clean(captcha)
@@ -404,16 +405,16 @@ def main():
     # gen_clean()
     #
     # 原图的attention
-    # GRADCAM_infer("train/model", ori_flienames)
+    GRADCAM_infer("train/model", ori_flienames)
     #
     # # 高斯的attention
     GRADCAM_infer("train/model", gauss_flienames)
     #
     # # 我們考慮預處理的方法的對抗樣本attention
-    # creat_adv("train/model", ori_flienames,'all')
+    creat_adv("train/model", ori_flienames,'all')
     #
     # # 普通的方法的對抗樣本attention
-    # creat_adv("train/model", ori_flienames,'ori')
+    creat_adv("train/model", ori_flienames,'ori')
 
 
 if __name__ == '__main__':
