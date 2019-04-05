@@ -407,7 +407,7 @@ def main():
     # GRADCAM_infer("train/model", ori_flienames)
     #
     # # 高斯的attention
-    # GRADCAM_infer("train/model", gauss_flienames)
+    GRADCAM_infer("train/model", gauss_flienames)
     #
     # # 我們考慮預處理的方法的對抗樣本attention
     # creat_adv("train/model", ori_flienames,'all')
