@@ -284,4 +284,6 @@ def S2T(source_model, target_model, num):
 if __name__ == '__main__':
     # train()
     # test()
-    S2T(CNN4, RES, 2)
+    # source: CNN4, RES, INCE, ENS3, (DENSE)
+    # target: CNN4, RES, INCE, DENSE
+    S2T("ENS3", RES, 2)
