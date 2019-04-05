@@ -1,3 +1,6 @@
+import glob
+import shutil
+
 import tensorflow as tf
 import LSTM_model as LSTM
 import time
@@ -23,8 +26,12 @@ image_channel = 3
 
 train_feeder = LSTM.DataIterator()
 val_feeder = LSTM.DataIterator()
-
-
+gauss_flienames = glob.glob('images/gauss/*.png')
+ori_flienames = glob.glob('images/ori/*.png')
+our_ori_flienames = glob.glob('images/ori_adv/*.png')
+common_ori_flienames = glob.glob('images/common_adv/*.png')
+adv_step = 0.01
+adv_count=30
 def train(restore=False, checkpoint_dir="train/model"):
     os.environ["CUDA_VISIBLE_DEVICES"] = '0'
     model = LSTM.LSTMOCR('train')
@@ -157,7 +164,7 @@ def infer(Checkpoint_PATH, img_PATH):
     print(expression)
 
 
-def creat_adv(Checkpoint_PATH, img_PATH):
+def creat_adv(Checkpoint_PATH, img_PATH,type):
     shuff_dir = {}
     lst = [i for i in range(36)]
     random.shuffle(lst)
@@ -172,7 +179,9 @@ def creat_adv(Checkpoint_PATH, img_PATH):
     shuff_dir.update({37: creat_onehot(37)})
 
     os.environ["CUDA_VISIBLE_DEVICES"] = '0'
-    model = LSTM.LSTMOCR("train")
+
+    model = LSTM.LSTMOCR("train",type)
+
     model.build_graph()
     config = tf.ConfigProto()
     config.gpu_options.allow_growth = True
@@ -205,66 +214,83 @@ def creat_adv(Checkpoint_PATH, img_PATH):
         print('cannot restore')
         return
 
-    im = cv2.imread(img_PATH).astype(np.float32) / 255.
-    im = cv2.resize(im, (192, 64))
+    for img in img_PATH:
+        im = cv2.imread(img).astype(np.float32) / 255.
+        im = cv2.resize(im, (192, 64))
 
-    imgs_input = []
-    imgs_input.append(im)
-    imgs_input = np.asarray(imgs_input)
-    imgs_input = np.repeat(imgs_input, batch_size, axis=0)
+        imgs_input = []
+        imgs_input.append(im)
+        imgs_input = np.asarray(imgs_input)
+        imgs_input = np.repeat(imgs_input, batch_size, axis=0)
 
-    imgs_input_before = imgs_input
-    feed = {model.inputs: imgs_input}
+        imgs_input_before = imgs_input
+        feed = {model.inputs: imgs_input}
 
-    log = sess.run(model.logits, feed)
-    fir = log[:, 0, :]
-    ex = np.argmax(fir, axis=1)
-    print(ex)
+        log = sess.run(model.logits, feed)
+        fir = log[:, 0, :]
+        ex = np.argmax(fir, axis=1)
+        print(ex)
 
-    target_creat = []
-    for i in range(12):
-        target_creat.append(shuff_dir[ex[i]])
+        target_creat = []
+        for i in range(12):
+            target_creat.append(shuff_dir[ex[i]])
 
-    target_creat = np.asarray(target_creat)
-    target_creat = target_creat[:, np.newaxis, :]
-    target_creat = np.repeat(target_creat, batch_size, axis=1)
+        target_creat = np.asarray(target_creat)
+        target_creat = target_creat[:, np.newaxis, :]
+        target_creat = np.repeat(target_creat, batch_size, axis=1)
 
-    dense_decoded_code = sess.run(model.dense_decoded, feed)
-    expression = ''
-    for i in dense_decoded_code[0]:
-        if i == -1:
-            expression += '-'
-        else:
-            expression += LSTM.decode_maps[i]
-    print("BEFORE:{}".format(expression))
+        dense_decoded_code = sess.run(model.dense_decoded, feed)
+        expression = ''
+        for i in dense_decoded_code[0]:
+            if i == -1:
+                expression += '-'
+            else:
+                expression += LSTM.decode_maps[i]
+        print("BEFORE:{}".format(expression))
 
-    adv_step = 0.01
-    feed = {model.inputs: imgs_input, target: target_creat, origin_inputs: imgs_input_before}
-    for i in range(80):
-        loss_now, grad = sess.run([ADV_LOSS, grad_y2x], feed)
-        if (i + 1) % 10 == 0:
-            print("LOSS:{}".format(loss_now))
-        imgs_input = imgs_input - grad * adv_step
+
         feed = {model.inputs: imgs_input, target: target_creat, origin_inputs: imgs_input_before}
+        for i in range(adv_count):
+            loss_now, grad = sess.run([ADV_LOSS, grad_y2x], feed)
+            if (i + 1) % 10 == 0:
+                print("LOSS:{}".format(loss_now))
+            imgs_input = imgs_input - grad * adv_step
+            feed = {model.inputs: imgs_input, target: target_creat, origin_inputs: imgs_input_before}
 
-    imgs_input_after = imgs_input
+        imgs_input_after = imgs_input
 
-    feed = {model.inputs: imgs_input, target: target_creat, origin_inputs: imgs_input_before}
-    dense_decoded_code = sess.run(model.dense_decoded, feed)
-    expression = ''
-    for i in dense_decoded_code[0]:
-        if i == -1:
-            expression += ''
-        else:
-            expression += LSTM.decode_maps[i]
-    print("AFTER:{}".format(expression))
+        feed = {model.inputs: imgs_input, target: target_creat, origin_inputs: imgs_input_before}
+        dense_decoded_code = sess.run(model.dense_decoded, feed)
+        expression = ''
+        for i in dense_decoded_code[0]:
+            if i == -1:
+                expression += ''
+            else:
+                expression += LSTM.decode_maps[i]
+        print("AFTER:{}".format(expression))
 
-    test = (sess.run([predict, current_status, current_mengban], feed_dict=feed))
+        test = (sess.run([predict, current_status, current_mengban], feed_dict=feed))
+        plt.imshow(imgs_input_after[0])
+        onehot_out = tf.one_hot(tf.argmax(model.logits, axis=2), 38)
+        tar = np.ones([12, 32, 38])
+        tar[:, :, 0] = 0
+        tar[:, :, 37] = 0
+        tar_tensor = tf.convert_to_tensor(tar, dtype=tf.float32)
+        onehot_out = tar_tensor * onehot_out
+        gradcam = grad_cam(model.attention_pool, model.logits, onehot_out)
+        feed = {model.inputs: imgs_input_after}
+        g_img = sess.run(gradcam, feed_dict=feed)
+        ori_img = imgs_input_after[0]
+        prehot_img = resize(g_img[0], (64, 192))
 
-    plt.imsave("/home/kirin/Python_Code/Ensambel/fast_rabbit/example_img/clean_example_1.png", imgs_input_before[0])
-    plt.imsave("/home/kirin/Python_Code/Ensambel/fast_rabbit/example_img/adv_example_1.png", imgs_input_after[0])
-    plt.imshow(imgs_input_after[0])
-    plt.show()
+        prehot_img /= prehot_img.max()
+        heatmap = cv2.applyColorMap(np.uint8(255 * prehot_img), cv2.COLORMAP_JET)
+        heatmap = cv2.cvtColor(heatmap, cv2.COLOR_BGR2RGB)
+        alpha = 0.0072
+        heatmap = ori_img + alpha * heatmap
+        heatmap /= heatmap.max()
+        plt.imshow(heatmap)
+        plt.show()
     return
 
 
@@ -309,48 +335,82 @@ def GRADCAM_infer(Checkpoint_PATH, img_PATH):
         print('restore from ckpt{}'.format(ckpt))
     else:
         print('cannot restore')
+    for img in img_PATH:
+        im = cv2.imread(img).astype(np.float32) / 255.
+        imgs_input = []
+        imgs_input.append(im)
 
-    im = cv2.imread(img_PATH).astype(np.float32) / 255.
-    imgs_input = []
-    imgs_input.append(im)
+        imgs_input = np.asarray(imgs_input)
+        imgs_input = np.repeat(imgs_input, batch_size, axis=0)
 
-    imgs_input = np.asarray(imgs_input)
-    imgs_input = np.repeat(imgs_input, batch_size, axis=0)
+        onehot_out = tf.one_hot(tf.argmax(model.logits, axis=2), 38)
+        tar = np.ones([12, 32, 38])
+        tar[:, :, 0] = 0
+        tar[:, :, 37] = 0
+        tar_tensor = tf.convert_to_tensor(tar, dtype=tf.float32)
+        onehot_out = tar_tensor * onehot_out
 
-    onehot_out = tf.one_hot(tf.argmax(model.logits, axis=2), 38)
-    tar = np.ones([12, 32, 38])
-    tar[:, :, 0] = 0
-    tar[:, :, 37] = 0
-    tar_tensor = tf.convert_to_tensor(tar, dtype=tf.float32)
-    onehot_out = tar_tensor * onehot_out
+        gradcam = grad_cam(model.attention_pool, model.logits, onehot_out)
 
-    gradcam = grad_cam(model.attention_pool, model.logits, onehot_out)
+        feed = {model.inputs: imgs_input}
+        g_img = sess.run(gradcam, feed_dict=feed)
 
-    feed = {model.inputs: imgs_input}
-    g_img = sess.run(gradcam, feed_dict=feed)
+        ori_img = imgs_input[0]
+        prehot_img = resize(g_img[0], (64, 192))
 
-    ori_img = imgs_input[0]
-    prehot_img = resize(g_img[0], (64, 192))
-
-    prehot_img /= prehot_img.max()
-    heatmap = cv2.applyColorMap(np.uint8(255 * prehot_img), cv2.COLORMAP_JET)
-    heatmap = cv2.cvtColor(heatmap, cv2.COLOR_BGR2RGB)
-    alpha = 0.0072
-    heatmap = ori_img + alpha * heatmap
-    heatmap /= heatmap.max()
-    plt.imshow(heatmap)
-    plt.show()
+        prehot_img /= prehot_img.max()
+        heatmap = cv2.applyColorMap(np.uint8(255 * prehot_img), cv2.COLORMAP_JET)
+        heatmap = cv2.cvtColor(heatmap, cv2.COLOR_BGR2RGB)
+        alpha = 0.0072
+        heatmap = ori_img + alpha * heatmap
+        heatmap /= heatmap.max()
+        plt.imshow(heatmap)
+        plt.show()
 
 
-def main():
-    LABEL_CHOICES = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-    LABEL_CHOICES_LIST = [str(i) for i in LABEL_CHOICES]
+LABEL_CHOICES = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+LABEL_CHOICES_LIST = [str(i) for i in LABEL_CHOICES]
+
+
+def gen_clean():
+    dirname='images/ori/'
+    if os.path.isdir(dirname):
+        shutil.rmtree(dirname)
+    os.mkdir(dirname)
+    # 生成干净样本
     for i in range(10):
         slice = random.sample(LABEL_CHOICES_LIST, 4)
         captcha = ''.join(slice)
-        gene_code_clean(captcha).save('images/%s_%s.png' % (i,captcha))
-    # creat_adv("train/model", "/home/kirin/Python_Code/Ensambel/fast_rabbit/example_img/example_1.png")
-    # GRADCAM_infer("train/model", "/home/kirin/Python_Code/Ensambel/fast_rabbit/example_img/adv_example_1.png")
+        gene_code_clean(captcha).save('%s/%s_%s.png' % (dirname,i, captcha))
+
+
+def gen_gauss_clean():
+    dirname = 'images/gauss/'
+    if os.path.isdir(dirname):
+        shutil.rmtree(dirname)
+    os.mkdir(dirname)
+    # 生成高斯样本
+    for i in range(10):
+        slice = random.sample(LABEL_CHOICES_LIST, 4)
+        captcha = ''.join(slice)
+        gene_code_clean(captcha).save('%s/%s_%s.png' % (dirname,i, captcha))
+
+
+def main():
+    # gen_gauss_clean()
+    # gen_clean()
+    #
+    # # 原图的attention
+    # GRADCAM_infer("train/model", ori_flienames)
+    #
+    # # 高斯的attention
+    # GRADCAM_infer("train/model", gauss_flienames)
+    #
+    # # 我們考慮預處理的方法的對抗樣本attention
+    # creat_adv("train/model", ori_flienames,'all')
+    #
+    # # 普通的方法的對抗樣本attention
+    # creat_adv("train/model", ori_flienames,'ori')
 
 
 if __name__ == '__main__':

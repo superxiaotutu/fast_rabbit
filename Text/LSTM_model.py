@@ -119,8 +119,23 @@ class DataIterator:
 
 
 class LSTMOCR(object):
-    def __init__(self, mode):
+    def __init__(self, mode, process_type='ori'):
         self.mode = mode
+        # image
+        self.inputs = tf.placeholder(tf.float32, [None, image_height, image_width, image_channel])
+        if process_type == 'ori':
+            print('ori')
+            self.pre_inputs = self.inputs
+        if process_type == 'bin':
+            print('bin')
+            self.pre_inputs = self.head_B(self.inputs)
+        if process_type == 'gauss':
+            print('gauss')
+            self.pre_inputs = self.head_Guss(self.inputs)
+        if process_type == 'all':
+            print('all')
+            self.inputs1 = self.head_Guss(self.inputs, kerStd=0.8)
+            self.pre_inputs = self.head_B(self.inputs1)
 
         self.inputs = tf.placeholder(tf.float32, [None, image_height, image_width, image_channel])
         self.labels = tf.sparse_placeholder(tf.int32)
@@ -624,42 +639,35 @@ class LSTMOCR(object):
             after_softmax_x = slim.softmax(x)
         return x, after_softmax_x
 
-    def head_B(self, input):
-        phi = 0.5
-        S = 1 / (1 + tf.exp(-(input - phi)))
+    def head_B(self, input, phi=0.8):
+        kernel_3_1 = np.ones([1, 1, 3, 1]) / 3
+        kernel_1_3 = np.ones([1, 1, 1, 3])
+        a = tf.nn.conv2d(input, kernel_3_1, strides=[1, 1, 1, 1], padding="SAME")
+        b = tf.nn.conv2d(a, kernel_1_3, strides=[1, 1, 1, 1], padding="SAME")
+        S = 1 / (1 + tf.exp(- 20 * (b - phi)))
         return S
 
-    def head_Guss(self, input):
+    def head_Guss(self, inputs, kerStd=0.8):
         def getGuessValue(kerStd, posX, posY):
             return 1. / (2. * np.pi * (np.power(kerStd, 2))) * np.exp(
                 -(np.power(posX, 2) + np.power(posY, 2)) / (2. * (np.power(kerStd, 2))))
 
         def getGuessKernel(kerStd):
-            K11 = np.column_stack(
-                (np.row_stack((np.eye(3) * getGuessValue(kerStd, -1, 1), [0., 0., 0.])), np.array([0., 0., 0., 1.])))
-            K12 = np.column_stack(
-                (np.row_stack((np.eye(3) * getGuessValue(kerStd, 0, 1), [0., 0., 0.])), np.array([0., 0., 0., 1.])))
-            K13 = np.column_stack(
-                (np.row_stack((np.eye(3) * getGuessValue(kerStd, 1, 1), [0., 0., 0.])), np.array([0., 0., 0., 1.])))
-            K21 = np.column_stack(
-                (np.row_stack((np.eye(3) * getGuessValue(kerStd, -1, 0), [0., 0., 0.])), np.array([0., 0., 0., 1.])))
-            K22 = np.column_stack(
-                (np.row_stack((np.eye(3) * getGuessValue(kerStd, 0, 0), [0., 0., 0.])), np.array([0., 0., 0., 1.])))
-            K23 = np.column_stack(
-                (np.row_stack((np.eye(3) * getGuessValue(kerStd, 1, 0), [0., 0., 0.])), np.array([0., 0., 0., 1.])))
-            K31 = np.column_stack(
-                (np.row_stack((np.eye(3) * getGuessValue(kerStd, -1, -1), [0., 0., 0.])), np.array([0., 0., 0., 1.])))
-            K32 = np.column_stack(
-                (np.row_stack((np.eye(3) * getGuessValue(kerStd, 0, -1), [0., 0., 0.])), np.array([0., 0., 0., 1.])))
-            K33 = np.column_stack(
-                (np.row_stack((np.eye(3) * getGuessValue(kerStd, 1, -1), [0., 0., 0.])), np.array([0., 0., 0., 1.])))
+            K11 = np.eye(3) * getGuessValue(kerStd, -1, 1)
+            K12 = np.eye(3) * getGuessValue(kerStd, 0, 1)
+            K13 = np.eye(3) * getGuessValue(kerStd, 1, 1)
+            K21 = np.eye(3) * getGuessValue(kerStd, -1, 0)
+            K22 = np.eye(3) * getGuessValue(kerStd, 0, 0)
+            K23 = np.eye(3) * getGuessValue(kerStd, 1, 0)
+            K31 = np.eye(3) * getGuessValue(kerStd, -1, -1)
+            K32 = np.eye(3) * getGuessValue(kerStd, 0, -1)
+            K33 = np.eye(3) * getGuessValue(kerStd, 1, -1)
             kernel = tf.constant(np.array([[K11, K12, K13], [K21, K22, K23], [K31, K32, K33]]),
                                  dtype=tf.float32)  # 3*3*4*4
             return kernel
 
-        kernel = getGuessKernel(0.8)
-        Guss = tf.nn.conv2d(input, kernel, strides=[1, 1, 1, 1], padding="SAME")
-        return Guss
+        kernel = getGuessKernel(kerStd)
+        return tf.nn.conv2d(inputs, kernel, strides=[1, 1, 1, 1], padding="SAME")
 
 
 def accuracy_calculation(original_seq, decoded_seq, ignore_value=-1, isPrint=False):
