@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="8feb12b8-79f9-4cc5-93b4-f2d358429c07" name="Default Changelist" comment="">
+    <list default="true" id="8feb12b8-79f9-4cc5-93b4-f2d358429c07" name="Default Changelist" comment="ensemble">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Text/LSTM_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/Text/LSTM_model.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Text/train.py" beforeDir="false" afterPath="$PROJECT_DIR$/Text/train.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example_img/adv_example_1.png" beforeDir="false" afterPath="$PROJECT_DIR$/example_img/adv_example_1.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example_img/clean_example_1.png" beforeDir="false" afterPath="$PROJECT_DIR$/example_img/clean_example_1.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ensemble/ensemble_train.py" beforeDir="false" afterPath="$PROJECT_DIR$/ensemble/ensemble_train.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -26,7 +23,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/ensemble/Model.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="221">
+            <state relative-caret-position="23">
               <caret line="15" column="36" selection-start-line="15" selection-start-column="36" selection-end-line="15" selection-end-column="36" />
               <folding>
                 <element signature="e#0#23#0" expanded="true" />
@@ -35,16 +32,36 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Text/train.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-912">
-              <caret line="270" selection-start-line="270" selection-end-line="270" />
+            <state relative-caret-position="210">
+              <caret line="413" column="5" lean-forward="true" selection-start-line="413" selection-start-column="5" selection-end-line="413" selection-end-column="5" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
-                <element signature="e#491#4036#0" />
-                <element signature="e#8958#9553#0" />
+                <element signature="e#843#4388#0" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/ensemble/ensemble_train.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="196">
+              <caret line="290" column="29" selection-start-line="290" selection-start-column="17" selection-end-line="290" selection-end-column="29" />
+              <folding>
+                <element signature="e#0#17#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Text/gen_type_codes.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="319">
+              <caret line="80" column="26" selection-start-line="80" selection-start-column="26" selection-end-line="80" selection-end-column="26" />
             </state>
           </provider>
         </entry>
@@ -54,18 +71,6 @@
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="234">
               <caret line="109" column="40" selection-start-line="109" selection-start-column="40" selection-end-line="109" selection-end-column="40" />
-              <folding>
-                <element signature="e#0#23#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Text/LSTM_model.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="891">
-              <caret line="670" selection-start-line="670" selection-end-line="670" />
               <folding>
                 <element signature="e#0#23#0" expanded="true" />
               </folding>
@@ -87,6 +92,7 @@
       <find>train_feeder</find>
       <find>get_acc</find>
       <find>target_model</find>
+      <find>GRADCAM_infer</find>
       <find>LABEL_CHOICES_LIST</find>
     </findStrings>
   </component>
@@ -102,15 +108,15 @@
         <option value="$PROJECT_DIR$/ensemble/train.py" />
         <option value="$PROJECT_DIR$/ensemble/gen_type_codes.py" />
         <option value="/run/media/kirin/新加卷1/server/marker_thread.py" />
-        <option value="$PROJECT_DIR$/Text/train/model/checkpoint" />
-        <option value="$PROJECT_DIR$/Text/gen_type_codes.py" />
         <option value="$PROJECT_DIR$/Text/attack.py" />
         <option value="$PROJECT_DIR$/ensemble/UT.py" />
-        <option value="$PROJECT_DIR$/ensemble/ensemble_train.py" />
         <option value="$PROJECT_DIR$/Text/one_char.py" />
         <option value="$PROJECT_DIR$/ensemble/Model.py" />
         <option value="$PROJECT_DIR$/Text/LSTM_model.py" />
+        <option value="$PROJECT_DIR$/Text/train/model/checkpoint" />
+        <option value="$PROJECT_DIR$/Text/gen_type_codes.py" />
         <option value="$PROJECT_DIR$/Text/train.py" />
+        <option value="$PROJECT_DIR$/ensemble/ensemble_train.py" />
       </list>
     </option>
   </component>
@@ -137,13 +143,12 @@
             <path>
               <item name="fast_rabbit" type="b2602c69:ProjectViewProjectNode" />
               <item name="fast_rabbit" type="462c0819:PsiDirectoryNode" />
-              <item name="Text" type="462c0819:PsiDirectoryNode" />
+              <item name="ensemble" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="fast_rabbit" type="b2602c69:ProjectViewProjectNode" />
               <item name="fast_rabbit" type="462c0819:PsiDirectoryNode" />
               <item name="Text" type="462c0819:PsiDirectoryNode" />
-              <item name="images" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -154,6 +159,11 @@
   <component name="PropertiesComponent">
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="true" />
+    <property name="WebServerToolWindowPanel.toolwindow.highlight.mappings" value="true" />
+    <property name="WebServerToolWindowPanel.toolwindow.highlight.symlinks" value="true" />
+    <property name="WebServerToolWindowPanel.toolwindow.show.date" value="false" />
+    <property name="WebServerToolWindowPanel.toolwindow.show.permissions" value="false" />
+    <property name="WebServerToolWindowPanel.toolwindow.show.size" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/Text/train/backup" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
@@ -181,7 +191,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.train (1)">
+  <component name="RunManager" selected="Python.train">
     <configuration default="true" type="PythonConfigurationType" factoryName="Python">
       <module name="fast_rabbit" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -316,8 +326,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.train (1)" />
         <item itemvalue="Python.train" />
+        <item itemvalue="Python.train (1)" />
         <item itemvalue="Python.attack" />
         <item itemvalue="Python.marker_thread" />
         <item itemvalue="Python.gen_type_codes" />
@@ -337,7 +347,7 @@
       <workItem from="1554254129797" duration="4829000" />
       <workItem from="1554281685362" duration="11521000" />
       <workItem from="1554293928505" duration="21214000" />
-      <workItem from="1554383245092" duration="16552000" />
+      <workItem from="1554383245092" duration="20576000" />
     </task>
     <task id="LOCAL-00001" summary="ensemble">
       <created>1554268460818</created>
@@ -360,11 +370,53 @@
       <option name="project" value="LOCAL" />
       <updated>1554434433005</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="ensemble">
+      <created>1554435837427</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1554435837427</updated>
+    </task>
+    <task id="LOCAL-00005" summary="ensemble">
+      <created>1554436582520</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1554436582520</updated>
+    </task>
+    <task id="LOCAL-00006" summary="ensemble">
+      <created>1554436683508</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1554436683508</updated>
+    </task>
+    <task id="LOCAL-00007" summary="ensemble">
+      <created>1554436698151</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1554436698151</updated>
+    </task>
+    <task id="LOCAL-00008" summary="ensemble">
+      <created>1554437943290</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1554437943290</updated>
+    </task>
+    <task id="LOCAL-00009" summary="ensemble">
+      <created>1554439610956</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1554439610956</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="54116000" />
+    <option name="totallyTimeSpent" value="58140000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1920" height="1080" extended-state="6" />
@@ -389,8 +441,8 @@
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
-      <window_info anchor="right" id="Remote Host" order="3" />
-      <window_info anchor="right" id="SciView" order="4" sideWeight="0.6915584" visible="true" weight="0.2588047" />
+      <window_info anchor="right" id="Remote Host" order="3" weight="0.32977587" />
+      <window_info anchor="right" id="SciView" order="4" sideWeight="0.6915584" weight="0.5192102" />
       <window_info anchor="right" id="Database" order="5" />
     </layout>
   </component>
@@ -418,8 +470,8 @@
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/fast_rabbit$train__1_.coverage" NAME="train (1) Coverage Results" MODIFIED="1554435784364" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Text" />
-    <SUITE FILE_PATH="coverage/fast_rabbit$train.coverage" NAME="train Coverage Results" MODIFIED="1554433836651" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ensemble" />
+    <SUITE FILE_PATH="coverage/fast_rabbit$train__1_.coverage" NAME="train (1) Coverage Results" MODIFIED="1554438932410" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Text" />
+    <SUITE FILE_PATH="coverage/fast_rabbit$train.coverage" NAME="train Coverage Results" MODIFIED="1554440078548" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/ensemble" />
   </component>
   <component name="debuggerHistoryManager">
     <expressions id="evaluateExpression">
@@ -431,30 +483,6 @@
     </expressions>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/Text/test.py">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Text/ensemble.py" />
-    <entry file="file:///usr/local/lib/python3.7/site-packages/tensorflow/python/training/saver.py" />
-    <entry file="file:///usr/local/lib/python3.7/site-packages/tensorflow/python/ops/variable_scope.py" />
-    <entry file="file:///usr/local/lib/python3.7/site-packages/tensorflow/python/client/session.py" />
-    <entry file="file:///usr/local/lib/python3.7/site-packages/dask/utils.py" />
-    <entry file="file:///usr/local/lib/python3.7/site-packages/tensorflow/python/framework/meta_graph.py" />
-    <entry file="file:///usr/local/lib/python3.7/site-packages/tensorflow/python/framework/ops.py" />
-    <entry file="file:///usr/lib/python3.6/site-packages/matplotlib/image.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="179">
-          <caret line="645" selection-start-line="645" selection-end-line="645" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file:///usr/lib/python3.6/site-packages/tensorflow/python/framework/op_def_library.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="341">
-          <caret line="787" selection-start-line="787" selection-end-line="787" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file:///usr/lib/python3.6/site-packages/tensorflow/python/ops/image_ops_impl.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="179">
@@ -487,13 +515,6 @@
     <entry file="file:///run/media/kirin/新加卷1/server/marker_thread.py" />
     <entry file="file://$PROJECT_DIR$/ensemble/ens_model_old/checkpoint">
       <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Text/train/model/checkpoint">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret column="37" selection-start-column="37" selection-end-column="37" />
-        </state>
-      </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/example_img/example_1.png">
       <provider selected="true" editor-type-id="images" />
@@ -589,26 +610,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/ensemble/ensemble_train.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="51">
-          <caret line="281" column="25" selection-start-line="281" selection-start-column="25" selection-end-line="281" selection-end-column="25" />
-          <folding>
-            <element signature="e#0#17#0" expanded="true" />
-            <element signature="e#747#1990#0" />
-            <element signature="e#1782#3112#0" />
-            <element signature="e#4014#4091#0" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Text/gen_type_codes.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="165">
-          <caret line="40" column="60" selection-start-line="40" selection-start-column="60" selection-end-line="40" selection-end-column="60" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Text/images/9_EGBL.png">
       <provider selected="true" editor-type-id="images" />
     </entry>
@@ -624,29 +625,19 @@
     <entry file="file://$PROJECT_DIR$/Text/images/3_LAG4.png">
       <provider selected="true" editor-type-id="images" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/Text/images/0_VKCM.png">
+    <entry file="file://$PROJECT_DIR$/Text/images/gauss/4_U10T.png">
       <provider selected="true" editor-type-id="images" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/Text/images/1_150C.png">
+    <entry file="file://$PROJECT_DIR$/Text/images/gauss/0_2BZG.png">
       <provider selected="true" editor-type-id="images" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/ensemble/Model.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="221">
-          <caret line="15" column="36" selection-start-line="15" selection-start-column="36" selection-end-line="15" selection-end-column="36" />
-          <folding>
-            <element signature="e#0#23#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
+    <entry file="file://$PROJECT_DIR$/Text/images/gauss/1_C6YG.png">
+      <provider selected="true" editor-type-id="images" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/Text/LSTM_model.py">
+    <entry file="file:///usr/lib/python3.6/site-packages/skimage/util/noise.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="891">
-          <caret line="670" selection-start-line="670" selection-end-line="670" />
-          <folding>
-            <element signature="e#0#23#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="132">
+          <caret line="7" column="4" selection-start-line="7" selection-start-column="4" selection-end-line="7" selection-end-column="4" />
         </state>
       </provider>
     </entry>
@@ -660,14 +651,87 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/Text/images/gauss/3_57R0.png">
+      <provider selected="true" editor-type-id="images" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Text/images/0_VKCM.png">
+      <provider selected="true" editor-type-id="images" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Text/images/1_150C.png">
+      <provider selected="true" editor-type-id="images" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Text/images/gauss/2_LP72.png">
+      <provider selected="true" editor-type-id="images" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Text/images/gauss/2_TOZ1.png">
+      <provider selected="true" editor-type-id="images" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Text/images/gauss/8_8FDP.png">
+      <provider selected="true" editor-type-id="images" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Text/images/gauss/7_D69C.png">
+      <provider selected="true" editor-type-id="images" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Text/images/gauss/1_4G50.png">
+      <provider selected="true" editor-type-id="images" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Text/images/gauss/0_LG5S.png">
+      <provider selected="true" editor-type-id="images" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Text/images/ori/0_0824.png">
+      <provider selected="true" editor-type-id="images" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Text/LSTM_model.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-332">
+          <caret line="494" column="30" selection-start-line="494" selection-start-column="17" selection-end-line="494" selection-end-column="30" />
+          <folding>
+            <element signature="e#0#23#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Text/train/model/checkpoint">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="44">
+          <caret line="2" lean-forward="true" selection-start-line="2" selection-end-line="2" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Text/gen_type_codes.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="319">
+          <caret line="80" column="26" selection-start-line="80" selection-start-column="26" selection-end-line="80" selection-end-column="26" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ensemble/Model.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="23">
+          <caret line="15" column="36" selection-start-line="15" selection-start-column="36" selection-end-line="15" selection-end-column="36" />
+          <folding>
+            <element signature="e#0#23#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/Text/train.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-912">
-          <caret line="270" selection-start-line="270" selection-end-line="270" />
+        <state relative-caret-position="210">
+          <caret line="413" column="5" lean-forward="true" selection-start-line="413" selection-start-column="5" selection-end-line="413" selection-end-column="5" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
-            <element signature="e#491#4036#0" />
-            <element signature="e#8958#9553#0" />
+            <element signature="e#843#4388#0" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ensemble/ensemble_train.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="196">
+          <caret line="290" column="29" selection-start-line="290" selection-start-column="17" selection-end-line="290" selection-end-column="29" />
+          <folding>
+            <element signature="e#0#17#0" expanded="true" />
           </folding>
         </state>
       </provider>

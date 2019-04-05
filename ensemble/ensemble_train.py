@@ -278,7 +278,7 @@ def S2T(source_model, target_model, num):
                 count[str(T)] += infer(T, adv_img, ori_label, sess)
         for T in target_model:
             print("\nSource:{}, Target:{}, Num_Success:{}/{}".format(str(source_model), str(T), count[str(T)], num))
-        log_file.write("\nSource:{}, Target:{}, Num_Success:{}/{}".format(str(source_model), str(T), count[str(T)], num))
+            log_file.write("Source:{}, Target:{}, Num_Success:{}/{}\n".format(str(source_model), str(T), count[str(T)], num))
     else:
         count = {}
         for T in target_model:
@@ -290,7 +290,7 @@ def S2T(source_model, target_model, num):
                 count[str(T)] += infer(T, adv_img, ori_label, sess)
         for T in target_model:
             print("\nSource:ENS3, Target:{}, Num_Success:{}/{}".format(str(T), count[str(T)], num))
-        log_file.write("\nSource:{}, Target:{}, Num_Success:{}/{}".format(str(source_model), str(T), count[str(T)], num))
+            log_file.write("Source:{}, Target:{}, Num_Success:{}/{}\n".format(str(source_model), str(T), count[str(T)], num))
 
 if __name__ == '__main__':
 #     # train()
