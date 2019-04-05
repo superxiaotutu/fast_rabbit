@@ -355,6 +355,8 @@ def GRADCAM_infer(Checkpoint_PATH, img_PATH):
         gradcam = grad_cam(model.attention_pool, model.logits, onehot_out)
 
         feed = {model.inputs: imgs_input}
+        code=sess.run(model.dense_decoded,feed)
+        print(code)
         g_img = sess.run(gradcam, feed_dict=feed)
 
         ori_img = imgs_input[0]
@@ -405,16 +407,16 @@ def main():
     # gen_clean()
     #
     # 原图的attention
-    GRADCAM_infer("train/model", ori_flienames)
+    # GRADCAM_infer("train/model", ori_flienames)
     #
     # # 高斯的attention
     GRADCAM_infer("train/model", gauss_flienames)
     #
     # # 我們考慮預處理的方法的對抗樣本attention
-    creat_adv("train/model", ori_flienames,'all')
+    # creat_adv("train/model", ori_flienames,'all')
     #
     # # 普通的方法的對抗樣本attention
-    creat_adv("train/model", ori_flienames,'ori')
+    # creat_adv("train/model", ori_flienames,'ori')
 
 
 if __name__ == '__main__':
