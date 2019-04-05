@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 import random
 from skimage.transform import resize
 
-from gen_type_codes import gene_code_clean
+from gen_type_codes import gene_code_clean, add_gauss, add_gauss_code
 
 num_epochs = 500
 batch_size = 32
@@ -31,7 +31,9 @@ ori_flienames = glob.glob('images/ori/*.png')
 our_ori_flienames = glob.glob('images/ori_adv/*.png')
 common_ori_flienames = glob.glob('images/common_adv/*.png')
 adv_step = 0.01
-adv_count=30
+adv_count = 30
+gauss_level=2
+
 def train(restore=False, checkpoint_dir="train/model"):
     os.environ["CUDA_VISIBLE_DEVICES"] = '0'
     model = LSTM.LSTMOCR('train')
@@ -164,7 +166,7 @@ def infer(Checkpoint_PATH, img_PATH):
     print(expression)
 
 
-def creat_adv(Checkpoint_PATH, img_PATH,type):
+def creat_adv(Checkpoint_PATH, img_PATH, type):
     shuff_dir = {}
     lst = [i for i in range(36)]
     random.shuffle(lst)
@@ -180,7 +182,7 @@ def creat_adv(Checkpoint_PATH, img_PATH,type):
 
     os.environ["CUDA_VISIBLE_DEVICES"] = '0'
 
-    model = LSTM.LSTMOCR("train",type)
+    model = LSTM.LSTMOCR("train", type)
 
     model.build_graph()
     config = tf.ConfigProto()
@@ -247,7 +249,6 @@ def creat_adv(Checkpoint_PATH, img_PATH,type):
             else:
                 expression += LSTM.decode_maps[i]
         print("BEFORE:{}".format(expression))
-
 
         feed = {model.inputs: imgs_input, target: target_creat, origin_inputs: imgs_input_before}
         for i in range(adv_count):
@@ -373,7 +374,7 @@ LABEL_CHOICES_LIST = [str(i) for i in LABEL_CHOICES]
 
 
 def gen_clean():
-    dirname='images/ori/'
+    dirname = 'images/ori/'
     if os.path.isdir(dirname):
         shutil.rmtree(dirname)
     os.mkdir(dirname)
@@ -381,7 +382,7 @@ def gen_clean():
     for i in range(10):
         slice = random.sample(LABEL_CHOICES_LIST, 4)
         captcha = ''.join(slice)
-        gene_code_clean(captcha).save('%s/%s_%s.png' % (dirname,i, captcha))
+        gene_code_clean(captcha).save('%s/%s_%s.png' % (dirname, i, captcha))
 
 
 def gen_gauss_clean():
@@ -393,14 +394,16 @@ def gen_gauss_clean():
     for i in range(10):
         slice = random.sample(LABEL_CHOICES_LIST, 4)
         captcha = ''.join(slice)
-        gene_code_clean(captcha).save('%s/%s_%s.png' % (dirname,i, captcha))
+        img = gene_code_clean(captcha)
+        img = add_gauss_code(img, level=gauss_level)
+        plt.imsave('%s/%s_%s.png' % (dirname, i, captcha), img)
 
 
 def main():
     # gen_gauss_clean()
     # gen_clean()
     #
-    # # 原图的attention
+    # 原图的attention
     # GRADCAM_infer("train/model", ori_flienames)
     #
     # # 高斯的attention

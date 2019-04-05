@@ -72,7 +72,14 @@ def gen_gauss_code(captcha):
         img = random_noise(img)
     np.clip(img, 0, 1)
     return img
+def add_gauss_code(img,level):
+    img = np.asarray(img).astype(np.float32) / 255.
+    img.flags.writeable = True
+    for j in range(level):
+        img = random_noise(img)
+        np.clip(img, 0, 1)
 
+    return img
 
 def add_gauss(image, radius=2):
     image = image.filter(MyGaussianBlur(radius))
