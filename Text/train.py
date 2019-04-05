@@ -9,6 +9,8 @@ import matplotlib.pyplot as plt
 import random
 from skimage.transform import resize
 
+from gen_type_codes import gene_code_clean
+
 num_epochs = 500
 batch_size = 32
 num_batches_per_epoch = 100
@@ -341,10 +343,14 @@ def GRADCAM_infer(Checkpoint_PATH, img_PATH):
 
 
 def main():
-    # train(True, "train/model")
-    # infer("train/model", "/home/kirin/Python_Code/Ensambel/fast_rabbit/example_img/example_1.png")
+    LABEL_CHOICES = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+    LABEL_CHOICES_LIST = [str(i) for i in LABEL_CHOICES]
+    for i in range(10):
+        slice = random.sample(LABEL_CHOICES_LIST, 4)
+        captcha = ''.join(slice)
+        gene_code_clean(captcha).save('images/%s_%s.png' % (i,captcha))
     # creat_adv("train/model", "/home/kirin/Python_Code/Ensambel/fast_rabbit/example_img/example_1.png")
-    GRADCAM_infer("train/model", "/home/kirin/Python_Code/Ensambel/fast_rabbit/example_img/adv_example_1.png")
+    # GRADCAM_infer("train/model", "/home/kirin/Python_Code/Ensambel/fast_rabbit/example_img/adv_example_1.png")
 
 
 if __name__ == '__main__':
