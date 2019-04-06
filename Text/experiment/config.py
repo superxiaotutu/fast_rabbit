@@ -26,12 +26,12 @@ decay_rate = 0.96
 output_keep_prob = 0.8
 batch_size = 1
 
-RELEASE = True
+RELEASE = False
 adv_step = 0.01
-adv_count = 30
-c = 20
+adv_count = 10
+c = 15
 radius = 0.8
-file_count = 500
+file_count = 100
 
 LABEL_CHOICES = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 LABEL_CHOICES_LIST = [str(i) for i in LABEL_CHOICES]

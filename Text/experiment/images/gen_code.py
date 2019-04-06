@@ -1,4 +1,5 @@
 import os
+import random
 import shutil
 
 from config import LABEL_CHOICES_LIST

@@ -1,9 +1,7 @@
 import tensorflow as tf
 import tensorflow.contrib.slim as slim
-from config import *
-from PIL import Image, ImageFont, ImageDraw, ImageFilter
-from captcha.image import ImageCaptcha
-from gen_type_codes import *
+from codes.config import *
+from codes.gen_type_codes import *
 
 
 def sparse_tuple_from_label(sequences, dtype=np.int32):

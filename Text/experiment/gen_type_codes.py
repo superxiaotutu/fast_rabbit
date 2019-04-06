@@ -7,7 +7,7 @@ from PIL import ImageFont
 from PIL import ImageFilter
 from captcha.image import DEFAULT_FONTS, ImageCaptcha
 from skimage.util import random_noise
-from config import image_height, image_width, plt
+from config import image_height, image_width
 
 image = ImageCaptcha(width=image_width, height=image_height)
 
@@ -195,7 +195,7 @@ def gen_type_3(chars):
     background = random_color(238, 255)
     color = random_color(10, 200, random.randint(220, 255))
     im = image.create_captcha_image(chars, color, background)
-    dot, line = 60, 20
+    dot, line = 60, 15
     image.create_noise_dots(im, color, number=dot)
     for i in range(line):
         image.create_noise_curve(im, color)

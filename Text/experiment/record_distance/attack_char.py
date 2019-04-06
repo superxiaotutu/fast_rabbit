@@ -14,8 +14,8 @@ from config import *
 from gen_type_codes import *
 
 adv_step = 0.01
-adv_count = 30
-c = 20
+adv_count = 10
+c = 10
 os.environ["CUDA_VISIBLE_DEVICES"] = '0'
 model = LSTM.LSTMOCR('lenet', "infer", 'ori')
 model.build_graph()
@@ -47,7 +47,8 @@ ADV_LOSS = tf.reduce_mean(tf.square(origin_inputs - model.inputs)) + c * tf.redu
 # grad_y2x = tf.sign(tf.gradients(ADV_LOSS, model.inputs)[0])
 grad_y2x = tf.gradients(ADV_LOSS, model.inputs)[0]
 
-def attack(imgs_input, imgs_label,dense_decoded_code, cap_num=0):
+
+def attack(imgs_input, imgs_label, dense_decoded_code, cap_num=0):
     # adv_node
     attack_success = True
     shuff_dir = {}
@@ -65,7 +66,6 @@ def attack(imgs_input, imgs_label,dense_decoded_code, cap_num=0):
     for k in dense_decoded_code[0][:cap_num]:
         shuff_dir.update({k: creat_onehot(k)})
 
-
     imgs_input_before = imgs_input
     feed = {model.inputs: imgs_input}
     log = sess.run(model.logits, feed)
@@ -82,12 +82,9 @@ def attack(imgs_input, imgs_label,dense_decoded_code, cap_num=0):
     feed = {model.inputs: imgs_input, OCR_target: target_creat, origin_inputs: imgs_input_before}
     for i in range(adv_count):
         loss_now, grad = sess.run([ADV_LOSS, grad_y2x], feed)
-        if (i + 1) % 1 == 0:
-            print("LOSS:{}".format(loss_now))
         imgs_input = imgs_input - grad * adv_step * is_attacked_matrix
         imgs_input = np.clip(imgs_input, 0, 1)
         dense_decoded_code = sess.run(model.dense_decoded, {model.inputs: imgs_input})
-        print(dense_decoded_code[0])
         is_attacked_matrix = update_matrix(is_attacked_matrix, imgs_label, dense_decoded_code)
         if is_attacked_matrix.any() == 0:
             break
@@ -108,9 +105,10 @@ def multiply_char(cap_num):
     attack_scc = 0
     log_file = open("log/attack_char=%s_step=%s.log" % (4 - cap_num, adv_step), 'w')
     img_files = glob.glob('/home/kirin/Python_Code/fast_rabbit _xky/Text/experiment/images/ori/*.png')
-    print(img_files)
-    for index,im in enumerate(img_files[:550]):
-        print(index)
+    for index, im in enumerate(img_files[:100]):
+        # print(index)
+        if index % 200 == 0:
+            print(index)
         label = im[-8:-4]
         im = Image.open(im).convert("RGB")
         im = np.asarray(im).astype(np.float32) / 255.
@@ -122,10 +120,14 @@ def multiply_char(cap_num):
                 expression += ''
             else:
                 expression += LSTM.decode_maps[i]
-        print(expression, label)
         if expression == label:
-            distance, cost_time, imgs_input_after, attack_success = attack([im], [label], dense_decoded_code,cap_num=cap_num)
+
+            distance, cost_time, imgs_input_after, attack_success = attack([im], [label], dense_decoded_code,
+                                                                           cap_num=cap_num)
+            if attack_success:
+                attack_scc += 1
             log_file.write("dis:%s cost_time:%s c:%s attack_scc:%s\n" % (distance, cost_time, c, attack_success))
+    print(4 - cap_num, attack_scc)
     log_file.close()
 
 

@@ -6,7 +6,6 @@ import tensorflow as tf
 # plt.switch_backend('agg')
 import sys
 
-sys.path.append('../')
 import model as LSTM
 from config import *
 from gen_type_codes import *
@@ -118,8 +117,6 @@ def attack(model, sess, imgs_input, imgs_label, type, ):
 
 
 def cnn_generate(Checkpoint_PATH, model_name='cnn', process_type='ori'):
-    log_file = open("log/%s_%s.log" % (model_name, process_type), 'w')
-
     if RELEASE:
         adv_sample_dir = '../images/cnn_adv_%s' % process_type
         if os.path.isdir(adv_sample_dir):
@@ -143,7 +140,7 @@ def cnn_generate(Checkpoint_PATH, model_name='cnn', process_type='ori'):
         for type in range(0, 1):
             adv_acc = 0
             prec_acc = 0
-            img_files = glob.glob("../ori/*.png")
+            img_files = glob.glob("/home/kirin/Python_Code/images/ori/*.png")
             for epoch in range(file_count // batch_size):
                 ori_imgs_input = [img_files.pop() for i in range(batch_size)]
                 print(len(ori_imgs_input))
@@ -157,7 +154,6 @@ def cnn_generate(Checkpoint_PATH, model_name='cnn', process_type='ori'):
                 if RELEASE:
                     for i, v in enumerate(imgs_input_after):
                         plt.imsave("%s/%s_%s_%s_%s.png" % (adv_sample_dir, type, epoch, i, imgs_label[i]), v)
-                log_file.write("epoch:%s distance:%s time:%s\n" % (epoch, distance, cost_time))
                 feed = {model.inputs: imgs_input_after}
                 dense_decoded_code = sess.run(model.dense_decoded, feed)
                 adv_acc += get_acc(imgs_label, dense_decoded_code)
@@ -167,12 +163,11 @@ def cnn_generate(Checkpoint_PATH, model_name='cnn', process_type='ori'):
                     f.write(
                         "%s %s %s\n" % (
                             type, prec_acc, adv_acc,))
-    log_file.close()
 
 
 def ocr_generate(Checkpoint_PATH, model_name='lenet', process_type='bin'):
     if RELEASE:
-        adv_sample_dir = '../images/ocr_adv_%s' % process_type
+        adv_sample_dir = 'images/ocr_adv_%s' % process_type
         if os.path.isdir(adv_sample_dir):
             shutil.rmtree(adv_sample_dir)
         os.mkdir(adv_sample_dir)
@@ -191,11 +186,11 @@ def ocr_generate(Checkpoint_PATH, model_name='lenet', process_type='bin'):
         return
     with open('ocr_result.txt', 'w')as f:
         # -,G,B,gb
-        for type in range(0, 1):
+        for type in range(1, 4):
             adv_acc = 0
             prec_acc = 0
-            img_files = glob.glob("../ori/*.png")
-
+            img_files = glob.glob("/home/kirin/Python_Code/"
+                                  "images/ori_type_%s/*.png" % type)
             print(img_files)
             for epoch in range(file_count // batch_size):
                 ori_imgs_input = [img_files.pop() for i in range(batch_size)]
@@ -207,10 +202,10 @@ def ocr_generate(Checkpoint_PATH, model_name='lenet', process_type='bin'):
                 prec_acc += get_acc(imgs_label, dense_decoded_code)
                 print(prec_acc)
                 distance, cost_time, imgs_input_after = attack(model, sess, imgs_input, imgs_label, 'ocr')
-                # if RELEASE:
-                #     for i, v in enumerate(imgs_input_after):
-                #         plt.imsave("%s/%s_%s_%s_%s.png" % (adv_sample_dir, type, epoch, i, imgs_label[i]), v)
-                # log_file.write("epoch:%s distance:%s time:%s\n" % (epoch, distance, cost_time))
+                if RELEASE:
+                    for i, v in enumerate(imgs_input_after):
+                        plt.imsave("%s/%s_%s_%s_%s_%s.png" % (adv_sample_dir, type, process_type, epoch, i, imgs_label[i]),
+                                   v)
                 feed = {model.inputs: imgs_input_after}
                 dense_decoded_code = sess.run(model.dense_decoded, feed)
                 adv_acc += get_acc(imgs_label, dense_decoded_code)
@@ -339,19 +334,18 @@ def get_process(ori_imgs_input, type):
 
 
 if __name__ == '__main__':
-    ocr_generate('/home/kirin/Python_Code/fast_rabbit'
-                 '/train_model/train_lenet_fine/model', process_type='all')
-    # ocr_generate('/home/kirin/Python_Code/fast_rabbit'
-    #              '/train_model/train_lenet_fine/model', process_type='gauss')
-    # ocr_generate('/home/kirin/Python_Code/fast_rabbit'
-    #              '/train_model/train_lenet_fine/model', process_type='bin')
     # ocr_generate('/home/kirin/Python_Code/fast_rabbit'
     #              '/train_model/train_lenet_fine/model', process_type='all')
+    # ocr_generate('/home/kirin/Python_Code/fast_rabbit'
+    #              '/train_model/train_lenet_fine/model', process_type='gauss')
+    ocr_generate('/home/kirin/Python_Code/fast_rabbit'
+                 '/train_model/train_lenet_fine/model', process_type='bin')
 
-    # cnn_generate('../train_cnn/model', process_type='ori')
-    # cnn_generate('../train_cnn/model', process_type='gauss')
-    # cnn_generate('../train_cnn/model', process_type='bin')
-    # cnn_generate('../train_cnn/model', process_type='all')
+    cnn_ckpt = '/home/kirin/Python_Code/fast_rabbit _xky/train_model/train_cnn/model'
+    # cnn_generate(cnn_ckpt, process_type='ori')
+    # cnn_generate(cnn_ckpt, process_type='gauss')
+    cnn_generate(cnn_ckpt, process_type='bin')
+    cnn_generate(cnn_ckpt, process_type='all')
     # test_model('/home/kirin/Python_Code/fast_rabbit/train_model/train_lenet_fine/model',
     #            'lenet', process_type='ori', sample_type='all')
     # test_model('/home/kirin/Python_Code/fast_rabbit/train_model/train_lenet_fine/model',
