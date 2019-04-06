@@ -1,7 +1,7 @@
 import tensorflow as tf
 import tensorflow.contrib.slim as slim
-from codes.config import *
-from codes.gen_type_codes import *
+from config import *
+from gen_type_codes import *
 
 
 def sparse_tuple_from_label(sequences, dtype=np.int32):
