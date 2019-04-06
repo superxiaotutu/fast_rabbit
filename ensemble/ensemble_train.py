@@ -6,8 +6,7 @@ import random
 from config import *
 import matplotlib.pylab as plt
 
-
-os.environ["CUDA_VISIBLE_DEVICES"] = '0'
+os.environ["CUDA_VISIBLE_DEVICES"] = '1'
 
 CNN4 = M.CNN4_OCR('train')
 RES = M.RESNET_OCR('train')
@@ -22,7 +21,6 @@ sess = tf.Session(config=config)
 
 sess.run(tf.global_variables_initializer())
 var = tf.global_variables()
-
 
 saver = tf.train.Saver(var)
 
@@ -90,7 +88,7 @@ def test():
 
 
 def S2T(source_model, target_model, num):
-    log_file=open('%s_%s_%s.log'%(source_model,target_model,num),'w')
+    log_file = open('%s_%s_%s.log' % (source_model, target_model, num), 'w')
     saver.restore(sess, "/home/kirin/Python_Code/Ensambel/fast_rabbit/ensemble/4ens_model/4ens.ckpt")
 
     target = tf.placeholder(tf.float32, [12, batch_size, 38])
@@ -116,15 +114,14 @@ def S2T(source_model, target_model, num):
             tf.reduce_sum(predict_RES * current_mengban_RES) - tf.reduce_sum(predict_RES * target))
         grad_y2x_RES = tf.sign(tf.gradients(ADV_LOSS_RES, RES.inputs)[0])
 
-        predict_INCE = tf.nn.softmax(INCE.logits)
-        current_mengban_INCE = tf.transpose(tf.one_hot(tf.argmax(predict_INCE, axis=-1), 38, axis=0), [1, 2, 0])
-        ADV_LOSS_INCE = tf.reduce_mean(tf.square(origin_inputs - INCE.inputs)) + tf.reduce_mean(
-            tf.reduce_sum(predict_INCE * current_mengban_INCE) - tf.reduce_sum(predict_INCE * target))
-        grad_y2x_INCE = tf.sign(tf.gradients(ADV_LOSS_INCE, INCE.inputs)[0])
+        predict_DENSE = tf.nn.softmax(DENSE.logits)
+        current_mengban_DENSE = tf.transpose(tf.one_hot(tf.argmax(predict_DENSE, axis=-1), 38, axis=0), [1, 2, 0])
+        ADV_LOSS_DENSE = tf.reduce_mean(tf.square(origin_inputs - DENSE.inputs)) + tf.reduce_mean(
+            tf.reduce_sum(predict_DENSE * current_mengban_DENSE) - tf.reduce_sum(predict_DENSE * target))
+        grad_y2x_DENSE = tf.sign(tf.gradients(ADV_LOSS_DENSE, DENSE.inputs)[0])
 
-        ADV_LOSS = (ADV_LOSS_CNN + ADV_LOSS_RES + ADV_LOSS_INCE)/3
-        grad_y2x = (grad_y2x_CNN + grad_y2x_RES + grad_y2x_INCE)/3
-
+        ADV_LOSS = (ADV_LOSS_CNN + ADV_LOSS_RES + ADV_LOSS_DENSE) / 3
+        grad_y2x = (grad_y2x_CNN + grad_y2x_RES + grad_y2x_DENSE) / 3
 
     shuff_dir = {}
     lst = [i for i in range(36)]
@@ -152,7 +149,7 @@ def S2T(source_model, target_model, num):
         log = sess.run(model.logits, feed)
         fir = log[:, 0, :]
         ex = np.argmax(fir, axis=1)
-        print('\n'+str(ex))
+        print('\n' + str(ex))
 
         target_creat = []
         for i in range(12):
@@ -227,13 +224,15 @@ def S2T(source_model, target_model, num):
         bexpression = expression
 
         adv_step = 0.01
-        feed = {CNN4.inputs: imgs_input, RES.inputs: imgs_input, INCE.inputs: imgs_input, target: target_creat, origin_inputs: imgs_input_before}
+        feed = {CNN4.inputs: imgs_input, RES.inputs: imgs_input, DENSE.inputs: imgs_input, target: target_creat,
+                origin_inputs: imgs_input_before}
         for i in range(50):
             loss_now, grad = sess.run([ADV_LOSS, grad_y2x], feed)
             if (i + 1) % 25 == 0:
                 print("LOSS:{}".format(loss_now))
             imgs_input = imgs_input - grad * adv_step
-            feed = {CNN4.inputs: imgs_input, RES.inputs: imgs_input, INCE.inputs: imgs_input, target: target_creat, origin_inputs: imgs_input_before}
+            feed = {CNN4.inputs: imgs_input, RES.inputs: imgs_input, DENSE.inputs: imgs_input, target: target_creat,
+                    origin_inputs: imgs_input_before}
 
         imgs_input_after = imgs_input
 
@@ -272,29 +271,37 @@ def S2T(source_model, target_model, num):
         for T in target_model:
             count[str(T)] = 0
         for i in range(num):
+            print('step:%s' % i)
             example_img, example_label = data_train.get_example()
             adv_img, ori_label = creat_one(source_model, example_img, sess)
             for T in target_model:
                 count[str(T)] += infer(T, adv_img, ori_label, sess)
         for T in target_model:
             print("\nSource:{}, Target:{}, Num_Success:{}/{}".format(str(source_model), str(T), count[str(T)], num))
-            log_file.write("Source:{}, Target:{}, Num_Success:{}/{}\n".format(str(source_model), str(T), count[str(T)], num))
+            log_file.write(
+                "Source:{}, Target:{}, Num_Success:{}/{}\n".format(str(source_model), str(T), count[str(T)], num))
     else:
         count = {}
         for T in target_model:
             count[str(T)] = 0
         for i in range(num):
+            print('step:%s' % i)
             example_img, example_label = data_train.get_example()
             adv_img, ori_label = creat_one_from_ENS3(example_img, sess)
             for T in target_model:
                 count[str(T)] += infer(T, adv_img, ori_label, sess)
         for T in target_model:
             print("\nSource:ENS3, Target:{}, Num_Success:{}/{}".format(str(T), count[str(T)], num))
-            log_file.write("Source:{}, Target:{}, Num_Success:{}/{}\n".format(str(source_model), str(T), count[str(T)], num))
+            log_file.write(
+                "Source:{}, Target:{}, Num_Success:{}/{}\n".format(str(source_model), str(T), count[str(T)], num))
+
 
 if __name__ == '__main__':
-#     # train()
-#     # test()
-#     # source: CNN4, RES, INCE, ENS3, (DENSE)
-#     # target: CNN4, RES, INCE, DENSE
-    S2T(CNN4, [CNN4, RES, INCE, DENSE], 50)
+    #     # train()
+    #     # test()
+    #     # source: CNN4, RES, ENS3, DENSE
+    #     # target: CNN4, RES,  DENSE, INCE
+    #     S2T(CNN4, [CNN4, RES, INCE, DENSE], 100)
+    #     S2T(RES, [CNN4, RES, INCE, DENSE], 100)
+    #     S2T(DENSE, [CNN4, RES, INCE, DENSE], 100)
+          S2T('ENS3', [CNN4, RES, INCE, DENSE], 100)
