@@ -6,7 +6,7 @@ import random
 from config import *
 import matplotlib.pylab as plt
 
-os.environ["CUDA_VISIBLE_DEVICES"] = '1'
+os.environ["CUDA_VISIBLE_DEVICES"] = '0'
 
 CNN4 = M.CNN4_OCR('train')
 RES = M.RESNET_OCR('train')
@@ -95,33 +95,35 @@ def S2T(source_model, target_model, num):
     origin_inputs = tf.placeholder(tf.float32, [None, image_height, image_width, image_channel])
 
     if source_model != "ENS3":
-        predict = tf.nn.softmax(source_model.logits)
+        predict = (source_model.logits)
         current_mengban = tf.transpose(tf.one_hot(tf.argmax(predict, axis=-1), 38, axis=0), [1, 2, 0])
-        ADV_LOSS = tf.reduce_mean(tf.square(origin_inputs - source_model.inputs)) + tf.reduce_mean(
-            tf.reduce_sum(predict * current_mengban) - tf.reduce_sum(predict * target))
+        ADV_LOSS = tf.reduce_mean(tf.square(origin_inputs - source_model.inputs)) + c * tf.reduce_mean(
+            tf.reduce_sum(predict * target) - tf.reduce_sum(predict * current_mengban))
         grad_y2x = tf.sign(tf.gradients(ADV_LOSS, source_model.inputs)[0])
     else:
         print("Source From ENS3!!!")
-        predict_CNN = tf.nn.softmax(CNN4.logits)
-        current_mengban_CNN = tf.transpose(tf.one_hot(tf.argmax(predict_CNN, axis=-1), 38, axis=0), [1, 2, 0])
-        ADV_LOSS_CNN = tf.reduce_mean(tf.square(origin_inputs - CNN4.inputs)) + tf.reduce_mean(
-            tf.reduce_sum(predict_CNN * current_mengban_CNN) - tf.reduce_sum(predict_CNN * target))
-        grad_y2x_CNN = tf.sign(tf.gradients(ADV_LOSS_CNN, CNN4.inputs)[0])
-
-        predict_RES = tf.nn.softmax(RES.logits)
+        predict_RES = (RES.logits)
         current_mengban_RES = tf.transpose(tf.one_hot(tf.argmax(predict_RES, axis=-1), 38, axis=0), [1, 2, 0])
-        ADV_LOSS_RES = tf.reduce_mean(tf.square(origin_inputs - RES.inputs)) + tf.reduce_mean(
-            tf.reduce_sum(predict_RES * current_mengban_RES) - tf.reduce_sum(predict_RES * target))
+        ADV_LOSS_RES = tf.reduce_mean(tf.square(origin_inputs - RES.inputs)) + c * tf.reduce_mean(
+            tf.reduce_sum(predict_RES * target) - tf.reduce_sum(predict_RES * current_mengban_RES))
         grad_y2x_RES = tf.sign(tf.gradients(ADV_LOSS_RES, RES.inputs)[0])
 
-        predict_DENSE = tf.nn.softmax(DENSE.logits)
+        predict_CNN4 = (CNN4.logits)
+        current_mengban_CNN4 = tf.transpose(tf.one_hot(tf.argmax(predict_CNN4, axis=-1), 38, axis=0), [1, 2, 0])
+        ADV_LOSS_CNN4 = tf.reduce_mean(tf.square(origin_inputs - CNN4.inputs)) + c * tf.reduce_mean(
+            tf.reduce_sum(predict_CNN4 * target)
+            - tf.reduce_sum(predict_CNN4 * current_mengban_CNN4))
+        grad_y2x_CNN4 = tf.sign(tf.gradients(ADV_LOSS_CNN4, CNN4.inputs)[0])
+
+        predict_DENSE = (DENSE.logits)
         current_mengban_DENSE = tf.transpose(tf.one_hot(tf.argmax(predict_DENSE, axis=-1), 38, axis=0), [1, 2, 0])
-        ADV_LOSS_DENSE = tf.reduce_mean(tf.square(origin_inputs - DENSE.inputs)) + tf.reduce_mean(
-            tf.reduce_sum(predict_DENSE * current_mengban_DENSE) - tf.reduce_sum(predict_DENSE * target))
+        ADV_LOSS_DENSE = tf.reduce_mean(tf.square(origin_inputs - DENSE.inputs)) + c * tf.reduce_mean(
+            tf.reduce_sum(predict_DENSE * target)
+            - tf.reduce_sum(predict_DENSE * current_mengban_DENSE))
         grad_y2x_DENSE = tf.sign(tf.gradients(ADV_LOSS_DENSE, DENSE.inputs)[0])
 
-        ADV_LOSS = (ADV_LOSS_CNN + ADV_LOSS_RES + ADV_LOSS_DENSE) / 3
-        grad_y2x = (grad_y2x_CNN + grad_y2x_RES + grad_y2x_DENSE) / 3
+        ADV_LOSS = (ADV_LOSS_RES + ADV_LOSS_CNN4 + ADV_LOSS_DENSE)
+        grad_y2x = (grad_y2x_RES + grad_y2x_CNN4 + grad_y2x_DENSE)
 
     shuff_dir = {}
     lst = [i for i in range(36)]
@@ -169,12 +171,11 @@ def S2T(source_model, target_model, num):
         print("BEFORE:{}".format(expression))
         bexpression = expression
 
-        adv_step = 0.01
         feed = {model.inputs: imgs_input, target: target_creat, origin_inputs: imgs_input_before}
-        for i in range(50):
+        for i in range(adv_count):
             loss_now, grad = sess.run([ADV_LOSS, grad_y2x], feed)
-            # if (i + 1) % 10 == 0:
-            #     print("LOSS:{}".format(loss_now))
+            if (i + 1) % 100 == 0:
+                print("LOSS:{}".format(loss_now))
             imgs_input = imgs_input - grad * adv_step
             feed = {model.inputs: imgs_input, target: target_creat, origin_inputs: imgs_input_before}
 
@@ -198,9 +199,9 @@ def S2T(source_model, target_model, num):
         imgs_input = np.repeat(imgs_input, batch_size, axis=0)
 
         imgs_input_before = imgs_input
-        feed = {CNN4.inputs: imgs_input}
+        feed = {INCE.inputs: imgs_input}
 
-        log = sess.run(CNN4.logits, feed)
+        log = sess.run(INCE.logits, feed)
         fir = log[:, 0, :]
         ex = np.argmax(fir, axis=1)
         print('\n' + str(ex))
@@ -213,7 +214,7 @@ def S2T(source_model, target_model, num):
         target_creat = target_creat[:, np.newaxis, :]
         target_creat = np.repeat(target_creat, batch_size, axis=1)
 
-        dense_decoded_code = sess.run(CNN4.dense_decoded, feed)
+        dense_decoded_code = sess.run(INCE.dense_decoded, feed)
         expression = ''
         for i in dense_decoded_code[0]:
             if i == -1:
@@ -223,21 +224,20 @@ def S2T(source_model, target_model, num):
         print("BEFORE:{}".format(expression))
         bexpression = expression
 
-        adv_step = 0.01
-        feed = {CNN4.inputs: imgs_input, RES.inputs: imgs_input, DENSE.inputs: imgs_input, target: target_creat,
+        feed = {CNN4.inputs: imgs_input, INCE.inputs: imgs_input, RES.inputs: imgs_input, DENSE.inputs: imgs_input, target: target_creat,
                 origin_inputs: imgs_input_before}
-        for i in range(50):
+        for i in range(adv_count):
             loss_now, grad = sess.run([ADV_LOSS, grad_y2x], feed)
-            if (i + 1) % 25 == 0:
+            if (i + 1) % 100 == 0:
                 print("LOSS:{}".format(loss_now))
             imgs_input = imgs_input - grad * adv_step
-            feed = {CNN4.inputs: imgs_input, RES.inputs: imgs_input, DENSE.inputs: imgs_input, target: target_creat,
+            feed = {CNN4.inputs: imgs_input, INCE.inputs: imgs_input, RES.inputs: imgs_input, DENSE.inputs: imgs_input, target: target_creat,
                     origin_inputs: imgs_input_before}
 
         imgs_input_after = imgs_input
 
-        feed = {CNN4.inputs: imgs_input, target: target_creat, origin_inputs: imgs_input_before}
-        dense_decoded_code = sess.run(CNN4.dense_decoded, feed)
+        feed = {CNN4.inputs: imgs_input, INCE.inputs: imgs_input, target: target_creat, origin_inputs: imgs_input_before}
+        dense_decoded_code = sess.run(INCE.dense_decoded, feed)
         expression = ''
         for i in dense_decoded_code[0]:
             if i == -1:
@@ -297,11 +297,12 @@ def S2T(source_model, target_model, num):
 
 
 if __name__ == '__main__':
-    #     # train()
-    #     # test()
-    #     # source: CNN4, RES, ENS3, DENSE
-    #     # target: CNN4, RES,  DENSE, INCE
-    #     S2T(CNN4, [CNN4, RES, INCE, DENSE], 100)
-    #     S2T(RES, [CNN4, RES, INCE, DENSE], 100)
-    #     S2T(DENSE, [CNN4, RES, INCE, DENSE], 100)
-          S2T('ENS3', [CNN4, RES, INCE, DENSE], 100)
+    # train()
+    # test()
+    # source: CNN4, RES, ENS3, DENSE
+    # target: CNN4, RES,  DENSE, INCE
+    # S2T(INCE, [CNN4, RES, INCE, DENSE], 100)
+    # S2T(CNN4, [CNN4, RES, INCE, DENSE], 100)
+    # S2T(RES, [CNN4, RES, INCE, DENSE], 100)
+    # S2T(DENSE, [CNN4, RES, INCE, DENSE], 100)
+    S2T('ENS3', [CNN4, RES, INCE, DENSE], 100)
